@@ -245,6 +245,7 @@ select option{background:#1A1A1A}
   <div class="topbar">
     <div><div class="topbar-title">LÉO SUB-40</div><div class="topbar-sub" id="d-today-str">—</div></div>
     <div class="topbar-right">
+      <button onclick="goTo('stats')" style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);width:36px;height:36px;color:var(--mut);font-size:16px;cursor:pointer">📊</button>
       <div class="tag tag-or bebas" id="d-phase-badge" style="font-size:13px">P1</div>
     </div>
   </div>
@@ -265,24 +266,30 @@ select option{background:#1A1A1A}
 
   <!-- Objectifs muscu -->
   <div class="card">
-    <div class="card-title">Objectifs Muscu</div>
-    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label"><div>Pompes</div><div class="obj-sub">Départ 18</div></div><div class="obj-val"><div class="obj-cur" id="obj-pompes">18</div><div class="obj-tgt">→ 50</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-pompes" style="width:36%"></div></div><div class="pbar-labels"><span>18</span><span>50</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label"><div>Dips</div><div class="obj-sub">Départ 2</div></div><div class="obj-val"><div class="obj-cur" id="obj-dips">2</div><div class="obj-tgt">→ 20</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-dips" style="width:10%"></div></div><div class="pbar-labels"><span>2</span><span>20</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label"><div>Tractions</div><div class="obj-sub">Départ 1</div></div><div class="obj-val"><div class="obj-cur" id="obj-tractions">1</div><div class="obj-tgt">→ 12</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-tractions" style="width:8%"></div></div><div class="pbar-labels"><span>1</span><span>12</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label"><div>Gainage</div><div class="obj-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-gainage">?</div><div class="obj-tgt">→ 300s</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 0"><div class="pbar"><div class="pbar-fill" id="pb-gainage" style="width:5%"></div></div><div class="pbar-labels"><span>?</span><span>5min</span></div></div>
+    <div class="row-between" style="margin-bottom:10px">
+      <div class="card-title" style="margin:0">Objectifs Muscu</div>
+      <button class="btn btn-ghost btn-sm" onclick="openObjModal()">✏ Modifier</button>
+    </div>
+    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label"><div>Pompes</div><div class="obj-sub" id="obj-pompes-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-pompes">0</div><div class="obj-tgt" id="obj-pompes-tgt">→ 50</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-pompes" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-pompes-l">0</span><span id="pbl-pompes-r">50</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label"><div>Dips</div><div class="obj-sub" id="obj-dips-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-dips">0</div><div class="obj-tgt" id="obj-dips-tgt">→ 20</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-dips" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-dips-l">0</span><span id="pbl-dips-r">20</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label"><div>Tractions</div><div class="obj-sub" id="obj-tractions-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-tractions">0</div><div class="obj-tgt" id="obj-tractions-tgt">→ 12</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-tractions" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-tractions-l">0</span><span id="pbl-tractions-r">12</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label"><div>Gainage</div><div class="obj-sub" id="obj-gainage-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-gainage">?</div><div class="obj-tgt" id="obj-gainage-tgt">→ 300s</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 0"><div class="pbar"><div class="pbar-fill" id="pb-gainage" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-gainage-l">0</span><span id="pbl-gainage-r">300s</span></div></div>
   </div>
 
   <!-- Objectifs course -->
   <div class="card">
     <div class="card-title">Objectifs Course</div>
-    <div class="obj-row"><div class="obj-ico">⚖</div><div class="obj-label">Poids cible</div><div class="obj-val"><div class="obj-cur" id="obj-poids-c">97.3</div><div class="obj-tgt">→ 89 kg</div></div></div>
-    <div class="obj-row"><div class="obj-ico">🏃</div><div class="obj-label">5K best</div><div class="obj-val"><div class="obj-cur" id="obj-5k">22:52</div><div class="obj-tgt">→ 20:00</div></div></div>
-    <div class="obj-row"><div class="obj-ico">🏁</div><div class="obj-label">10K objectif</div><div class="obj-val"><div class="obj-cur" id="obj-10k">—</div><div class="obj-tgt">→ SUB 40:00 🔥</div></div></div>
-    <div class="obj-row"><div class="obj-ico">❤</div><div class="obj-label">FC au seuil (Zone 2)</div><div class="obj-val"><div class="obj-cur" style="font-size:13px">~152</div><div class="obj-tgt">Cible entraîn.</div></div></div>
+    <div class="obj-row"><div class="obj-ico">⚖</div><div class="obj-label">Poids actuel</div><div class="obj-val"><div class="obj-cur" id="obj-poids-c">—</div><div class="obj-tgt">→ 89 kg</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-poids" style="width:0%;background:linear-gradient(90deg,var(--blu),#5aa0ff)"></div></div><div class="pbar-labels"><span id="pbl-poids-l">—</span><span>89 kg</span></div></div>
+    <div class="obj-row"><div class="obj-ico">🏃</div><div class="obj-label">5K meilleur temps</div><div class="obj-val"><div class="obj-cur" id="obj-5k">—</div><div class="obj-tgt">→ 20:00</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-5k" style="width:0%;background:linear-gradient(90deg,var(--grn),#00f07a)"></div></div><div class="pbar-labels"><span id="pbl-5k-l">—</span><span>20:00</span></div></div>
+    <div class="obj-row"><div class="obj-ico">🏁</div><div class="obj-label">10K meilleur temps</div><div class="obj-val"><div class="obj-cur" id="obj-10k">—</div><div class="obj-tgt">→ SUB 40:00 🔥</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-10k" style="width:0%;background:linear-gradient(90deg,var(--pur),#c896ff)"></div></div><div class="pbar-labels"><span id="pbl-10k-l">—</span><span>40:00</span></div></div>
+    <div class="obj-row"><div class="obj-ico">❤</div><div class="obj-label">Zone 2 cible</div><div class="obj-val"><div class="obj-cur" style="font-size:13px" id="d-z2-range">152-162</div><div class="obj-tgt">bpm</div></div></div>
   </div>
 
   <!-- Alerte genoux -->
@@ -367,10 +374,18 @@ select option{background:#1A1A1A}
       <div class="card-title">📍 Données Course</div>
       <div class="form-row">
         <div class="form-group" style="margin:0"><label>Distance (km)</label><input type="number" id="l-dist" placeholder="5.0" step="0.01" inputmode="decimal"></div>
-        <div class="form-group" style="margin:0"><label>Durée (min)</label><input type="number" id="l-duree" placeholder="25" inputmode="numeric"></div>
+        <div class="form-group" style="margin:0">
+          <label>Durée</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="number" id="l-duree-min" placeholder="25" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
+            <span style="color:var(--mut);font-size:13px;flex-shrink:0">min</span>
+            <input type="number" id="l-duree-sec" placeholder="00" min="0" max="59" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
+            <span style="color:var(--mut);font-size:13px;flex-shrink:0">sec</span>
+          </div>
+        </div>
       </div>
       <div class="form-row mt-8">
-        <div class="form-group" style="margin:0"><label>Allure (min/km)</label><input type="text" id="l-allure" placeholder="5:00" inputmode="text"></div>
+        <div class="form-group" style="margin:0"><label>Allure (auto-calculée)</label><input type="text" id="l-allure" placeholder="5:00" inputmode="text"></div>
         <div class="form-group" style="margin:0"><label>FC moy (bpm)</label><input type="number" id="l-fc" placeholder="165" inputmode="numeric"></div>
       </div>
       <div class="form-row mt-8">
@@ -399,8 +414,9 @@ select option{background:#1A1A1A}
       </div>
     </div>
     <div class="card card-sm">
-      <div class="card-title">✅ Exercices effectués</div>
+      <div class="card-title">✅ Exercices — Suivi par série</div>
       <div id="l-ex-list"></div>
+      <div id="l-circuit-summary" style="margin-top:10px;text-align:center;font-size:13px;color:var(--mut)"></div>
     </div>
   </div>
 
@@ -471,7 +487,10 @@ select option{background:#1A1A1A}
 
 <!-- ═══════════════════════ STATS ═══════════════════════ -->
 <div id="pg-stats" class="page">
-  <div class="s-head"><div class="s-title">Stats</div><div class="s-sub">Visualise ta progression</div></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div><div class="s-title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px">Stats</div><div class="s-sub">Visualise ta progression</div></div>
+    <button class="btn-icon" onclick="goTo('set')" style="width:42px;height:42px;font-size:20px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2)">⚙</button>
+  </div>
 
   <div class="stat-grid" style="margin-bottom:12px">
     <div class="stat-box"><div class="stat-n" id="st-total">0</div><div class="stat-l">Séances</div></div>
@@ -481,7 +500,7 @@ select option{background:#1A1A1A}
   </div>
 
   <div class="card"><div class="card-title">📉 Poids (kg)</div><div class="chart-wrap"><canvas id="ch-poids"></canvas></div></div>
-  <div class="card"><div class="card-title">⚡ Allure 5K/10K (min/km)</div><div class="chart-wrap"><canvas id="ch-allure"></canvas></div></div>
+  <div class="card"><div class="card-title">📍 Kilomètres courus par mois</div><div class="chart-wrap"><canvas id="ch-km"></canvas></div></div>
   <div class="card"><div class="card-title">❤ Fréquence Cardiaque moy.</div><div class="chart-wrap"><canvas id="ch-fc"></canvas></div></div>
   <div class="card"><div class="card-title">💪 Pompes / Dips / Tractions</div><div class="chart-wrap"><canvas id="ch-muscu"></canvas></div></div>
   <div class="card"><div class="card-title">😊 Ressenti par séance</div><div class="chart-wrap"><canvas id="ch-feel"></canvas></div></div>
@@ -572,6 +591,45 @@ select option{background:#1A1A1A}
   </div>
 </div>
 
+<!-- ═══════════════════════ OBJECTIFS PERSO ═══════════════════════ -->
+<div id="pg-perso" class="page">
+  <div class="s-head"><div class="s-title">Perso</div><div class="s-sub" id="perso-date-label">Aujourd'hui</div></div>
+
+  <!-- Daily checklist -->
+  <div class="card">
+    <div class="row-between" style="margin-bottom:12px">
+      <div class="card-title" style="margin:0">🎯 Objectifs du jour</div>
+      <div class="tag tag-or" id="perso-score">0/6</div>
+    </div>
+    <div class="pbar" style="margin-bottom:14px"><div class="pbar-fill" id="perso-pbar" style="width:0%"></div></div>
+
+    <div id="perso-items"></div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="resetPersoDay()">🔄 Réinitialiser le jour</button>
+  </div>
+
+  <!-- Streak & historique -->
+  <div class="stat-grid" style="margin-bottom:12px">
+    <div class="stat-box"><div class="stat-n sm" id="perso-streak">0🔥</div><div class="stat-l">Streak parfait</div></div>
+    <div class="stat-box"><div class="stat-n sm" id="perso-best">0</div><div class="stat-l">Best streak</div></div>
+    <div class="stat-box"><div class="stat-n sm" id="perso-total-days">0</div><div class="stat-l">Jours complets</div></div>
+    <div class="stat-box"><div class="stat-n sm" id="perso-avg">—</div><div class="stat-l">Moy. objectifs</div></div>
+  </div>
+
+  <!-- Objectifs perso modifiables -->
+  <div class="card">
+    <div class="card-title">✏ Personnaliser les objectifs</div>
+    <div id="perso-edit-list"></div>
+    <button class="btn btn-or btn-sm" style="margin-top:12px" onclick="savePersoGoals()">Sauvegarder</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addPersoGoal()">+ Ajouter un objectif</button>
+  </div>
+
+  <!-- Historique 7 derniers jours -->
+  <div class="card">
+    <div class="card-title">📅 7 derniers jours</div>
+    <div id="perso-history"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════════ CALENDRIER ═══════════════════════ -->
 <div id="pg-cal" class="page">
   <div class="s-head"><div class="s-title">Calendrier</div><div class="s-sub" id="cal-month-label">—</div></div>
@@ -630,9 +688,9 @@ select option{background:#1A1A1A}
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Accueil
   </button>
-  <button class="bnav-btn" onclick="goTo('cal')" id="nb-cal">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Calendrier
+  <button class="bnav-btn" onclick="goTo('prog')" id="nb-prog">
+    <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    Programme
   </button>
   <button class="bnav-btn" onclick="goTo('log')" id="nb-log" style="position:relative;top:-2px">
     <div class="bnav-center">
@@ -640,13 +698,13 @@ select option{background:#1A1A1A}
     </div>
     Logger
   </button>
-  <button class="bnav-btn" onclick="goTo('prog')" id="nb-prog">
-    <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-    Programme
+  <button class="bnav-btn" onclick="goTo('perso')" id="nb-perso">
+    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    Perso
   </button>
-  <button class="bnav-btn" onclick="goTo('stats')" id="nb-stats">
-    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    Stats
+  <button class="bnav-btn" onclick="goTo('cal')" id="nb-cal">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendrier
   </button>
 </nav>
 
@@ -685,6 +743,27 @@ select option{background:#1A1A1A}
     </div>
     <div class="form-group mt-8"><label>Date début programme</label><input type="date" id="ob-start"></div>
     <div class="mt-16"><button class="btn btn-or" style="font-size:17px;padding:15px" onclick="saveOnboarding()">🚀 Commencer le programme</button></div>
+  </div>
+</div>
+
+<!-- Objectives edit modal -->
+<div class="modal-bg" id="obj-modal-bg" onclick="if(event.target===this)closeObjModal()">
+  <div class="modal" id="obj-modal-body">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏ Modifier les objectifs</div>
+    <div class="alert alert-or" style="margin-bottom:14px;font-size:12px">Ces objectifs sont tes cibles finales à S20. Modifie-les si tu veux changer l'ambition.</div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0"><label>Pompes cible</label><input type="number" id="om-pompes" placeholder="50" inputmode="numeric"></div>
+      <div class="form-group" style="margin:0"><label>Dips cible</label><input type="number" id="om-dips" placeholder="20" inputmode="numeric"></div>
+    </div>
+    <div class="form-row mt-8">
+      <div class="form-group" style="margin:0"><label>Tractions cible</label><input type="number" id="om-tractions" placeholder="12" inputmode="numeric"></div>
+      <div class="form-group" style="margin:0"><label>Gainage cible (sec)</label><input type="number" id="om-gainage" placeholder="300" inputmode="numeric"></div>
+    </div>
+    <div class="mt-12 gap">
+      <button class="btn btn-or" onclick="saveObjTargets()">💾 Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeObjModal()">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -888,6 +967,7 @@ function goTo(p){
   if(p==='set') refreshSettings();
   if(p==='prog') refreshProg();
   if(p==='cal') refreshCal();
+  if(p==='perso') refreshPerso();
   window.scrollTo(0,0);
 }
 
@@ -964,18 +1044,32 @@ function updSlider(inp,valId,type){
 }
 
 // ════════════════════════════ SAVE SESSION ════════════════════════════
+function autoCalcAllure(){
+  const dist=parseFloat(document.getElementById('l-dist').value);
+  const min=parseInt(document.getElementById('l-duree-min').value)||0;
+  const sec=parseInt(document.getElementById('l-duree-sec').value)||0;
+  if(!dist||(!min&&!sec))return;
+  const totalMin=min+sec/60;
+  const allureMin=totalMin/dist;
+  const am=Math.floor(allureMin),as=Math.round((allureMin-am)*60);
+  document.getElementById('l-allure').value=`${am}:${String(as).padStart(2,'0')}`;
+}
+
 function saveSession(){
   const d=D(), date=document.getElementById('l-date').value;
   if(!date){toast('⚠ Choisis une date !',true);return}
-  // Check knee protocol (not required for test_max)
   const protoDone=protoChecked.filter(Boolean).length;
   if(protoDone<4 && curType!=='test_max'){toast('🦵 Complète le protocole genoux d\'abord !',true);return}
   const isCourse=COURSE_TYPES.includes(curType),isMuscu=MUSCU_TYPES.includes(curType);
   const s={id:Date.now(),date,type:curType,feeling:+document.getElementById('l-feeling').value,genou:+document.getElementById('l-genou').value,notes:document.getElementById('l-notes').value};
   const pw=document.getElementById('l-poids').value;if(pw) s.poids=parseFloat(pw);
   if(isCourse){
-    const dist=document.getElementById('l-dist').value,duree=document.getElementById('l-duree').value;
-    if(dist) s.distance=parseFloat(dist);if(duree) s.duree=parseInt(duree);
+    const dist=document.getElementById('l-dist').value;
+    const dmin=parseInt(document.getElementById('l-duree-min').value)||0;
+    const dsec=parseInt(document.getElementById('l-duree-sec').value)||0;
+    const totalSec=dmin*60+dsec;
+    if(dist) s.distance=parseFloat(dist);
+    if(totalSec>0){s.duree=dmin+(dsec/60);s.dureeSec=totalSec;}
     s.allure=document.getElementById('l-allure').value||null;
     const fc=document.getElementById('l-fc').value,fcmax=document.getElementById('l-fcmax').value,deniv=document.getElementById('l-deniv').value;
     if(fc) s.fc=parseInt(fc);if(fcmax) s.fcmax=parseInt(fcmax);if(deniv) s.deniv=parseInt(deniv);
@@ -984,10 +1078,10 @@ function saveSession(){
   if(isMuscu){
     const po=document.getElementById('l-pompes').value,di=document.getElementById('l-dips').value,tr=document.getElementById('l-tractions').value,ga=document.getElementById('l-gainage').value;
     if(po) s.pompes=parseInt(po);if(di) s.dips=parseInt(di);if(tr) s.tractions=parseInt(tr);if(ga) s.gainage=parseInt(ga);
-    if(s.pompes&&s.pompes>d.prs.pompes) d.prs.pompes=s.pompes;
-    if(s.dips&&s.dips>d.prs.dips) d.prs.dips=s.dips;
-    if(s.tractions&&s.tractions>d.prs.tractions) d.prs.tractions=s.tractions;
-    if(s.gainage&&s.gainage>d.prs.gainage) d.prs.gainage=s.gainage;
+    if(s.pompes&&s.pompes>(d.prs.pompes||0)) d.prs.pompes=s.pompes;
+    if(s.dips&&s.dips>(d.prs.dips||0)) d.prs.dips=s.dips;
+    if(s.tractions&&s.tractions>(d.prs.tractions||0)) d.prs.tractions=s.tractions;
+    if(s.gainage&&s.gainage>(d.prs.gainage||0)) d.prs.gainage=s.gainage;
     s.exDone=[...document.querySelectorAll('.ex-check.done')].length;
     s.exTotal=document.querySelectorAll('.ex-check').length;
   }
@@ -995,14 +1089,15 @@ function saveSession(){
   toast('✅ Séance enregistrée !');resetLog();resetProto();
 }
 function resetLog(){
-  ['l-notes','l-dist','l-duree','l-allure','l-fc','l-fcmax','l-deniv','l-frac-det','l-poids','l-pompes','l-dips','l-tractions','l-gainage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  ['l-notes','l-dist','l-duree-min','l-duree-sec','l-allure','l-fc','l-fcmax','l-deniv','l-frac-det','l-poids','l-pompes','l-dips','l-tractions','l-gainage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   document.getElementById('l-feeling').value=7;document.getElementById('l-genou').value=0;
   updSlider(document.getElementById('l-feeling'),'rv-feel','feel');
   updSlider(document.getElementById('l-genou'),'rv-genou','genou');
   document.querySelectorAll('.ex-check.done').forEach(el=>el.classList.remove('done'));
+  circuitState={};
+  const sum=document.getElementById('l-circuit-summary');if(sum)sum.textContent='';
 }
 
-// ════════════════════════════ DASHBOARD ════════════════════════════
 function refreshDash(){
   const d=D();
   curWeek=getCurWeek();viewWeek=curWeek;
@@ -1011,30 +1106,81 @@ function refreshDash(){
   document.getElementById('d-week').textContent='S'+curWeek;
   document.getElementById('d-sessions').textContent=d.sessions.length;
   const streak=calcStreak(d.sessions);document.getElementById('d-streak').textContent=streak+'🔥';
-  const lastW=d.sessions.filter(s=>s.poids).sort((a,b)=>b.date.localeCompare(a.date))[0]?.poids||d.settings.poidsInit||'—';
-  document.getElementById('d-poids').textContent=lastW;
+  const lastW=d.sessions.filter(s=>s.poids).sort((a,b)=>b.date.localeCompare(a.date))[0]?.poids||d.settings.poidsInit||null;
+  document.getElementById('d-poids').textContent=lastW||'—';
   document.getElementById('d-phase-badge').textContent='P'+getPhase(curWeek);
   document.getElementById('d-phase-badge').className='tag bebas '+getPhaseTag(curWeek);
-  const p=d.prs;
-  document.getElementById('obj-pompes').textContent=p.pompes||0;document.getElementById('pb-pompes').style.width=Math.min(((p.pompes||0)/50)*100,100)+'%';
-  document.getElementById('obj-dips').textContent=p.dips||0;document.getElementById('pb-dips').style.width=Math.min(((p.dips||0)/20)*100,100)+'%';
-  document.getElementById('obj-tractions').textContent=p.tractions||0;document.getElementById('pb-tractions').style.width=Math.min(((p.tractions||0)/12)*100,100)+'%';
-  const gainageStr=(p.gainage&&p.gainage>0)?p.gainage+'s':'?';
-  document.getElementById('obj-gainage').textContent=gainageStr;document.getElementById('pb-gainage').style.width=Math.min(((p.gainage||0)/300)*100,100)+'%';
-  document.getElementById('obj-poids-c').textContent=lastW;
-  const best5k=getBestTime(d.sessions,5,.4);document.getElementById('obj-5k').textContent=best5k||d.settings.pr5k||'—';
-  const best10k=getBestTime(d.sessions,10,.7);document.getElementById('obj-10k').textContent=best10k||d.settings.pr10k||'—';
-  
+
+  // Muscu objectives with editable targets
+  const p=d.prs||{}, tgt=d.targets||{pompes:50,dips:20,tractions:12,gainage:300};
+  const init=d.settings||{};
+  const muscuItems=[
+    {id:'pompes',cur:p.pompes||0,tgt:tgt.pompes||50,init:d.prs?.pompes||0},
+    {id:'dips',cur:p.dips||0,tgt:tgt.dips||20,init:d.prs?.dips||0},
+    {id:'tractions',cur:p.tractions||0,tgt:tgt.tractions||12,init:d.prs?.tractions||0},
+    {id:'gainage',cur:p.gainage||0,tgt:tgt.gainage||300,init:d.prs?.gainage||0,unit:'s'},
+  ];
+  muscuItems.forEach(({id,cur,tgt:t,init:ini,unit=''})=>{
+    const pct=Math.min(Math.round((cur/t)*100),100);
+    document.getElementById('obj-'+id).textContent=cur+(unit);
+    document.getElementById('obj-'+id+'-tgt').textContent='→ '+t+unit;
+    document.getElementById('obj-'+id+'-sub').textContent='Départ '+ini+unit;
+    document.getElementById('pb-'+id).style.width=pct+'%';
+    document.getElementById('pbl-'+id+'-l').textContent=cur+unit;
+    document.getElementById('pbl-'+id+'-r').textContent=t+unit;
+  });
+
+  // Course objectives with proper TIME display and progress bars
+  const poidsInit=d.settings?.poidsInit||null;
+  const poidsTgt=d.targets?.poids||89;
+  document.getElementById('obj-poids-c').textContent=lastW?lastW+'kg':'—';
+  document.getElementById('pbl-poids-l').textContent=lastW?lastW+'kg':'—';
+  if(lastW&&poidsInit){
+    const pct=Math.min(Math.round(((poidsInit-lastW)/(poidsInit-poidsTgt))*100),100);
+    document.getElementById('pb-poids').style.width=Math.max(0,pct)+'%';
+  }
+
+  // 5K best TIME (not pace)
+  const best5kTime=getBestSessionTime(d.sessions,5,.4)||d.settings.pr5k||null;
+  document.getElementById('obj-5k').textContent=best5kTime||'—';
+  document.getElementById('pbl-5k-l').textContent=best5kTime||'—';
+  if(best5kTime){
+    const cur5kSec=timeStrToSec(best5kTime),tgt5kSec=20*60;
+    const ini5kSec=d.settings.pr5k?timeStrToSec(d.settings.pr5k):null;
+    if(ini5kSec&&ini5kSec>tgt5kSec){
+      const pct=Math.min(Math.round(((ini5kSec-cur5kSec)/(ini5kSec-tgt5kSec))*100),100);
+      document.getElementById('pb-5k').style.width=Math.max(0,pct)+'%';
+    }
+  }
+
+  // 10K best TIME
+  const best10kTime=getBestSessionTime(d.sessions,10,.7)||d.settings.pr10k||null;
+  document.getElementById('obj-10k').textContent=best10kTime||'—';
+  document.getElementById('pbl-10k-l').textContent=best10kTime||'—';
+  if(best10kTime){
+    const cur10kSec=timeStrToSec(best10kTime),tgt10kSec=40*60;
+    const ini10kSec=d.settings.pr10k?timeStrToSec(d.settings.pr10k):null;
+    if(ini10kSec&&ini10kSec>tgt10kSec){
+      const pct=Math.min(Math.round(((ini10kSec-cur10kSec)/(ini10kSec-tgt10kSec))*100),100);
+      document.getElementById('pb-10k').style.width=Math.max(0,pct)+'%';
+    }
+  }
+
+  // Zone 2 from fcmax
+  const fcmax=d.settings?.fcmax||200;
+  const z2lo=Math.round(fcmax*0.6),z2hi=Math.round(fcmax*0.7);
+  const z2el=document.getElementById('d-z2-range');
+  if(z2el) z2el.textContent=z2lo+'-'+z2hi;
+
   // Next session
-  const dow=today.getDay();// 0=Sun
+  const dow=today.getDay();
   const dayIdx=[1,2,3,4,5,6,0].indexOf(dow);
   const days=getDays(curWeek);
   const next=days[dayIdx]||days[0];
   document.getElementById('d-next-content').innerHTML=`
     <div class="row" style="margin-bottom:8px"><span class="tag ${next.tag}">${next.type}</span><span class="txt-xs txt-mut">Semaine ${curWeek}</span></div>
     <div class="txt-sm lh" style="color:var(--txt2)">${next.desc}</div>`;
-  
-  // Recent
+
   const recent=[...d.sessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
   const rel=document.getElementById('d-recent');
   rel.innerHTML=recent.length?recent.map(s=>miniCard(s)).join(''):'<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Aucune séance logguée.<br>Commence dès aujourd\'hui !</div></div>';
@@ -1124,7 +1270,7 @@ function refreshStats(){
   document.getElementById('st-streak').textContent=calcBestStreak(ss);
   setTimeout(()=>{
     drawPoids(ss,d.settings.poidsInit);
-    drawAllure(ss);
+    drawKmMonth(ss);
     drawFC(ss);
     drawMuscu(ss);
     drawFeel(ss);
@@ -1152,11 +1298,18 @@ function drawPoids(ss,init){
   const vals=[init||97.3,...ws.map(s=>s.poids)];
   mkChart('ch-poids',labels,[{label:'Poids (kg)',data:vals,borderColor:'#FF4500',backgroundColor:'rgba(255,69,0,.08)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#FF4500'}]);
 }
-function drawAllure(ss){
-  const cs=ss.filter(s=>s.allure&&s.distance).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!cs.length)return;
-  const toMin=a=>{const p=a.split(':');return p.length===2?parseInt(p[0])+parseInt(p[1])/60:null};
-  mkChart('ch-allure',cs.map(s=>s.date.slice(5)),[{label:'Allure moy (min/km)',data:cs.map(s=>toMin(s.allure)),borderColor:'#00D26A',backgroundColor:'rgba(0,210,106,.06)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00D26A'}]);
+function drawKmMonth(ss){
+  // Last 6 months km
+  const now=new Date();
+  const months=[];const labels=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const km=ss.filter(s=>s.date.startsWith(key)&&s.distance).reduce((a,s)=>a+(s.distance||0),0);
+    months.push(Math.round(km*10)/10);
+    labels.push(CAL_MONTHS[d.getMonth()].slice(0,3));
+  }
+  mkChart('ch-km',labels,[{label:'Km courus',data:months,backgroundColor:months.map((_,i)=>i===5?'rgba(255,69,0,.8)':'rgba(255,69,0,.35)'),borderColor:'#FF4500',borderWidth:2,borderRadius:6}],'bar');
 }
 function drawFC(ss){
   const cs=ss.filter(s=>s.fc).sort((a,b)=>a.date.localeCompare(b.date));
@@ -1383,6 +1536,299 @@ function saveOnboarding(){
   curWeek=getCurWeek();viewWeek=curWeek;
   refreshDash();
   toast('🔥 Bienvenue '+( prenom||'') +' ! Programme lancé.');
+}
+
+// ════════════════════════════ CIRCUIT EXERCISE TRACKER ════════════════════════════
+let circuitState={};// {exIdx: setsCompleted}
+let circuitExList=[];
+
+function loadExList(t){
+  const week=getCurWeek();
+  const exs=t==='muscu_a'?getMuscuA(week):t==='muscu_b'?getMuscuB(week):t==='test_max'?[
+    {n:'Pompes — MAX absolu',s:'3 essais',note:'Repose 3min entre chaque. Note le meilleur.'},
+    {n:'Dips — MAX absolu',s:'3 essais',note:'Descente complète obligatoire.'},
+    {n:'Tractions — MAX absolu',s:'3 essais',note:'Montée menton au-dessus de la barre.'},
+    {n:'Gainage frontal — MAX durée',s:'2 essais',note:'Note le temps en secondes.'},
+  ]:[];
+  circuitExList=exs;
+  circuitState={};
+  const el=document.getElementById('l-ex-list');
+  if(!exs.length){el.innerHTML='';updateCircuitSummary();return}
+  renderCircuit();
+}
+
+function parseSetCount(sStr){
+  const m=sStr.match(/(\d+)×/);
+  return m?parseInt(m[1]):null;
+}
+
+function renderCircuit(){
+  const el=document.getElementById('l-ex-list');
+  if(!circuitExList.length){el.innerHTML='';return}
+  let html='';
+  circuitExList.forEach((ex,i)=>{
+    const totalSets=parseSetCount(ex.s)||1;
+    const done=circuitState[i]||0;
+    const pct=Math.round((done/totalSets)*100);
+    const allDone=done>=totalSets;
+    html+=`<div style="padding:10px 0;border-bottom:1px solid var(--bd)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="flex:1">
+          <div class="ex-name" style="color:${allDone?'var(--grn)':'var(--txt)'}">${allDone?'✅ ':''} ${ex.n}</div>
+          <div class="ex-note">${ex.note}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="ex-sets" style="color:${allDone?'var(--grn)':'var(--or)'}">${done}/${totalSets}</div>
+          <div style="font-size:10px;color:var(--mut)">${ex.s}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="flex:1">
+          <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${allDone?'var(--grn)':'linear-gradient(90deg,var(--or),var(--or2))'}"></div></div>
+        </div>
+        ${!allDone?`<button onclick="tickSet(${i})" style="background:var(--or);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;flex-shrink:0">✓ Série</button>`:`<span style="color:var(--grn);font-size:18px;flex-shrink:0">🎉</span>`}
+        ${done>0?`<button onclick="unTickSet(${i})" style="background:var(--s3);border:1px solid var(--bd);border-radius:6px;color:var(--mut);font-size:11px;padding:6px 8px;cursor:pointer;flex-shrink:0">↩</button>`:''}
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+  updateCircuitSummary();
+}
+
+function tickSet(i){
+  const totalSets=parseSetCount(circuitExList[i].s)||1;
+  circuitState[i]=Math.min((circuitState[i]||0)+1,totalSets);
+  renderCircuit();
+}
+function unTickSet(i){
+  circuitState[i]=Math.max((circuitState[i]||0)-1,0);
+  renderCircuit();
+}
+function updateCircuitSummary(){
+  const sum=document.getElementById('l-circuit-summary');if(!sum)return;
+  if(!circuitExList.length){sum.textContent='';return}
+  const totalSeries=circuitExList.reduce((a,ex)=>a+(parseSetCount(ex.s)||1),0);
+  const doneSeries=Object.values(circuitState).reduce((a,b)=>a+b,0);
+  const remaining=totalSeries-doneSeries;
+  sum.textContent=remaining>0?`${doneSeries}/${totalSeries} séries — ${remaining} restante${remaining>1?'s':''}` :'🎉 Toutes les séries complétées !';
+  sum.style.color=remaining===0?'var(--grn)':'var(--mut)';
+}
+
+// ════════════════════════════ OBJECTIVES MODAL ════════════════════════════
+function openObjModal(){
+  const d=D(),tgt=d.targets||{pompes:50,dips:20,tractions:12,gainage:300};
+  document.getElementById('om-pompes').value=tgt.pompes||50;
+  document.getElementById('om-dips').value=tgt.dips||20;
+  document.getElementById('om-tractions').value=tgt.tractions||12;
+  document.getElementById('om-gainage').value=tgt.gainage||300;
+  document.getElementById('obj-modal-bg').classList.add('open');
+}
+function closeObjModal(){document.getElementById('obj-modal-bg').classList.remove('open')}
+function saveObjTargets(){
+  const d=D();
+  d.targets=d.targets||{};
+  d.targets.pompes=parseInt(document.getElementById('om-pompes').value)||50;
+  d.targets.dips=parseInt(document.getElementById('om-dips').value)||20;
+  d.targets.tractions=parseInt(document.getElementById('om-tractions').value)||12;
+  d.targets.gainage=parseInt(document.getElementById('om-gainage').value)||300;
+  SD(d);closeObjModal();refreshDash();toast('✅ Objectifs mis à jour');
+}
+
+// ════════════════════════════ PERSONAL OBJECTIVES ════════════════════════════
+const DEFAULT_PERSO_GOALS=[
+  {id:'lecture',label:'📚 Lire 10 pages',emoji:'📚'},
+  {id:'anglais',label:'🇬🇧 10 min d\'anglais',emoji:'🇬🇧'},
+  {id:'eau',label:'💧 Boire 2L d\'eau',emoji:'💧'},
+  {id:'travail',label:'💼 10 min de travail perso',emoji:'💼'},
+  {id:'etirement',label:'🧘 Étirements',emoji:'🧘'},
+  {id:'aucun_ecran',label:'📵 1h sans écran avant dodo',emoji:'📵'},
+];
+
+function getTodayStr(){return new Date().toISOString().split('T')[0]}
+
+function getPersoGoals(){
+  const d=D();
+  return d.persoGoals||DEFAULT_PERSO_GOALS;
+}
+
+function getPersoDay(dateStr){
+  const d=D();
+  return (d.persoLogs&&d.persoLogs[dateStr])||{};
+}
+
+function savePersoDay(dateStr,checks){
+  const d=D();
+  d.persoLogs=d.persoLogs||{};
+  d.persoLogs[dateStr]=checks;
+  SD(d);
+}
+
+function refreshPerso(){
+  const today=getTodayStr();
+  document.getElementById('perso-date-label').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const goals=getPersoGoals();
+  const checks=getPersoDay(today);
+  renderPersoItems(goals,checks,today);
+  renderPersoEdit(goals);
+  renderPersoHistory(goals);
+  updatePersoStats(goals);
+}
+
+function renderPersoItems(goals,checks,dateStr){
+  const done=goals.filter(g=>checks[g.id]).length;
+  const pct=Math.round((done/goals.length)*100);
+  document.getElementById('perso-score').textContent=done+'/'+goals.length;
+  document.getElementById('perso-pbar').style.width=pct+'%';
+  document.getElementById('perso-pbar').style.background=pct===100?'var(--grn)':'linear-gradient(90deg,var(--or),var(--or2))';
+
+  let html='';
+  goals.forEach(g=>{
+    const isDone=!!checks[g.id];
+    html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="togglePerso('${g.id}','${dateStr}')">
+      <div style="width:26px;height:26px;border-radius:7px;border:2px solid ${isDone?'var(--grn)':'var(--bd2)'};background:${isDone?'var(--grn)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">${isDone?'✓':''}</div>
+      <div style="flex:1;font-size:15px;font-weight:500;color:${isDone?'var(--txt2)':'var(--txt)'};text-decoration:${isDone?'line-through':'none'}">${g.label}</div>
+    </div>`;
+  });
+  document.getElementById('perso-items').innerHTML=html;
+}
+
+function togglePerso(goalId,dateStr){
+  const checks={...getPersoDay(dateStr)};
+  checks[goalId]=!checks[goalId];
+  savePersoDay(dateStr,checks);
+  const goals=getPersoGoals();
+  renderPersoItems(goals,checks,dateStr);
+  updatePersoStats(goals);
+  renderPersoHistory(goals);
+  const done=goals.filter(g=>checks[g.id]).length;
+  if(done===goals.length) toast('🎉 Tous les objectifs du jour complétés !');
+}
+
+function resetPersoDay(){
+  savePersoDay(getTodayStr(),{});
+  refreshPerso();
+  toast('Jour réinitialisé');
+}
+
+function renderPersoEdit(goals){
+  let html='';
+  goals.forEach((g,i)=>{
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <input type="text" value="${g.label}" id="pedit-${i}" style="flex:1;font-size:14px;padding:8px 10px">
+      <button onclick="removePersoGoal(${i})" style="background:var(--red2);border:1px solid rgba(255,48,64,.2);border-radius:6px;color:var(--red);width:32px;height:32px;cursor:pointer;font-size:16px;flex-shrink:0">×</button>
+    </div>`;
+  });
+  document.getElementById('perso-edit-list').innerHTML=html;
+}
+
+function savePersoGoals(){
+  const goals=getPersoGoals();
+  const d=D();
+  d.persoGoals=goals.map((g,i)=>{
+    const inp=document.getElementById('pedit-'+i);
+    return{...g,label:inp?inp.value:g.label};
+  });
+  SD(d);refreshPerso();toast('✅ Objectifs perso sauvegardés');
+}
+
+function addPersoGoal(){
+  const d=D();
+  d.persoGoals=getPersoGoals();
+  d.persoGoals.push({id:'custom_'+Date.now(),label:'Nouvel objectif',emoji:'⭐'});
+  SD(d);refreshPerso();
+}
+
+function removePersoGoal(i){
+  const d=D();
+  const goals=getPersoGoals();
+  goals.splice(i,1);
+  d.persoGoals=goals;
+  SD(d);refreshPerso();
+}
+
+function renderPersoHistory(goals){
+  const d=D();
+  const logs=d.persoLogs||{};
+  let html='';
+  for(let i=6;i>=0;i--){
+    const dt=new Date();dt.setDate(dt.getDate()-i);
+    const dateStr=dt.toISOString().split('T')[0];
+    const checks=logs[dateStr]||{};
+    const done=goals.filter(g=>checks[g.id]).length;
+    const pct=goals.length>0?Math.round((done/goals.length)*100):0;
+    const dayLabel=i===0?'Auj.':dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'});
+    const col=pct===100?'var(--grn)':pct>=50?'var(--yel)':done>0?'var(--or)':'var(--mut2)';
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--s3)">
+      <div style="width:50px;font-size:11px;color:var(--mut)">${dayLabel}</div>
+      <div style="flex:1"><div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${col}"></div></div></div>
+      <div style="font-size:12px;font-weight:600;color:${col};width:30px;text-align:right">${done}/${goals.length}</div>
+    </div>`;
+  }
+  document.getElementById('perso-history').innerHTML=html;
+}
+
+function updatePersoStats(goals){
+  const d=D();const logs=d.persoLogs||{};
+  // Count perfect days (all goals done)
+  let streak=0,today=new Date();
+  for(let i=0;i<365;i++){
+    const dt=new Date(today);dt.setDate(dt.getDate()-i);
+    const ds=dt.toISOString().split('T')[0];
+    const checks=logs[ds]||{};
+    const done=goals.filter(g=>checks[g.id]).length;
+    if(done===goals.length)streak++;
+    else if(i>0)break;
+  }
+  // Best streak
+  let bestStreak=0,cur=0;
+  const allDates=Object.keys(logs).sort();
+  allDates.forEach(ds=>{
+    const checks=logs[ds]||{};
+    const done=goals.filter(g=>checks[g.id]).length;
+    if(done===goals.length){cur++;bestStreak=Math.max(bestStreak,cur)}else cur=0;
+  });
+  const totalPerfect=allDates.filter(ds=>{
+    const checks=logs[ds]||{};
+    return goals.filter(g=>checks[g.id]).length===goals.length;
+  }).length;
+  const allAvg=allDates.length?allDates.reduce((a,ds)=>{
+    const checks=logs[ds]||{};
+    return a+goals.filter(g=>checks[g.id]).length;
+  },0)/allDates.length:0;
+
+  document.getElementById('perso-streak').textContent=streak+'🔥';
+  document.getElementById('perso-best').textContent=bestStreak;
+  document.getElementById('perso-total-days').textContent=totalPerfect;
+  document.getElementById('perso-avg').textContent=allAvg?allAvg.toFixed(1)+'/'+ goals.length:'—';
+}
+
+// ════════════════════════════ HELPERS (NEW) ════════════════════════════
+function timeStrToSec(t){
+  if(!t)return null;
+  const p=t.split(':');
+  if(p.length===2)return parseInt(p[0])*60+parseInt(p[1]);
+  if(p.length===3)return parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);
+  return null;
+}
+
+function secToTimeStr(s){
+  const m=Math.floor(s/60),sec=Math.round(s%60);
+  return`${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function getBestSessionTime(ss,dist,tol){
+  // Find best total time for a given distance (actual session time, not pace-derived)
+  const rel=ss.filter(s=>s.distance&&s.dureeSec&&Math.abs(s.distance-dist)<=tol);
+  if(!rel.length){
+    // Fall back to duree in minutes
+    const rel2=ss.filter(s=>s.distance&&s.duree&&Math.abs(s.distance-dist)<=tol);
+    if(!rel2.length)return null;
+    const best=rel2.reduce((a,b)=>a.duree/a.distance<b.duree/b.distance?a:b);
+    const totalMin=best.duree;const totalSec=Math.round(totalMin*60);
+    return secToTimeStr(totalSec);
+  }
+  const best=rel.reduce((a,b)=>a.dureeSec/a.distance<b.dureeSec/b.distance?a:b);
+  return secToTimeStr(Math.round(best.dureeSec));
 }
 
 // ════════════════════════════ CALENDAR ════════════════════════════

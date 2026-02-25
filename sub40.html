@@ -452,7 +452,7 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
-  <button class="btn btn-or" style="font-size:17px;padding:16px" onclick="saveSession()">💾 Enregistrer la Séance</button>
+  <button class="btn btn-or" id="save-btn" style="font-size:17px;padding:16px" onclick="saveSession()">💾 Enregistrer la Séance</button>
   <div style="height:8px"></div>
 </div>
 
@@ -1085,8 +1085,18 @@ function saveSession(){
     s.exDone=[...document.querySelectorAll('.ex-check.done')].length;
     s.exTotal=document.querySelectorAll('.ex-check').length;
   }
-  d.sessions.push(s);SD(d);
-  toast('✅ Séance enregistrée !');resetLog();resetProto();
+  if(editingSessionId){
+    // Update existing session
+    const idx=d.sessions.findIndex(s=>s.id===editingSessionId);
+    if(idx>=0){ s.id=editingSessionId; d.sessions[idx]=s; }
+    editingSessionId=null;
+    document.getElementById('save-btn').textContent='💾 Enregistrer la Séance';
+    document.getElementById('save-btn').style.background='';
+    SD(d);toast('✅ Séance modifiée !');resetLog();resetProto();
+  } else {
+    d.sessions.push(s);SD(d);
+    toast('✅ Séance enregistrée !');resetLog();resetProto();
+  }
 }
 function resetLog(){
   ['l-notes','l-dist','l-duree-min','l-duree-sec','l-allure','l-fc','l-fcmax','l-deniv','l-frac-det','l-poids','l-pompes','l-dips','l-tractions','l-gainage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
@@ -1095,7 +1105,9 @@ function resetLog(){
   updSlider(document.getElementById('l-genou'),'rv-genou','genou');
   document.querySelectorAll('.ex-check.done').forEach(el=>el.classList.remove('done'));
   circuitState={};
-  const sum=document.getElementById('l-circuit-summary');if(sum)sum.textContent='';
+  editingSessionId=null;
+  const sbtn=document.getElementById('save-btn');
+  if(sbtn){sbtn.textContent='💾 Enregistrer la Séance';sbtn.style.background='';}
 }
 
 function refreshDash(){
@@ -1106,19 +1118,20 @@ function refreshDash(){
   document.getElementById('d-week').textContent='S'+curWeek;
   document.getElementById('d-sessions').textContent=d.sessions.length;
   const streak=calcStreak(d.sessions);document.getElementById('d-streak').textContent=streak+'🔥';
-  const lastW=d.sessions.filter(s=>s.poids).sort((a,b)=>b.date.localeCompare(a.date))[0]?.poids||d.settings.poidsInit||null;
-  document.getElementById('d-poids').textContent=lastW||'—';
+  const weightSessions=d.sessions.filter(s=>s.poids).sort((a,b)=>a.date===b.date?b.id-a.id:b.date.localeCompare(a.date));
+  const lastW=weightSessions[0]?.poids||d.settings.poidsInit||null;
+  document.getElementById('d-poids').textContent=lastW?lastW+'kg':'—';
   document.getElementById('d-phase-badge').textContent='P'+getPhase(curWeek);
   document.getElementById('d-phase-badge').className='tag bebas '+getPhaseTag(curWeek);
 
   // Muscu objectives with editable targets
   const p=d.prs||{}, tgt=d.targets||{pompes:50,dips:20,tractions:12,gainage:300};
-  const init=d.settings||{};
+  const ini=d.settings.initPrs||{pompes:0,dips:0,tractions:0,gainage:0};
   const muscuItems=[
-    {id:'pompes',cur:p.pompes||0,tgt:tgt.pompes||50,init:d.prs?.pompes||0},
-    {id:'dips',cur:p.dips||0,tgt:tgt.dips||20,init:d.prs?.dips||0},
-    {id:'tractions',cur:p.tractions||0,tgt:tgt.tractions||12,init:d.prs?.tractions||0},
-    {id:'gainage',cur:p.gainage||0,tgt:tgt.gainage||300,init:d.prs?.gainage||0,unit:'s'},
+    {id:'pompes',cur:p.pompes||0,tgt:tgt.pompes||50,init:ini.pompes||0},
+    {id:'dips',cur:p.dips||0,tgt:tgt.dips||20,init:ini.dips||0},
+    {id:'tractions',cur:p.tractions||0,tgt:tgt.tractions||12,init:ini.tractions||0},
+    {id:'gainage',cur:p.gainage||0,tgt:tgt.gainage||300,init:ini.gainage||0,unit:'s'},
   ];
   muscuItems.forEach(({id,cur,tgt:t,init:ini,unit=''})=>{
     const pct=Math.min(Math.round((cur/t)*100),100);
@@ -1376,7 +1389,7 @@ function refreshPRs(){
   document.getElementById('pr-muscu').innerHTML=mt;
   
   // Goals
-  const lastW=ss.filter(s=>s.poids).sort((a,b)=>b.date.localeCompare(a.date))[0]?.poids||d.settings.poidsInit||97.3;
+  const lastW=ss.filter(s=>s.poids).sort((a,b)=>a.date===b.date?b.id-a.id:b.date.localeCompare(a.date))[0]?.poids||d.settings.poidsInit||null;
   const best10kRaw=getBestRawMin(ss,10,.7);
   setGoal('g-10k',best10kRaw&&best10kRaw<40);
   setGoal('g-poids',lastW<=89);
@@ -1419,12 +1432,60 @@ function openModal(id){
     ${s.notes?`<div class="divider"></div><div class="card-title">Notes</div><div class="txt-sm lh" style="color:var(--txt2)">${s.notes}</div>`:''}
     <div class="divider"></div>
     <div style="display:flex;gap:8px">
+      <button class="btn btn-or btn-sm" onclick="editSession(${s.id})">✏ Modifier</button>
       <button class="btn btn-danger btn-sm" onclick="delSession(${s.id})">🗑 Supprimer</button>
       <button class="btn btn-ghost btn-sm" onclick="closeModal()">Fermer</button>
     </div>`;
   document.getElementById('modal-bg').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-bg').classList.remove('open')}
+
+let editingSessionId=null;
+
+function editSession(id){
+  closeModal();
+  const d=D(),s=d.sessions.find(s=>s.id===id);if(!s)return;
+  editingSessionId=id;
+  goTo('log');
+  // Pre-fill type
+  const pill=document.querySelector(`#type-pills .pill[onclick*="${s.type}"]`);
+  if(pill) setType(s.type,pill);
+  // Pre-fill date & weight
+  document.getElementById('l-date').value=s.date;
+  if(s.poids) document.getElementById('l-poids').value=s.poids;
+  // Course fields
+  if(s.distance) document.getElementById('l-dist').value=s.distance;
+  if(s.dureeSec){
+    document.getElementById('l-duree-min').value=Math.floor(s.dureeSec/60);
+    document.getElementById('l-duree-sec').value=s.dureeSec%60;
+  } else if(s.duree){
+    document.getElementById('l-duree-min').value=Math.floor(s.duree);
+    document.getElementById('l-duree-sec').value=Math.round((s.duree%1)*60);
+  }
+  if(s.allure) document.getElementById('l-allure').value=s.allure;
+  if(s.fc) document.getElementById('l-fc').value=s.fc;
+  if(s.fcmax) document.getElementById('l-fcmax').value=s.fcmax;
+  if(s.deniv) document.getElementById('l-deniv').value=s.deniv;
+  if(s.fracDet) document.getElementById('l-frac-det').value=s.fracDet;
+  // Muscu fields
+  if(s.pompes) document.getElementById('l-pompes').value=s.pompes;
+  if(s.dips) document.getElementById('l-dips').value=s.dips;
+  if(s.tractions) document.getElementById('l-tractions').value=s.tractions;
+  if(s.gainage) document.getElementById('l-gainage').value=s.gainage;
+  // Feeling & genou
+  document.getElementById('l-feeling').value=s.feeling||7;
+  document.getElementById('l-genou').value=s.genou||0;
+  updSlider(document.getElementById('l-feeling'),'rv-feel','feel');
+  updSlider(document.getElementById('l-genou'),'rv-genou','genou');
+  if(s.notes) document.getElementById('l-notes').value=s.notes;
+  // Auto-check knee protocol in edit mode
+  protoChecked=[true,true,true,true];
+  for(let i=0;i<4;i++) toggleProto(i);toggleProto(0);toggleProto(1);toggleProto(2);toggleProto(3);
+  // Update save button
+  document.getElementById('save-btn').textContent='💾 Mettre à jour la séance';
+  document.getElementById('save-btn').style.background='var(--blu)';
+  toast('Mode édition — modifie et sauvegarde');
+}
 function delSession(id){
   if(!confirm('Supprimer ?'))return;
   const d=D();d.sessions=d.sessions.filter(s=>s.id!==id);SD(d);
@@ -1531,6 +1592,7 @@ function saveOnboarding(){
   d.settings.prenom=prenom||'Toi';
   d.settings.onboardingDone=true;
   d.prs={pompes,dips,tractions,gainage};
+  d.settings.initPrs={pompes,dips,tractions,gainage};
   SD(d);
   document.getElementById('onboard-bg').style.display='none';
   curWeek=getCurWeek();viewWeek=curWeek;

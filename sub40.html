@@ -293,16 +293,32 @@ select option{background:#1A1A1A}
   </div>
 
   <div class="stat-grid stat-grid-4" style="margin-bottom:12px">
-    <div class="stat-box" onclick="openPoidsModal()" style="cursor:pointer;border-color:rgba(61,142,255,.3)"><div class="stat-n sm" id="d-poids">—</div><div class="stat-l">Poids kg ✏</div></div>
+    <div class="stat-box" onclick="openPoidsModal()" style="cursor:pointer;border-color:rgba(61,142,255,.3)"><div class="stat-n sm" id="d-poids">—</div><div class="stat-l">Poids ✏</div></div>
     <div class="stat-box"><div class="stat-n sm" id="d-streak">0🔥</div><div class="stat-l">Streak</div></div>
     <div class="stat-box"><div class="stat-n sm" id="d-week">S1</div><div class="stat-l">Semaine</div></div>
-    <div class="stat-box"><div class="stat-n sm" id="d-sessions">0</div><div class="stat-l">Séances</div></div>
+    <div class="stat-box" id="d-dday-box" style="cursor:pointer" onclick="openRaceDateModal()"><div class="stat-n sm" id="d-dday">—</div><div class="stat-l" id="d-dday-label">J-Jour ✏</div></div>
+  </div>
+
+  <!-- Prédicteur 10K + VO2max — compact -->
+  <div class="card card-sm" id="d-predictor-card">
+    <div id="d-predictor-content">
+      <div class="txt-sm txt-mut" style="text-align:center;padding:4px 0">Log ton premier 5K pour voir ta prédiction</div>
+    </div>
+  </div>
+
+  <!-- Prochaine séance -->
+  <div class="card" id="d-next-card">
+    <div class="row-between" style="margin-bottom:10px">
+      <div class="card-title" style="margin:0">Prochaine Séance</div>
+      <button class="btn btn-or btn-sm" style="width:auto" onclick="goTo('log')">+ Logger →</button>
+    </div>
+    <div id="d-next-content"><div class="txt-mut txt-sm">—</div></div>
   </div>
 
   <!-- Note de forme -->
   <div class="card card-sm" id="d-forme-card">
     <div class="row-between" style="margin-bottom:10px">
-      <div class="card-title" style="margin:0">💊 Note de forme</div>
+      <div class="card-title" style="margin:0">Forme du jour</div>
       <div class="tag tag-gray" id="forme-score-tag">—</div>
     </div>
     <div class="form-tap" id="forme-taps">
@@ -324,7 +340,7 @@ select option{background:#1A1A1A}
   <!-- Charge + Bilan semaine -->
   <div class="card card-sm">
     <div class="row-between" style="margin-bottom:2px">
-      <div class="card-title" style="margin:0">📊 Charge semaine</div>
+      <div class="card-title" style="margin:0">Charge semaine</div>
       <div class="tag" id="load-tag" style="background:var(--s3);color:var(--mut)">—</div>
     </div>
     <div class="load-bar-wrap" id="load-bars"></div>
@@ -337,13 +353,6 @@ select option{background:#1A1A1A}
       <div style="font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Bilan S<span id="bilan-week-num">—</span></div>
       <div id="bilan-content" style="font-size:13px;color:var(--txt2);line-height:1.8"></div>
     </div>
-  </div>
-
-  <!-- Prochaine séance -->
-  <div class="card" id="d-next-card">
-    <div class="card-title">Prochaine Séance</div>
-    <div id="d-next-content"><div class="txt-mut txt-sm">—</div></div>
-    <div class="mt-12"><button class="btn btn-or btn-sm" style="width:auto" onclick="goTo('log')">+ Logger →</button></div>
   </div>
 
   <!-- Objectifs muscu -->
@@ -374,18 +383,16 @@ select option{background:#1A1A1A}
     <div class="obj-row"><div class="obj-ico">❤</div><div class="obj-label">Zone 2 cible</div><div class="obj-val"><div class="obj-cur" style="font-size:13px" id="d-z2-range">152-162</div><div class="obj-tgt">bpm</div></div></div>
   </div>
 
-  <!-- Alerte genoux -->
-  <div class="alert alert-red">
-    <strong>🦵 Protocole Genoux — AVANT chaque muscu / APRÈS chaque course</strong><br>
-    3×15 squats excentriques (descente 5s) · 3×20 hip thrust · Étirements mollets+quadri 3×30s<br>
-    <span style="color:var(--red)">Douleur &gt; 5/10 → arrêt + glace 15 min</span>
-  </div>
-
-  <!-- Prédicteur 10K + VO2max -->
-  <div class="card" id="d-predictor-card">
-    <div class="card-title">🔮 Prédicteur & Forme</div>
-    <div id="d-predictor-content">
-      <div class="txt-sm txt-mut" style="text-align:center;padding:8px 0">Course après ton premier 5K pour voir ta prédiction</div>
+  <!-- Alerte genoux collapsible -->
+  <div class="alert alert-red" id="genoux-alert" style="cursor:pointer" onclick="toggleGenouAlert()">
+    <div class="row-between">
+      <strong>🦵 Protocole Genoux</strong>
+      <span id="genoux-arrow" style="font-size:11px;color:var(--red)">▾ Voir</span>
+    </div>
+    <div id="genoux-detail" style="display:none;margin-top:6px">
+      AVANT chaque muscu / APRÈS chaque course<br>
+      3×15 squats excentriques (descente 5s) · 3×20 hip thrust · Étirements mollets+quadri 3×30s<br>
+      <span style="color:var(--red)">Douleur &gt; 5/10 → arrêt + glace 15 min</span>
     </div>
   </div>
 
@@ -447,7 +454,7 @@ select option{background:#1A1A1A}
   <div class="card card-sm">
     <div class="form-row">
       <div class="form-group" style="margin:0"><label>Date</label><input type="date" id="l-date"></div>
-      <div class="form-group" style="margin:0"><label>Poids (kg)</label><input type="number" id="l-poids" placeholder="ex: 75.5" step="0.1" inputmode="decimal"></div>
+      <div class="form-group" style="margin:0"><label>Poids (kg)</label><input type="text" id="l-poids" placeholder="ex: 96,5" inputmode="decimal"></div>
     </div>
   </div>
 
@@ -665,7 +672,7 @@ select option{background:#1A1A1A}
   <div class="card">
     <div class="card-title">📊 Données de départ</div>
     <div class="form-row">
-      <div class="form-group" style="margin:0"><label>Poids initial (kg)</label><input type="number" id="s-poids" placeholder="ex: 75.5" step="0.1" inputmode="decimal"></div>
+      <div class="form-group" style="margin:0"><label>Poids initial (kg)</label><input type="text" id="s-poids" placeholder="ex: 75,5" inputmode="decimal"></div>
       <div class="form-group" style="margin:0"><label>FC max estimée</label><input type="number" id="s-fcmax" placeholder="ex: 195" inputmode="numeric"></div>
     </div>
     <div class="form-row mt-8">
@@ -860,7 +867,7 @@ select option{background:#1A1A1A}
     <div class="alert alert-or" style="margin-bottom:16px">Ces infos restent sur ton téléphone uniquement. Rien n'est envoyé.</div>
     <div class="form-group"><label>Ton prénom</label><input type="text" id="ob-prenom" placeholder="Léo" inputmode="text"></div>
     <div class="form-row">
-      <div class="form-group" style="margin:0"><label>Poids actuel (kg)</label><input type="number" id="ob-poids" placeholder="ex: 75.5" step="0.1" inputmode="decimal"></div>
+      <div class="form-group" style="margin:0"><label>Poids actuel (kg)</label><input type="text" id="ob-poids" placeholder="ex: 97,3" inputmode="decimal"></div>
       <div class="form-group" style="margin:0"><label>Age</label><input type="number" id="ob-age" placeholder="ex: 25" inputmode="numeric"></div>
     </div>
     <div class="form-row mt-8">
@@ -901,6 +908,26 @@ select option{background:#1A1A1A}
   </div>
 </div>
 
+<!-- Race date modal -->
+<div class="modal-bg" id="race-modal-bg" onclick="if(event.target===this)closeRaceDateModal()">
+  <div class="modal" style="padding:24px">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏁 Date de Course</div>
+    <div class="form-group" style="margin:16px 0">
+      <label>Date de ton 10K cible</label>
+      <input type="date" id="race-date-input">
+    </div>
+    <div class="form-group">
+      <label>Nom (optionnel)</label>
+      <input type="text" id="race-name-input" placeholder="ex: 10K Lyon Métropole">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-or" onclick="saveRaceDate()">💾 Enregistrer</button>
+      <button class="btn btn-ghost" onclick="closeRaceDateModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- Poids rapide modal -->
 <div class="modal-bg" id="poids-modal-bg" onclick="if(event.target===this)closePoidsModal()">
   <div class="modal" id="poids-modal-body" style="padding:24px">
@@ -908,7 +935,7 @@ select option{background:#1A1A1A}
     <div class="modal-title">⚖ Entrer mon poids</div>
     <div class="form-group" style="margin:16px 0">
       <label>Poids aujourd'hui (kg)</label>
-      <input type="number" id="quick-poids" step="0.1" inputmode="decimal" placeholder="ex: 96.5" style="font-size:24px;text-align:center;padding:16px">
+      <input type="text" id="quick-poids" inputmode="decimal" placeholder="ex: 96,5" style="font-size:24px;text-align:center;padding:16px">
     </div>
     <div id="poids-history-mini" style="margin-bottom:16px"></div>
     <div style="display:flex;gap:8px">
@@ -1227,7 +1254,7 @@ function saveSession(){
   if(!protoDoneToggle && curType!=='test_max'){toast('🦵 Active le protocole genoux d\'abord !',true);return}
   const isCourse=COURSE_TYPES.includes(curType),isMuscu=MUSCU_TYPES.includes(curType);
   const s={id:Date.now(),date,type:curType,feeling:+document.getElementById('l-feeling').value,genou:+document.getElementById('l-genou').value,notes:document.getElementById('l-notes').value};
-  const pw=document.getElementById('l-poids').value;if(pw) s.poids=parseFloat(pw);
+  const pw=document.getElementById('l-poids').value;if(pw) s.poids=parseWeight(pw);
   if(isCourse){
     const dist=document.getElementById('l-dist').value;
     const dmin=parseInt(document.getElementById('l-duree-min').value)||0;
@@ -1281,7 +1308,8 @@ function refreshDash(){
   const today=new Date();
   document.getElementById('d-today-str').textContent=today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('d-week').textContent='S'+curWeek;
-  document.getElementById('d-sessions').textContent=d.sessions.length;
+  const sessionsEl=document.getElementById('d-sessions');
+  if(sessionsEl) sessionsEl.textContent=d.sessions.length;
   const streak=calcStreak(d.sessions);document.getElementById('d-streak').textContent=streak+'🔥';
   const weightSessions=d.sessions.filter(s=>s.poids).map(s=>({date:s.date,poids:s.poids,id:s.id}));
   const poidsLog=d.poidsLog||[];
@@ -1370,6 +1398,7 @@ function refreshDash(){
   renderBilanSemaine(d.sessions,curWeek);
   renderForme();
   renderPredictor(d);
+  updateDday();
 }
 
 function miniCard(s){
@@ -1689,7 +1718,7 @@ function saveSettings(){
 }
 function saveInitData(){
   const d=D();
-  const p=parseFloat(document.getElementById('s-poids').value);if(p) d.settings.poidsInit=p;
+  const p=parseWeight(document.getElementById('s-poids').value);if(p) d.settings.poidsInit=p;
   const fc=parseInt(document.getElementById('s-fcmax').value);if(fc) d.settings.fcmax=fc;
   d.settings.pr5k=document.getElementById('s-pr5k').value||d.settings.pr5k;
   d.settings.pr10k=document.getElementById('s-pr10k').value||d.settings.pr10k;
@@ -1751,7 +1780,7 @@ function toast(msg,err=false){
 // ════════════════════════════ ONBOARDING ════════════════════════════
 function saveOnboarding(){
   const prenom=document.getElementById('ob-prenom').value;
-  const poids=parseFloat(document.getElementById('ob-poids').value);
+  const poids=parseWeight(document.getElementById('ob-poids').value);
   const age=parseInt(document.getElementById('ob-age').value);
   const pr5k=document.getElementById('ob-5k').value;
   const pr10k=document.getElementById('ob-10k').value;
@@ -2193,51 +2222,46 @@ function renderPredictor(d){
   const vo2max=calcVO2max(ss);
 
   if(!pred10kSec&&!vo2max){
-    el.innerHTML='<div class="txt-sm txt-mut" style="text-align:center;padding:8px 0">Log ton premier 5K pour voir ta prédiction ici</div>';
+    el.innerHTML='<div class="txt-sm txt-mut" style="text-align:center;padding:4px 0">Log ton premier 5K pour voir ta prédiction</div>';
     return;
   }
 
-  let html='';
+  let html='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
 
   if(pred10kSec){
     const sub40=pred10kSec<2400;
     const diff=pred10kSec-2400;
-    const diffStr=diff>0?`-${secToTimeStr(diff)} à enlever`:'✅ Tu es prêt !';
+    const diffStr=diff>0?`-${secToTimeStr(diff)}`:'SUB40 ✅';
     const col=sub40?'var(--grn)':diff<120?'var(--yel)':'var(--or)';
-    html+=`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)">
-      <div style="font-size:28px">🏁</div>
-      <div style="flex:1">
-        <div style="font-size:11px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">10K estimé (Riegel)</div>
-        <div style="font-family:'DM Mono',monospace;font-size:26px;color:${col};font-weight:500">${secToTimeStr(pred10kSec)}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:12px;color:${col};font-weight:600">${diffStr}</div>
-        <div style="font-size:11px;color:var(--mut)">vs SUB 40:00</div>
-      </div>
+    html+=`<div style="flex:1;min-width:120px">
+      <div style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase">10K estimé</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;color:${col};font-weight:500;line-height:1.2">${secToTimeStr(pred10kSec)}</div>
+      <div style="font-size:11px;color:${col};font-weight:600">${diffStr} vs sub-40</div>
     </div>`;
-    // Progress bar toward sub40
-    const initPred=d.settings?.pr5k?Math.round(timeStrToSec(d.settings.pr5k)*Math.pow(2,1.06)):null;
-    if(initPred&&initPred>2400){
-      const pct=Math.min(Math.round(((initPred-pred10kSec)/(initPred-2400))*100),100);
-      html+=`<div style="padding:8px 0 4px"><div class="pbar"><div class="pbar-fill" style="width:${Math.max(0,pct)}%;background:linear-gradient(90deg,var(--or),var(--grn))"></div></div>
-      <div class="pbar-labels"><span>${secToTimeStr(initPred)}</span><span style="color:var(--grn)">40:00 🔥</span></div></div>`;
-    }
   }
 
   if(vo2max){
-    const lvl=vo2max>=55?'Excellent':vo2max>=50?'Très bon':vo2max>=45?'Bon':vo2max>=40?'Moyen':'En progression';
     const col=vo2max>=55?'var(--grn)':vo2max>=45?'var(--yel)':'var(--or)';
-    html+=`<div style="display:flex;align-items:center;gap:12px;padding:10px 0">
-      <div style="font-size:28px">❤️‍🔥</div>
-      <div style="flex:1">
-        <div style="font-size:11px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">VO2max estimé</div>
-        <div style="font-family:'DM Mono',monospace;font-size:26px;color:${col};font-weight:500">${vo2max} <span style="font-size:13px;color:var(--mut)">ml/kg/min</span></div>
-      </div>
-      <div style="text-align:right">
-        <div class="tag" style="background:${col}22;color:${col}">${lvl}</div>
-        <div style="font-size:11px;color:var(--mut);margin-top:4px">Sub-40 ≈ 55+</div>
-      </div>
+    const lvl=vo2max>=55?'Excellent':vo2max>=50?'Très bon':vo2max>=45?'Bon':vo2max>=40?'Moyen':'En progression';
+    html+=`<div style="flex:1;min-width:100px;text-align:right">
+      <div style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase">VO2max est.</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;color:${col};font-weight:500;line-height:1.2">${vo2max}</div>
+      <div style="font-size:11px;color:${col}">${lvl}</div>
     </div>`;
+  }
+
+  html+='</div>';
+
+  // Progress bar toward sub40 if we have initial value
+  if(pred10kSec){
+    const d=D();
+    const initPred=d.settings?.pr10k?timeStrToSec(d.settings.pr10k):null;
+    const base=initPred||pred10kSec+120;
+    if(base>2400){
+      const pct=Math.min(Math.round(((base-pred10kSec)/(base-2400))*100),100);
+      html+=`<div style="margin-top:8px"><div class="pbar"><div class="pbar-fill" style="width:${Math.max(0,pct)}%;background:linear-gradient(90deg,var(--or),var(--grn))"></div></div>
+      <div class="pbar-labels"><span>${secToTimeStr(base)}</span><span style="color:var(--grn)">40:00 🔥</span></div></div>`;
+    }
   }
 
   el.innerHTML=html;
@@ -2418,7 +2442,55 @@ function logForDate(dateStr){
   window.scrollTo(0,0);
 }
 
-// ════════════════════════════ QUICK WEIGHT ════════════════════════════
+// ════════════════════════════ RACE DATE ════════════════════════════
+function openRaceDateModal(){
+  const d=D();
+  if(d.settings?.raceDate) document.getElementById('race-date-input').value=d.settings.raceDate;
+  if(d.settings?.raceName) document.getElementById('race-name-input').value=d.settings.raceName;
+  document.getElementById('race-modal-bg').classList.add('open');
+}
+function closeRaceDateModal(){document.getElementById('race-modal-bg').classList.remove('open')}
+function saveRaceDate(){
+  const d=D();
+  const date=document.getElementById('race-date-input').value;
+  const name=document.getElementById('race-name-input').value;
+  if(date){d.settings.raceDate=date;d.settings.raceName=name||'Course 10K';}
+  SD(d);closeRaceDateModal();refreshDash();toast('🏁 Date enregistrée !');
+}
+function updateDday(){
+  const d=D();
+  const raceDate=d.settings?.raceDate;
+  const box=document.getElementById('d-dday-box');
+  const val=document.getElementById('d-dday');
+  const lbl=document.getElementById('d-dday-label');
+  if(!raceDate){val.textContent='—';lbl.textContent='J-Jour ✏';return;}
+  const today=new Date();today.setHours(0,0,0,0);
+  const race=new Date(raceDate+'T00:00:00');
+  const diff=Math.round((race-today)/(1000*60*60*24));
+  if(diff>0){
+    val.textContent='J-'+diff;
+    lbl.textContent=(d.settings.raceName||'Course').slice(0,10);
+    box.style.borderColor=diff<=14?'rgba(255,48,64,.4)':diff<=30?'rgba(255,184,0,.3)':'rgba(0,210,106,.3)';
+  } else if(diff===0){
+    val.textContent='HOJE';lbl.textContent='🏁 RACE DAY';
+    box.style.borderColor='rgba(255,69,0,.5)';box.style.background='rgba(255,69,0,.08)';
+  } else {
+    val.textContent=d.settings.raceName?.slice(0,6)||'Passée';lbl.textContent='Course passée';
+  }
+}
+
+// ════════════════════════════ GENOUX TOGGLE ════════════════════════════
+function toggleGenouAlert(){
+  const det=document.getElementById('genoux-detail');
+  const arr=document.getElementById('genoux-arrow');
+  const open=det.style.display==='none';
+  det.style.display=open?'block':'none';
+  arr.textContent=open?'▴ Masquer':'▾ Voir';
+}
+
+// ════════════════════════════ PARSEWEIGHT ════════════════════════════
+function parseWeight(val){return parseFloat(String(val).replace(',','.'))||0}
+
 function openPoidsModal(){
   const d=D();
   // Show last 5 weights
@@ -2444,7 +2516,7 @@ function openPoidsModal(){
 function closePoidsModal(){document.getElementById('poids-modal-bg').classList.remove('open')}
 
 function saveQuickPoids(){
-  const val=parseFloat(document.getElementById('quick-poids').value);
+  const val=parseWeight(document.getElementById('quick-poids').value);
   if(!val||val<30||val>250){toast('⚠ Poids invalide',true);return}
   const d=D();
   const today=new Date().toISOString().split('T')[0];

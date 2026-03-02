@@ -405,162 +405,232 @@ select option{background:#1A1A1A}
 
 <!-- ═══════════════════════ LOG SÉANCE ═══════════════════════ -->
 <div id="pg-log" class="page">
-  <div class="s-head"><div class="s-title">Logger</div><div class="s-sub">Enregistre ta séance</div></div>
-
-  <div class="card card-sm">
-    <div class="card-title">Type de séance</div>
-    <div class="pills" id="type-pills">
-      <div class="pill active" onclick="setType('muscu_a',this)">💪 Muscu A</div>
-      <div class="pill" onclick="setType('muscu_b',this)">💪 Muscu B</div>
-      <div class="pill" onclick="setType('test_max',this)">🧪 Test Max</div>
-      <div class="pill grn" onclick="setType('z2',this)">💚 Zone 2</div>
-      <div class="pill grn" onclick="setType('tempo',this)">🎯 Tempo</div>
-      <div class="pill grn" onclick="setType('frac_court',this)">⚡ Frac. Court</div>
-      <div class="pill grn" onclick="setType('frac_long',this)">⚡ Frac. Long</div>
-      <div class="pill grn" onclick="setType('pyramidal',this)">🔺 Pyramidal</div>
-      <div class="pill grn" onclick="setType('fartlek',this)">🌀 Fartlek</div>
-      <div class="pill grn" onclick="setType('cotes',this)">⛰ Côtes</div>
-      <div class="pill grn" onclick="setType('longue',this)">🌄 Longue</div>
-      <div class="pill" onclick="setType('autre',this)">✏ Autre</div>
-    </div>
+  <div class="s-head">
+    <div class="s-title">Logger</div>
+    <div class="s-sub" id="log-date-sub">Aujourd'hui</div>
   </div>
 
-  <!-- Warm-up -->
-  <div class="card card-sm" id="sec-warmup" style="display:none;border-color:rgba(0,210,106,.3);background:rgba(0,210,106,.04)">
-    <div class="row-between" style="margin-bottom:8px">
-      <div class="card-title" style="margin:0;color:var(--grn)">🔥 Échauffement recommandé</div>
-      <button type="button" onclick="toggleWarmup()" id="warmup-toggle-btn" class="btn btn-ghost btn-sm" style="width:auto">Voir ▾</button>
-    </div>
-    <div id="warmup-content" style="display:none;font-size:13px;color:var(--txt2);line-height:1.9"></div>
-  </div>
-
-  <!-- Description séance recommandée -->
-  <div class="alert alert-or" id="session-tip" style="display:none"></div>
-
-  <!-- PROTOCOLE GENOUX OBLIGATOIRE -->
-  <div class="card card-sm" id="sec-genoux-proto" style="border-color:rgba(255,48,64,.4);background:rgba(255,48,64,.04)">
-    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleProtoSingle()">
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--red)">🦵 Protocole genoux effectué ?</div>
-        <div style="font-size:11px;color:var(--mut);margin-top:2px">Squats excentriques · Hip thrust · Étirements mollets+quadri</div>
-      </div>
-      <div id="proto-toggle" style="width:52px;height:30px;border-radius:15px;background:var(--s3);border:2px solid var(--bd2);position:relative;transition:all .25s;flex-shrink:0">
-        <div id="proto-knob" style="width:22px;height:22px;border-radius:50%;background:var(--mut);position:absolute;top:2px;left:2px;transition:all .25s"></div>
+  <!-- ═══ BANNIÈRE SÉANCE DU JOUR (automatique) ═══ -->
+  <div class="card" id="today-banner" style="border-color:rgba(255,69,0,.4);background:linear-gradient(135deg,rgba(255,69,0,.07),rgba(255,120,0,.03));margin-bottom:14px">
+    <div style="display:flex;align-items:flex-start;gap:14px">
+      <div style="font-size:36px;flex-shrink:0;line-height:1" id="banner-ico">💪</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px" id="banner-day">Lundi · S1 · Phase 1</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--or);line-height:1.1" id="banner-title">Muscu A — Push</div>
+        <div style="font-size:12px;color:var(--txt2);line-height:1.7;margin-top:6px" id="banner-desc">—</div>
       </div>
     </div>
-  </div>
-
-  <!-- Date & Poids -->
-  <div class="card card-sm">
-    <div class="form-row">
-      <div class="form-group" style="margin:0"><label>Date</label><input type="date" id="l-date"></div>
-      <div class="form-group" style="margin:0"><label>Poids (kg)</label><input type="text" id="l-poids" placeholder="ex: 96,5" inputmode="decimal"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-or" style="flex:1;font-size:15px" onclick="confirmToday()">✅ Logger cette séance</button>
+      <button class="btn btn-ghost btn-sm" style="width:auto;flex-shrink:0" onclick="showOverride()">✏ Autre</button>
     </div>
   </div>
 
-  <!-- Section Course -->
-  <div id="sec-course" style="display:none">
-    <div class="card card-sm">
-      <div class="card-title">📍 Données Course</div>
-      <div class="form-row">
-        <div class="form-group" style="margin:0"><label>Distance (km)</label><input type="number" id="l-dist" placeholder="5.0" step="0.01" inputmode="decimal"></div>
-        <div class="form-group" style="margin:0">
-          <label>Durée</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input type="number" id="l-duree-min" placeholder="25" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
-            <span style="color:var(--mut);font-size:13px;flex-shrink:0">min</span>
-            <input type="number" id="l-duree-sec" placeholder="00" min="0" max="59" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
-            <span style="color:var(--mut);font-size:13px;flex-shrink:0">sec</span>
-          </div>
+  <!-- ═══ SÉLECTION MANUELLE (cachée) ═══ -->
+  <div id="override-panel" style="display:none;margin-bottom:14px">
+    <div class="card card-sm" style="border-color:rgba(255,184,0,.3)">
+      <div style="font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Choisir une autre séance</div>
+      <!-- 3 grandes catégories -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <button onclick="selectCat('muscu')" id="cat-btn-muscu"
+          style="padding:16px 6px;border-radius:10px;border:2px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .15s">
+          <div style="font-size:26px">💪</div>
+          <div style="font-size:12px;font-weight:700;margin-top:5px;color:var(--txt2)">Muscu</div>
+        </button>
+        <button onclick="selectCat('course')" id="cat-btn-course"
+          style="padding:16px 6px;border-radius:10px;border:2px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .15s">
+          <div style="font-size:26px">🏃</div>
+          <div style="font-size:12px;font-weight:700;margin-top:5px;color:var(--txt2)">Course</div>
+        </button>
+        <button onclick="selectCat('repos')" id="cat-btn-repos"
+          style="padding:16px 6px;border-radius:10px;border:2px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .15s">
+          <div style="font-size:26px">😴</div>
+          <div style="font-size:12px;font-weight:700;margin-top:5px;color:var(--txt2)">Repos</div>
+        </button>
+      </div>
+      <!-- Sous-types muscu -->
+      <div id="subcat-muscu" style="display:none">
+        <div style="font-size:11px;color:var(--mut);margin-bottom:8px">Quelle séance muscu ?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button onclick="activateType('muscu_a')" class="pill">💪 A — Push</button>
+          <button onclick="activateType('muscu_b')" class="pill">💪 B — Pull</button>
+          <button onclick="activateType('muscu_c')" class="pill">💪 C — Fonctionnel</button>
+          <button onclick="activateType('test_max')" class="pill">🧪 Test Max</button>
         </div>
       </div>
-      <div class="form-row mt-8">
-        <div class="form-group" style="margin:0"><label>Allure (auto-calculée)</label><input type="text" id="l-allure" placeholder="5:00" inputmode="text"></div>
-        <div class="form-group" style="margin:0"><label>FC moy (bpm)</label><input type="number" id="l-fc" placeholder="165" inputmode="numeric"></div>
-      </div>
-      <div class="form-row mt-8">
-        <div class="form-group" style="margin:0"><label>FC max (bpm)</label><input type="number" id="l-fcmax" placeholder="ex: 180" inputmode="numeric"></div>
-        <div class="form-group" style="margin:0"><label>Dénivelé (m)</label><input type="number" id="l-deniv" placeholder="30" inputmode="numeric"></div>
-      </div>
-    </div>
-    <!-- Détail fractionné -->
-    <div class="card card-sm" id="sec-frac-detail" style="display:none">
-      <div class="card-title">⚡ Détail Fractionné</div>
-      <div class="form-group" style="margin-bottom:10px"><label>Ex: 8×400m @ 4:15 — temps réels si dispo</label><input type="text" id="l-frac-det" placeholder="6×400m @ 4:15/km"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button type="button" onclick="openTimerFor('recup90')" class="btn btn-ghost btn-sm" style="width:auto">⏱ Récup 90s</button>
-        <button type="button" onclick="openTimerFor('recup120')" class="btn btn-ghost btn-sm" style="width:auto">⏱ Récup 2min</button>
-        <button type="button" onclick="openTimerFor('recup180')" class="btn btn-ghost btn-sm" style="width:auto">⏱ Récup 3min</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Section Muscu -->
-  <div id="sec-muscu">
-    <div class="card card-sm">
-      <div class="card-title">💪 Performances Muscu</div>
-      <div class="form-row">
-        <div class="form-group" style="margin:0"><label>Pompes (max set)</label><input type="number" id="l-pompes" placeholder="ex: 20" inputmode="numeric"></div>
-        <div class="form-group" style="margin:0"><label>Dips (max)</label><input type="number" id="l-dips" placeholder="ex: 5" inputmode="numeric"></div>
-      </div>
-      <div class="form-row mt-8">
-        <div class="form-group" style="margin:0"><label>Tractions (max)</label><input type="number" id="l-tractions" placeholder="ex: 3" inputmode="numeric"></div>
-        <div class="form-group" style="margin:0">
-          <label>Gainage (sec)</label>
-          <div style="display:flex;gap:6px">
-            <input type="number" id="l-gainage" placeholder="60" inputmode="numeric" style="flex:1">
-            <button type="button" onclick="openTimerFor('gainage')" style="background:var(--s3);border:1px solid var(--bd);border-radius:var(--r2);color:var(--or);font-size:18px;padding:0 12px;cursor:pointer;flex-shrink:0">⏱</button>
-          </div>
+      <!-- Sous-types course -->
+      <div id="subcat-course" style="display:none">
+        <div style="font-size:11px;color:var(--mut);margin-bottom:8px">Quel type de course ?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button onclick="activateType('z2')" class="pill grn">💚 Zone 2</button>
+          <button onclick="activateType('tempo')" class="pill grn">🎯 Tempo</button>
+          <button onclick="activateType('frac_court')" class="pill grn">⚡ Frac. Court</button>
+          <button onclick="activateType('frac_long')" class="pill grn">⚡ Frac. Long</button>
+          <button onclick="activateType('pyramidal')" class="pill grn">🔺 Pyramidal</button>
+          <button onclick="activateType('fartlek')" class="pill grn">🌀 Fartlek</button>
+          <button onclick="activateType('cotes')" class="pill grn">⛰ Côtes</button>
+          <button onclick="activateType('longue')" class="pill grn">🌄 Longue</button>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ═══ FORMULAIRE (apparaît après sélection) ═══ -->
+  <div id="form-zone" style="display:none">
+
+    <!-- Type actif -->
+    <div class="alert alert-or" id="active-type-bar" style="margin-bottom:14px"></div>
+
+    <!-- Protocole genoux -->
+    <div class="card card-sm" id="sec-genoux-proto" style="border-color:rgba(255,48,64,.4);background:rgba(255,48,64,.04)">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleProtoSingle()">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--red)">🦵 Protocole genoux effectué ?</div>
+          <div style="font-size:11px;color:var(--mut);margin-top:2px">Squats excentriques · Hip thrust · Étirements mollets+quadri</div>
+        </div>
+        <div id="proto-toggle" style="width:52px;height:30px;border-radius:15px;background:var(--s3);border:2px solid var(--bd2);position:relative;transition:all .25s;flex-shrink:0">
+          <div id="proto-knob" style="width:22px;height:22px;border-radius:50%;background:var(--mut);position:absolute;top:2px;left:2px;transition:all .25s"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date & Poids -->
     <div class="card card-sm">
-      <div class="card-title">✅ Exercices — Suivi par série</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <button type="button" onclick="openTimerFor('recup30')" class="btn btn-ghost btn-sm" style="width:auto">⏱ Récup 30s</button>
-        <button type="button" onclick="openTimerFor('recup90')" class="btn btn-ghost btn-sm" style="width:auto">⏱ Récup 90s</button>
-        <button type="button" onclick="openTimerFor('recup120')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 2 min</button>
-        <button type="button" onclick="openTimerFor('chrono')" class="btn btn-ghost btn-sm" style="width:auto;color:var(--or)">⏱ Chrono</button>
+      <div class="form-row">
+        <div class="form-group" style="margin:0"><label>Date</label><input type="date" id="l-date"></div>
+        <div class="form-group" style="margin:0"><label>Poids (kg)</label><input type="text" id="l-poids" placeholder="ex: 96,5" inputmode="decimal"></div>
       </div>
-      <div id="l-ex-list"></div>
-      <div id="l-circuit-summary" style="margin-top:10px;text-align:center;font-size:13px;color:var(--mut)"></div>
     </div>
-  </div>
 
-  <!-- Genoux -->
-  <div class="card card-sm">
-    <div class="card-title">🦵 Douleur Genoux</div>
-    <div class="range-wrap">
-      <div class="range-labels">
-        <span class="range-label grn" style="font-size:11px">0 — Aucune</span>
-        <span class="range-label yel" style="font-size:11px">5 — Modérée</span>
-        <span class="range-label red" style="font-size:11px">10 — Intense</span>
+    <!-- Échauffement course -->
+    <div class="card card-sm" id="sec-warmup" style="display:none;border-color:rgba(0,210,106,.3);background:rgba(0,210,106,.04)">
+      <div class="row-between" style="margin-bottom:8px">
+        <div class="card-title" style="margin:0;color:var(--grn)">🔥 Échauffement</div>
+        <button type="button" onclick="toggleWarmup()" id="warmup-toggle-btn" class="btn btn-ghost btn-sm" style="width:auto">Voir ▾</button>
       </div>
-      <input type="range" id="l-genou" min="0" max="10" value="0" oninput="updSlider(this,'rv-genou','genou')">
-      <div class="range-val grn" id="rv-genou">0/10</div>
+      <div id="warmup-content" style="display:none;font-size:13px;color:var(--txt2);line-height:1.9"></div>
     </div>
-  </div>
 
-  <!-- Ressenti -->
-  <div class="card card-sm">
-    <div class="card-title">💬 Ressenti Global</div>
-    <div class="range-wrap">
-      <div class="range-labels">
-        <span class="range-label red" style="font-size:11px">1 — Nul</span>
-        <span class="range-label yel" style="font-size:11px">5 — Ok</span>
-        <span class="range-label grn" style="font-size:11px">10 — 🔥</span>
+    <!-- Repos poids -->
+    <div class="card card-sm" id="sec-repos-poids" style="display:none;border-color:rgba(61,142,255,.3);background:rgba(61,142,255,.04)">
+      <div class="card-title" style="color:var(--blu)">😴 Journée de repos</div>
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:12px">Récupération = progression. Profites-en pour te peser.</div>
+      <div class="form-group" style="margin:0">
+        <label>Poids du matin (kg)</label>
+        <input type="text" id="repos-poids" inputmode="decimal" placeholder="ex: 96,5" style="font-size:22px;text-align:center">
       </div>
-      <input type="range" id="l-feeling" min="1" max="10" value="7" oninput="updSlider(this,'rv-feel','feel')">
-      <div class="range-val or" id="rv-feel">7/10</div>
     </div>
-    <div class="form-group mt-12" style="margin-bottom:0">
-      <label>Notes libres — sensations, difficultés, victoires, météo...</label>
-      <textarea id="l-notes" placeholder="Décris ta séance..."></textarea>
-    </div>
-  </div>
 
-  <button class="btn btn-or" id="save-btn" style="font-size:17px;padding:16px" onclick="saveSession()">💾 Enregistrer la Séance</button>
-  <div style="height:8px"></div>
+    <!-- Données course -->
+    <div id="sec-course" style="display:none">
+      <div class="card card-sm">
+        <div class="card-title">📍 Données Course</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0"><label>Distance (km)</label><input type="number" id="l-dist" placeholder="5.0" step="0.01" inputmode="decimal"></div>
+          <div class="form-group" style="margin:0">
+            <label>Durée</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="number" id="l-duree-min" placeholder="25" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
+              <span style="color:var(--mut);font-size:13px;flex-shrink:0">min</span>
+              <input type="number" id="l-duree-sec" placeholder="00" min="0" max="59" inputmode="numeric" style="flex:1" oninput="autoCalcAllure()">
+              <span style="color:var(--mut);font-size:13px;flex-shrink:0">sec</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row mt-8">
+          <div class="form-group" style="margin:0"><label>Allure (auto)</label><input type="text" id="l-allure" placeholder="5:00" inputmode="text"></div>
+          <div class="form-group" style="margin:0"><label>FC moy (bpm)</label><input type="number" id="l-fc" placeholder="165" inputmode="numeric"></div>
+        </div>
+        <div class="form-row mt-8">
+          <div class="form-group" style="margin:0"><label>FC max (bpm)</label><input type="number" id="l-fcmax" placeholder="180" inputmode="numeric"></div>
+          <div class="form-group" style="margin:0"><label>Dénivelé (m)</label><input type="number" id="l-deniv" placeholder="30" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="card card-sm" id="sec-frac-detail" style="display:none">
+        <div class="card-title">⚡ Détail Fractionné</div>
+        <div class="form-group" style="margin-bottom:10px"><label>Reps réels — ex: 8×400m @ 4:15</label><input type="text" id="l-frac-det" placeholder="6×400m @ 4:15/km"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" onclick="openTimerFor('recup90')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 90s</button>
+          <button type="button" onclick="openTimerFor('recup120')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 2min</button>
+          <button type="button" onclick="openTimerFor('recup180')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 3min</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Données muscu -->
+    <div id="sec-muscu" style="display:none">
+      <div class="card card-sm">
+        <div class="row-between" style="margin-bottom:10px">
+          <div class="card-title" style="margin:0">💪 Maxs actuels</div>
+          <button type="button" onclick="openUpdateMaxModal()" class="btn btn-ghost btn-sm" style="width:auto;color:var(--or)">⚡ Modifier</button>
+        </div>
+        <div id="current-maxs-display" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;padding:10px;background:var(--s2);border-radius:var(--r2)"></div>
+        <div class="alert" style="background:rgba(255,69,0,.06);border:1px solid rgba(255,69,0,.2);font-size:12px;margin-bottom:12px">
+          Remplis seulement si tu fais un <strong>test max</strong>. Sinon laisse vide — les reps des exos cochés sont comptées auto.
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0"><label>Pompes max (test)</label><input type="number" id="l-pompes" placeholder="—" inputmode="numeric"></div>
+          <div class="form-group" style="margin:0"><label>Dips max (test)</label><input type="number" id="l-dips" placeholder="—" inputmode="numeric"></div>
+        </div>
+        <div class="form-row mt-8">
+          <div class="form-group" style="margin:0"><label>Tractions max (test)</label><input type="number" id="l-tractions" placeholder="—" inputmode="numeric"></div>
+          <div class="form-group" style="margin:0">
+            <label>Gainage (sec)</label>
+            <div style="display:flex;gap:6px">
+              <input type="number" id="l-gainage" placeholder="—" inputmode="numeric" style="flex:1">
+              <button type="button" onclick="openTimerFor('gainage')" style="background:var(--s3);border:1px solid var(--bd);border-radius:var(--r2);color:var(--or);font-size:18px;padding:0 12px;cursor:pointer;flex-shrink:0">⏱</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-sm">
+        <div class="card-title">✅ Exercices du jour</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button type="button" onclick="openTimerFor('recup30')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 30s</button>
+          <button type="button" onclick="openTimerFor('recup90')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 90s</button>
+          <button type="button" onclick="openTimerFor('recup120')" class="btn btn-ghost btn-sm" style="width:auto">⏱ 2min</button>
+          <button type="button" onclick="openTimerFor('chrono')" class="btn btn-ghost btn-sm" style="width:auto;color:var(--or)">⏱ Chrono</button>
+        </div>
+        <div id="l-ex-list"></div>
+        <div id="l-circuit-summary" style="margin-top:10px;text-align:center;font-size:13px;color:var(--mut)"></div>
+      </div>
+    </div>
+
+    <!-- Douleur genoux -->
+    <div class="card card-sm" id="sec-genou-score">
+      <div class="card-title">🦵 Douleur Genoux</div>
+      <div class="range-wrap">
+        <div class="range-labels">
+          <span class="range-label grn" style="font-size:11px">0 — Aucune</span>
+          <span class="range-label yel" style="font-size:11px">5 — Modérée</span>
+          <span class="range-label red" style="font-size:11px">10 — Intense</span>
+        </div>
+        <input type="range" id="l-genou" min="0" max="10" value="0" oninput="updSlider(this,'rv-genou','genou')">
+        <div class="range-val grn" id="rv-genou">0/10</div>
+      </div>
+    </div>
+
+    <!-- Ressenti -->
+    <div class="card card-sm">
+      <div class="card-title">💬 Ressenti</div>
+      <div class="range-wrap">
+        <div class="range-labels">
+          <span class="range-label red" style="font-size:11px">1 — Nul</span>
+          <span class="range-label yel" style="font-size:11px">5 — Ok</span>
+          <span class="range-label grn" style="font-size:11px">10 — 🔥</span>
+        </div>
+        <input type="range" id="l-feeling" min="1" max="10" value="7" oninput="updSlider(this,'rv-feel','feel')">
+        <div class="range-val or" id="rv-feel">7/10</div>
+      </div>
+      <div class="form-group mt-12" style="margin-bottom:0">
+        <label>Notes libres</label>
+        <textarea id="l-notes" placeholder="Sensations, victoires, météo..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-or" id="save-btn" style="font-size:17px;padding:16px" onclick="saveSession()">💾 Enregistrer</button>
+    <div style="height:8px"></div>
+  </div><!-- /form-zone -->
 </div>
 
 <!-- ═══════════════════════ PROGRAMME ═══════════════════════ -->
@@ -908,6 +978,27 @@ select option{background:#1A1A1A}
   </div>
 </div>
 
+<!-- Update max modal -->
+<div class="modal-bg" id="update-max-modal-bg" onclick="if(event.target===this)closeUpdateMaxModal()">
+  <div class="modal" style="padding:24px">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚡ Mettre à jour mes Maxs</div>
+    <div class="alert alert-or" style="margin-bottom:14px;font-size:12px">Ces maxs recalibrent automatiquement TOUS tes exercices. Mets à jour après chaque test max ou quand tu sens que les reps sont trop faciles.</div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0"><label>Pompes max</label><input type="number" id="um-pompes" inputmode="numeric"></div>
+      <div class="form-group" style="margin:0"><label>Dips max</label><input type="number" id="um-dips" inputmode="numeric"></div>
+    </div>
+    <div class="form-row mt-8">
+      <div class="form-group" style="margin:0"><label>Tractions max</label><input type="number" id="um-tractions" inputmode="numeric"></div>
+      <div class="form-group" style="margin:0"><label>Gainage max (sec)</label><input type="number" id="um-gainage" inputmode="numeric"></div>
+    </div>
+    <div class="mt-12 gap">
+      <button class="btn btn-or" onclick="saveUpdatedMax()">💾 Mettre à jour</button>
+      <button class="btn btn-ghost" onclick="closeUpdateMaxModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- Race date modal -->
 <div class="modal-bg" id="race-modal-bg" onclick="if(event.target===this)closeRaceDateModal()">
   <div class="modal" style="padding:24px">
@@ -969,78 +1060,153 @@ function getPhase(w){ return w<=4?1:w<=12?2:3 }
 function getPhaseName(w){ return ['','Phase 1 — Base & Reprise','Phase 2 — Construction','Phase 3 — Spécifique 10K'][getPhase(w)] }
 function getPhaseTag(w){ return ['','tag-grn','tag-blu','tag-or'][getPhase(w)] }
 
-// Muscu exercises by phase
+// ════════════════════════════ ADAPTIVE MUSCU ════════════════════════════
+function getCurrentMax(){
+  const d=D();
+  return {
+    pompes: d.prs?.pompes || d.settings?.initPrs?.pompes || 19,
+    dips:   d.prs?.dips   || d.settings?.initPrs?.dips   || 3,
+    tractions: d.prs?.tractions || d.settings?.initPrs?.tractions || 1,
+    gainage: d.prs?.gainage || d.settings?.initPrs?.gainage || 45,
+  };
+}
+
+function adaptReps(max, pct){
+  if(!max || max<=0) return '?';
+  return Math.max(1, Math.round(max * pct));
+}
+
+function exSets(series, max, pct, unit=''){
+  const r = adaptReps(max, pct);
+  return `${series}×${r}${unit} (${Math.round(pct*100)}%)`;
+}
+
 function getMuscuA(w){
   const p=getPhase(w);
+  const m=getCurrentMax();
+  const phase=p===1?1:p===2?2:3;
+  // pompe pct by phase
+  const pp=[0,.60,.65,.70][phase];
+  const dp=[0,.60,.65,.70][phase];
+
   const base=[
     {n:'Squat excentrique 🦵',s:'3×15',note:'Descente 5 sec LENTE — obligatoire'},
     {n:'Hip thrust poids du corps',s:'3×20',note:'Contracte les fessiers au max'},
+    {n:'Activation scapulaire',s:'3×15 + 10s hang',note:'Rétractions + dead hang — prépare les tendons'},
   ];
+
   if(p===1) return [...base,
-    {n:'Pompes classiques',s:'4×max',note:`Objectif : dépasser 18 — pause si besoin`},
-    {n:'Dips (chaise romaine)',s:'3×max',note:'Descente complète bras 90°'},
-    {n:'Traction assistée (pieds sur chaise)',s:'3×5',note:'Aide avec les jambes'},
-    {n:'Rowing barre basse',s:'3×10',note:'Tirage horizontal, serrer omoplates'},
-    {n:'Gainage frontal',s:'4×max',note:'Note ton record → objectif 300s total'},
+    {n:'Pompes larges',s:exSets(5,m.pompes,.60),note:'Mains 1.5× largeur épaules · descente 2s · explosif',type:'pompes',pct:.60,series:5},
+    {n:'Pompes pieds surélevés',s:exSets(4,m.pompes,.55),note:'Pieds sur chaise ~45cm · haut poitrine',type:'pompes',pct:.55,series:4},
+    {n:'Pike push-ups',s:exSets(4,m.pompes,.55),note:'Hanches hautes en V · deltoides',type:'pompes',pct:.55,series:4},
+    {n:'Bench dips',s:exSets(4,m.dips,.60)+' + 3 négatifs 7s',note:'P1 : chaise uniquement · coudes vers l\'arrière',type:'dips',pct:.60,series:4},
+    {n:'Pompes diamant',s:exSets(3,m.pompes,.55),note:'Index-pouce se touchent · triceps',type:'pompes',pct:.55,series:3},
+    {n:'Gainage frontal',s:`4×${adaptReps(m.gainage,.55)}s`,note:'Note ton total → objectif 300s',type:'gainage',pct:.55,series:4},
     {n:'Gainage latéral',s:'3×25s/côté',note:'Hanches hautes, corps aligné'},
-    {n:'Crunch reverse',s:'3×15',note:'Soulève les hanches, pas le dos'},
+    {n:'Hollow body',s:`3×${adaptReps(m.gainage,.50)}s`,note:'Lombaires collées au sol',type:'gainage',pct:.50,series:3},
   ];
   if(p===2) return [...base,
-    {n:'Pompes',s:'4×max',note:'Vise +2 reps/semaine vs semaine précédente'},
-    {n:'Pompes explosives',s:'3×6',note:'Main quitte le sol, atterrissage souple'},
-    {n:'Dips',s:'4×max',note:'Ajouter leste (sac) si tu dépasses 12'},
-    {n:'Traction assistée → libre',s:'4×max',note:'Réduis l\'aide progressivement chaque semaine'},
-    {n:'Tirage horizontal (barre)',s:'3×12',note:'Rétraction scapulaire complète'},
-    {n:'Gainage frontal',s:'4×max',note:'Chaque set compte — note le total'},
-    {n:'Gainage dynamique (rocking)',s:'3×20',note:'Avant/arrière sur avant-bras, contrôle'},
-    {n:'L-sit chaise (jambes tendues)',s:'3×max',note:'Commence sur les genoux si difficile'},
+    {n:'Pompes larges',s:exSets(5,m.pompes,.65),note:'Corps rigide · fessiers serrés · 3 reps avant l\'échec',type:'pompes',pct:.65,series:5},
+    {n:'Pompes pieds surélevés',s:exSets(4,m.pompes,.60),note:'Progression +1 rep/semaine',type:'pompes',pct:.60,series:4},
+    {n:'Pike push-ups',s:exSets(4,m.pompes,.60),note:'Contrôle total · pause 1s en bas',type:'pompes',pct:.60,series:4},
+    {n:'Dips complets',s:exSets(4,m.dips,.65),note:'Plus de bench dips · coudes vers l\'arrière',type:'dips',pct:.65,series:4},
+    {n:'Pompes explosives',s:`3×6`,note:'Mains quittent le sol · atterrissage souple'},
+    {n:'Gainage frontal',s:`4×${adaptReps(m.gainage,.60)}s`,note:'Chaque set compte · note le total',type:'gainage',pct:.60,series:4},
+    {n:'Gainage dynamique (rocking)',s:'3×20',note:'Avant/arrière sur avant-bras · contrôle'},
+    {n:'L-sit chaise',s:`3×${adaptReps(m.gainage,.45)}s`,note:'Jambes tendues si possible',type:'gainage',pct:.45,series:3},
   ];
   return [...base,
-    {n:'Pompes',s:'5×max',note:'Objectif proche des 50'},
+    {n:'Pompes larges',s:exSets(5,m.pompes,.70),note:'Objectif proche des 50 · 3 reps avant l\'échec',type:'pompes',pct:.70,series:5},
     {n:'Pompes archer (1 bras partial)',s:'3×6/côté',note:'Travail unilatéral force'},
-    {n:'Dips lesté',s:'4×max',note:'Sac à dos avec charge si possible'},
-    {n:'Tractions complètes',s:'4×max',note:'Objectif 12 reps nettes'},
-    {n:'Muscle-up négatif',s:'3×3',note:'Si tu dépasses 8 tractions'},
-    {n:'Gainage frontal',s:'3×90s min',note:'Progression vers 5 min total'},
-    {n:'Gainage dragon flag négatif',s:'3×5',note:'Avancé — sur banc'},
+    {n:'Dips lesté',s:exSets(4,m.dips,.70),note:'Sac à dos si possible',type:'dips',pct:.70,series:4},
+    {n:'Pompes déclinées lestées',s:exSets(4,m.pompes,.65),note:'Sac à dos · haut pectoraux',type:'pompes',pct:.65,series:4},
+    {n:'Gainage frontal',s:`3×${adaptReps(m.gainage,.70)}s min`,note:'Progression vers 5 min total',type:'gainage',pct:.70,series:3},
+    {n:'Gainage dragon flag négatif',s:'3×5',note:'Sur banc · avancé'},
     {n:'Core circuit',s:'2 rounds',note:'20 crunch + 20 leg raise + 20 russian twist'},
   ];
 }
 
 function getMuscuB(w){
   const p=getPhase(w);
+  const m=getCurrentMax();
+
   const base=[
+    {n:'Dead hang passif',s:'3×20s + 10 rétractions',note:'Tendons · OBLIGATOIRE avant tractions'},
     {n:'Squat excentrique 🦵',s:'3×15',note:'TOUJOURS — descente 5 secondes'},
-    {n:'Nordic curl assisté (chaise)',s:'3×6',note:'Protection ischio-jambiers cruciale'},
+    {n:'Nordic curl assisté',s:'3×6',note:'Protection ischio-jambiers — crucial pour la course'},
   ];
+
+  // Tractions protocol based on current max
+  const tMax=m.tractions;
+  let tracNote,tracSets;
+  if(tMax<=1){tracSets='5×(1 négatif 7s + essai 1 full)';tracNote='Sauter en haut, descendre LENTEMENT en 7s';}
+  else if(tMax<=3){tracSets=`5×(2 négatifs + ${tMax<=2?1:2} full)`;tracNote='2 chin-ups supination + négatifs 7s';}
+  else if(tMax<=5){tracSets=exSets(5,tMax,.60);tracNote='Bande élastique épaisse · fin de série sans bande si possible';}
+  else if(tMax<=8){tracSets=exSets(5,tMax,.60);tracNote='Sans assistance · bande fine option';}
+  else{tracSets=exSets(5,tMax,.65);tracNote='Overhand · ajouter chin-ups en complément';}
+
   if(p===1) return [...base,
-    {n:'Fentes marchées',s:'3×10/jambe',note:'Pas assuré, genou à 90°'},
-    {n:'Step-up sur banc/chaise',s:'3×12/jambe',note:'Force fonctionnelle genou'},
-    {n:'Pompes déclinées (pieds sur banc)',s:'3×10',note:'Haut poitrine + épaules'},
-    {n:'Dips (chaise romaine)',s:'3×max',note:'Même progression que muscu A'},
-    {n:'Traction négative 8 sec',s:'3×5',note:'Monte avec chaise, descente LENTE'},
-    {n:'Superman / extension dos',s:'3×15',note:'3 sec de contraction en haut'},
-    {n:'Planche latérale + rotation',s:'3×10/côté',note:'Rotation avec genou avant-bras'},
+    {n:'Tractions / Variante',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.60:0,series:5},
+    {n:'Chin-ups (supination)',s:exSets(3,tMax,.60),note:'Prise paumes vers soi · plus facile · biceps',type:'tractions',pct:.60,series:3},
+    {n:'Rétraction suspendue',s:'4×12-15',note:'Descendre les épaules SANS plier les bras'},
+    {n:'Rowing australien',s:exSets(4,m.pompes,.60),note:'Corps incliné · tirer poitrine vers barre',type:'pompes',pct:.60,series:4},
+    {n:'Superman / extension dos',s:'3×15',note:'3s contraction en haut'},
+    {n:'Ab wheel',s:`3×${adaptReps(m.gainage,.55)}s equivalent`,note:'Ou planche si pas de roue'},
   ];
   if(p===2) return [...base,
-    {n:'Squat bulgare (chaise)',s:'3×10/jambe',note:'Pied arrière sur chaise'},
-    {n:'Fentes sautées',s:'3×8/jambe',note:'Skip si douleur genou'},
-    {n:'Pompes déclinées',s:'3×12',note:'Progression +1 rep/semaine'},
-    {n:'Dips lesté (si possible)',s:'4×max',note:'Sac sur les cuisses'},
-    {n:'Traction complète ou assistée',s:'4×max',note:'Priorité aux tractions libres'},
-    {n:'Traction prise neutre (si dispo)',s:'3×max',note:'Prise en marteau'},
-    {n:'Gainage + abducteurs (clam shell)',s:'3×20/côté',note:'Bande élastique si dispo'},
+    {n:'Tractions / Variante',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.60:0,series:5},
+    {n:'Chin-ups (supination)',s:exSets(3,tMax,.65),note:'Biceps · complément direct tractions',type:'tractions',pct:.65,series:3},
+    {n:'Rétraction suspendue',s:'4×12',note:'Exercice N°1 préparation tractions'},
+    {n:'Rowing australien',s:exSets(4,m.pompes,.65),note:'Rétraction scapulaire complète',type:'pompes',pct:.65,series:4},
+    {n:'Fentes marchées',s:'3×10/jambe',note:'Psoas + fessiers = moteurs de la foulée'},
+    {n:'Pont fessier unilatéral',s:'3×12/jambe',note:'Prévention genou + activation fessiers'},
     {n:'Core circuit finisher',s:'2 rounds',note:'15 leg raise + 15 russian twist + 30s planche'},
   ];
   return [...base,
+    {n:'Tractions complètes',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.65:0,series:5},
+    {n:'Chin-ups lents (3-1-3)',s:exSets(4,tMax,.65),note:'3s montée · 1s haut · 3s descente · force max',type:'tractions',pct:.65,series:4},
+    {n:'Rowing australien lesté',s:exSets(4,m.pompes,.70),note:'Sac à dos · dorsaux et rhomboïdes',type:'pompes',pct:.70,series:4},
     {n:'Pistol squat assisté',s:'3×5/jambe',note:'Tient une corde/porte'},
     {n:'Nordic curl libre',s:'3×8',note:'Excentrique + concentrique'},
-    {n:'Pompes déclinées lestées',s:'4×12',note:'Sac à dos'},
-    {n:'Dips avec pause basse',s:'3×8',note:'3s en bas = force maxi'},
-    {n:'Tractions lentes (3-1-3)',s:'4×max',note:'3s montée · 1s haut · 3s descente'},
-    {n:'Traction prise large',s:'3×max',note:'Pour les dorsaux'},
-    {n:'Dragon flag progressif',s:'3×5',note:'Sur banc — si suffisamment fort'},
-    {n:'Finisher tabata',s:'8 rounds 20/10',note:'Choice : burpees / mountain climbers'},
+    {n:'Dragon flag progressif',s:'3×5',note:'Sur banc'},
+    {n:'Finisher tabata',s:'8 rounds 20s/10s',note:'Burpees ou mountain climbers'},
+  ];
+}
+
+function getMuscuC(w){
+  // Session C — Fonctionnel (vendredi) selon le doc
+  const p=getPhase(w);
+  const m=getCurrentMax();
+  const base=[
+    {n:'Échauffement cardio',s:'8 min step/corde/escaliers',note:'Activation système nerveux avant force'},
+    {n:'Squat excentrique 🦵',s:'3×15',note:'Descente 5s — TOUJOURS'},
+  ];
+  if(p===1) return [...base,
+    {n:'Fentes marchées',s:'3×10/jambe',note:'Grand pas · genou arrière ~5cm du sol'},
+    {n:'Step-up sur banc/chaise',s:'3×12/jambe',note:'Force fonctionnelle genou'},
+    {n:'Pont fessier unilatéral',s:'3×12/jambe',note:'Dos au sol · hanches hautes · serrer fessier'},
+    {n:'Pompes déclinées (pieds sur banc)',s:exSets(3,m.pompes,.55),note:'Haut poitrine + épaules',type:'pompes',pct:.55,series:3},
+    {n:'Mollets (debout)',s:'4×20 + 3×10 lent',note:'2s montée · 3s descente · amplitude complète'},
+    {n:'Gainage latéral',s:'3×30s/côté',note:'Hanches hautes'},
+    {n:'Dead bug',s:'3×8/côté',note:'Lombaires collées au sol'},
+  ];
+  if(p===2) return [...base,
+    {n:'Squat bulgare (chaise)',s:'4×10/jambe',note:'Pied arrière surélevé · descente 3s · genou dans l\'axe'},
+    {n:'Fentes sautées',s:'3×8/jambe',note:'SKIP si douleur genou'},
+    {n:'Pont fessier unilatéral',s:'3×15/jambe',note:'Progression +3 reps/semaine'},
+    {n:'Pompes déclinées',s:exSets(4,m.pompes,.60),note:'Progression +1 rep/semaine',type:'pompes',pct:.60,series:4},
+    {n:'Mollets lestés (sac)',s:'4×15',note:'Sac à dos · amplitude maximale'},
+    {n:'Gainage + abducteurs',s:'3×20/côté',note:'Clam shell · bande élastique si dispo'},
+    {n:'Core circuit',s:'2 rounds',note:'20 crunch + 20 leg raise + 20 russian twist'},
+  ];
+  return [...base,
+    {n:'Pistol squat assisté',s:'4×5/jambe',note:'Progression vers libre'},
+    {n:'Nordic curl libre',s:'3×8',note:'Excentrique + concentrique'},
+    {n:'Pont fessier lesté',s:'3×15',note:'Poids sur les hanches'},
+    {n:'Pompes déclinées lestées',s:exSets(4,m.pompes,.65),note:'Sac à dos · haut pectoraux',type:'pompes',pct:.65,series:4},
+    {n:'Mollets unilatéraux',s:'4×12/jambe',note:'Sur une marche · amplitude max'},
+    {n:'L-sit progression',s:`3×${adaptReps(m.gainage,.50)}s`,note:'Jambes groupées puis tendues',type:'gainage',pct:.50,series:3},
+    {n:'Finisher tabata',s:'8 rounds 20s/10s',note:'Burpees / mountain climbers'},
   ];
 }
 
@@ -1144,6 +1310,7 @@ function goTo(p){
   if(nb) nb.classList.add('active');
   curPage=p;
   if(p==='dash') refreshDash();
+  if(p==='log') initLogPage();
   if(p==='journal') refreshJournal();
   if(p==='stats') refreshStats();
   if(p==='prs') refreshPRs();
@@ -1167,38 +1334,139 @@ function getCurWeek(){
 
 // ════════════════════════════ SESSION TYPE ════════════════════════════
 let curType='muscu_a';
+
 const TYPE_TIPS={
-  muscu_a:'💪 Muscu A — Protocole genoux obligatoire AVANT. Note tes maxs de pompes, dips, tractions.',
-  muscu_b:'💪 Muscu B — Ischio-jambiers, tractions, core. Protocole genoux AVANT.',
-  test_max:'🧪 Test Max — Séance de référence. Note tes maxs absolus : pompes, dips, tractions, gainage. Pas besoin de faire les exercices du programme.',
-  z2:'💚 Zone 2 — STRICTEMENT 152-162 bpm. Allure secondaire. Tu dois pouvoir parler normalement.',
-  tempo:'🎯 Tempo — Zone 3-4 (162-175 bpm). Allure "inconfortablement confortable". Voir le programme.',
-  frac_court:'⚡ Fractionné Court — Voir le programme pour ta semaine actuelle.',
-  frac_long:'⚡ Fractionné Long — Voir le programme pour ta semaine actuelle.',
-  pyramidal:'🔺 Pyramidal — Distances croissantes puis décroissantes. Allure constante.',
-  fartlek:'🌀 Fartlek — Course libre avec variations d\'allure intuitives. Pas de montre.',
-  cotes:'⛰ Côtes — 8-12 répétitions de 100-200m en côte. Récup descente en marchant.',
-  longue:'🌄 Sortie Longue — Z2 UNIQUEMENT. Durée selon programme. Allure conversationnelle.',
-  autre:'✏ Autre séance libre.',
+  muscu_a:'💪 Muscu A — Push. Protocole genoux AVANT. Pompes larges, pike push-ups, dips, gainage.',
+  muscu_b:'💪 Muscu B — Pull. Tractions, chin-ups, rowing. Protocole genoux AVANT.',
+  muscu_c:'💪 Muscu C — Fonctionnel. Squat bulgare, fentes, mollets, core. Critique à 97kg.',
+  test_max:'🧪 Test Max — Pompes / Dips / Tractions / Gainage à fond. Met à jour tes maxs pour recalibrer tous les exos.',
+  repos:'',
+  z2:'💚 Zone 2 — STRICTEMENT 125-145 bpm. Allure secondaire. Tu dois pouvoir parler normalement.',
+  tempo:'🎯 Tempo — Zone 3 (154-168 bpm). "Inconfortablement confortable".',
+  frac_court:'⚡ Fractionné Court — Voir détail ci-dessous.',
+  frac_long:'⚡ Fractionné Long — Voir détail ci-dessous.',
+  pyramidal:'🔺 Pyramidal — Distances croissantes puis décroissantes.',
+  fartlek:'🌀 Fartlek — Course libre avec variations d\'allure intuitives.',
+  cotes:'⛰ Côtes — 8-12 répétitions de 100-200m en côte.',
+  longue:'🌄 Sortie Longue — Z2 UNIQUEMENT. Durée selon programme.',
 };
 const COURSE_TYPES=['z2','tempo','frac_court','frac_long','pyramidal','fartlek','cotes','longue'];
-const MUSCU_TYPES=['muscu_a','muscu_b','test_max'];
+const MUSCU_TYPES=['muscu_a','muscu_b','muscu_c','test_max'];
+const REPOS_TYPE='repos';
 
-function setType(t,btn){
+// ════ PLANNING PAR JOUR DE LA SEMAINE ════
+// Lun=MusA, Mar=Z2+foulées, Mer=MusB, Jeu=Course variable, Ven=MusC, Sam=Longue, Dim=Repos
+function getTodayPlan(){
+  const w=getCurWeek();
+  const dow=new Date().getDay(); // 0=dim,1=lun...6=sam
+  const run=getRunSessions(w)||{};
+  const DAYS={
+    1:{ico:'💪',type:'muscu_a',label:'Muscu A — Push',
+       desc:`Session A · Pompes larges, pike push-ups, dips, gainage · 65 min · Phase ${getPhase(w)}`},
+    2:{ico:'💚',type:'z2',label:'Zone 2 + Foulées',
+       desc:(run.z2?.tip||'45-55 min à 125-145 bpm · Allure ~6:30-7:00/km')+' · 6 foulées progressives en fin'},
+    3:{ico:'💪',type:'muscu_b',label:'Muscu B — Pull',
+       desc:`Session B · Tractions, chin-ups, rowing · 65 min · Phase ${getPhase(w)}`},
+    4:{ico:'⚡',type:w<=4?'z2':w<=12?'frac_court':'frac_long',
+       label:w<=2?'Zone 2 40min':w===3?'4×800m Z4':w===4?'Zone 2 récup':w<=12?'Fractionné':'Fractionné Long',
+       desc:(run.frac?.tip||run.z2?.tip||'Course intensive selon programme')},
+    5:{ico:'💪',type:'muscu_c',label:'Muscu C — Fonctionnel',
+       desc:`Session C · Squat bulgare, fentes, mollets, core · 60 min · Critique à ${getCurrentMax&&getCurrentMax().poids||97}kg`},
+    6:{ico:'🌄',type:'longue',label:'Sortie Longue',
+       desc:(run.longue?.tip||'60-90 min à 6:30-7:00/km · Z2 uniquement')},
+    0:{ico:'😴',type:'repos',label:'Repos',
+       desc:'Récupération active · Étirements · Sommeil · Pesée du matin'},
+  };
+  return{...DAYS[dow],week:w,dow};
+}
+
+// ════ INIT LOGGER PAGE ════
+function initLogPage(){
+  const plan=getTodayPlan();
+  const today=new Date();
+  // Sub header
+  const el=document.getElementById('log-date-sub');
+  if(el) el.textContent=today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  // Fill banner
+  document.getElementById('banner-ico').textContent=plan.ico;
+  document.getElementById('banner-day').textContent=
+    ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][plan.dow]+' · S'+plan.week+' · Phase '+getPhase(plan.week);
+  document.getElementById('banner-title').textContent=plan.label;
+  document.getElementById('banner-desc').textContent=plan.desc.slice(0,220);
+  // Reset form
+  document.getElementById('override-panel').style.display='none';
+  document.getElementById('form-zone').style.display='none';
+  // Pre-set date
+  document.getElementById('l-date').value=today.toISOString().split('T')[0];
+}
+
+function confirmToday(){
+  const plan=getTodayPlan();
+  curType=plan.type;
+  activateForm(curType);
+}
+
+function showOverride(){
+  const op=document.getElementById('override-panel');
+  op.style.display=op.style.display==='none'?'block':'none';
+  // Reset category highlights
+  ['muscu','course','repos'].forEach(c=>{
+    const b=document.getElementById('cat-btn-'+c);
+    if(b){b.style.borderColor='var(--bd)';b.style.background='var(--s2)';}
+  });
+  document.getElementById('subcat-muscu').style.display='none';
+  document.getElementById('subcat-course').style.display='none';
+}
+
+function selectCat(cat){
+  ['muscu','course','repos'].forEach(c=>{
+    const b=document.getElementById('cat-btn-'+c);
+    if(b){b.style.borderColor='var(--bd)';b.style.background='var(--s2)';}
+  });
+  const btn=document.getElementById('cat-btn-'+cat);
+  if(btn){btn.style.borderColor='var(--or)';btn.style.background='rgba(255,69,0,.1)';}
+  document.getElementById('subcat-muscu').style.display=cat==='muscu'?'block':'none';
+  document.getElementById('subcat-course').style.display=cat==='course'?'block':'none';
+  if(cat==='repos') activateType('repos');
+}
+
+function activateType(t){
   curType=t;
-  document.querySelectorAll('#type-pills .pill').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
+  document.getElementById('override-panel').style.display='none';
+  activateForm(t);
+}
+
+function activateForm(t){
   const isCourse=COURSE_TYPES.includes(t);
   const isMuscu=MUSCU_TYPES.includes(t);
+  const isRepos=t===REPOS_TYPE;
+  const isFrac=['frac_court','frac_long','pyramidal'].includes(t);
+
+  // Show form zone
+  document.getElementById('form-zone').style.display='block';
+
+  // Active type bar
+  const bar=document.getElementById('active-type-bar');
+  const tip=TYPE_TIPS[t];
+  bar.style.display=tip?'block':'none';
+  bar.textContent=tip||'';
+
+  // Genoux proto
+  document.getElementById('sec-genoux-proto').style.display=(!isRepos&&t!=='test_max')?'block':'none';
+
+  // Course
   document.getElementById('sec-course').style.display=isCourse?'block':'none';
+  document.getElementById('sec-frac-detail').style.display=isFrac?'block':'none';
+
+  // Muscu
   document.getElementById('sec-muscu').style.display=isMuscu?'block':'none';
-  document.getElementById('sec-frac-detail').style.display=(t==='frac_court'||t==='frac_long'||t==='pyramidal')?'block':'none';
-  document.getElementById('sec-genoux-proto').style.display=t==='test_max'?'none':'block';
-  const tip=document.getElementById('session-tip');
-  tip.style.display='block';
-  tip.textContent=TYPE_TIPS[t]||'';
-  if(isMuscu) loadExList(t);
-  // Warmup
+  if(isMuscu){ loadExList(t); renderCurrentMaxs(); }
+
+  // Repos
+  document.getElementById('sec-repos-poids').style.display=isRepos?'block':'none';
+  document.getElementById('sec-genou-score').style.display=isRepos?'none':'block';
+
+  // Warmup course
   const wu=document.getElementById('sec-warmup');
   if(isCourse){
     wu.style.display='block';
@@ -1208,27 +1476,45 @@ function setType(t,btn){
   } else {
     wu.style.display='none';
   }
+
+  // Scroll to form
+  setTimeout(()=>{
+    const fz=document.getElementById('form-zone');
+    if(fz) fz.scrollIntoView({behavior:'smooth',block:'start'});
+  },150);
+}
+
+// Legacy setType for editSession compatibility
+function setType(t){
+  curType=t;
+  document.getElementById('form-zone').style.display='block';
+  activateForm(t);
 }
 
 function loadExList(t){
-  const week=getCurWeek();
-  const exs=t==='muscu_a'?getMuscuA(week):getMuscuB(week);
-  const el=document.getElementById('l-ex-list');
-  if(!exs.length){el.innerHTML='';return}
-  el.innerHTML=exs.map((ex,i)=>`
-    <div class="ex-item" onclick="toggleEx(${i})">
-      <div class="ex-check" id="exc-${i}"></div>
-      <div class="ex-info"><div class="ex-name">${ex.n}</div><div class="ex-note">${ex.note}</div></div>
-      <div class="ex-sets">${ex.s}</div>
-    </div>`).join('');
+  var week=getCurWeek();
+  var exs;
+  if(t==='test_max'){
+    exs=[
+      {n:'Pompes — MAX absolu',s:'3 essais',note:'Repos 3 min entre. Note le meilleur.'},
+      {n:'Dips — MAX absolu',s:'3 essais',note:'Descente complète bras à 90°.'},
+      {n:'Tractions — MAX absolu',s:'3 essais',note:'Menton au-dessus de la barre.'},
+      {n:'Gainage frontal — MAX durée',s:'2 essais',note:'Note le temps en secondes.'},
+    ];
+  } else if(t==='muscu_a'){exs=getMuscuA(week);}
+  else if(t==='muscu_c'){exs=getMuscuC(week);}
+  else{exs=getMuscuB(week);}
+  circuitExList=exs||[];
+  circuitState={};
+  renderCircuit();
 }
-function toggleEx(i){const el=document.getElementById('exc-'+i);el.classList.toggle('done')}
+function toggleEx(i){const el=document.getElementById('exc-'+i);el.classList.toggle('done');}
 
 // ════════════════════════════ SLIDERS ════════════════════════════
 function updSlider(inp,valId,type){
   const v=parseInt(inp.value),el=document.getElementById(valId);
   el.textContent=v+'/10';
-  const pct=(type==='genou'?v:v)/10*100;
+  const pct=v/10*100;
   let col;
   if(type==='genou') col=v<=2?'var(--grn)':v<=4?'var(--yel)':'var(--red)';
   else col=v<=3?'var(--red)':v<=6?'var(--yel)':'var(--grn)';
@@ -1251,10 +1537,32 @@ function autoCalcAllure(){
 function saveSession(){
   const d=D(), date=document.getElementById('l-date').value;
   if(!date){toast('⚠ Choisis une date !',true);return}
+  const isRepos=curType===REPOS_TYPE;
+  const isCourse=COURSE_TYPES.includes(curType);
+  const isMuscu=MUSCU_TYPES.includes(curType);
+
+  // Repos : skip genoux check, just save poids + date
+  if(isRepos){
+    const rpw=document.getElementById('repos-poids').value;
+    const poids=rpw?parseWeight(rpw):null;
+    const s={id:Date.now(),date,type:'repos',feeling:+document.getElementById('l-feeling').value,notes:document.getElementById('l-notes').value};
+    if(poids){
+      s.poids=poids;
+      d.poidsLog=d.poidsLog||[];
+      d.poidsLog.unshift({date,poids});
+    }
+    d.sessions.push(s);SD(d);
+    toast('😴 Repos enregistré !');resetLog();resetProto();refreshDash();
+    // Open the saved session
+    setTimeout(()=>openModal(s.id),350);
+    return;
+  }
+
   if(!protoDoneToggle && curType!=='test_max'){toast('🦵 Active le protocole genoux d\'abord !',true);return}
-  const isCourse=COURSE_TYPES.includes(curType),isMuscu=MUSCU_TYPES.includes(curType);
+
   const s={id:Date.now(),date,type:curType,feeling:+document.getElementById('l-feeling').value,genou:+document.getElementById('l-genou').value,notes:document.getElementById('l-notes').value};
   const pw=document.getElementById('l-poids').value;if(pw) s.poids=parseWeight(pw);
+
   if(isCourse){
     const dist=document.getElementById('l-dist').value;
     const dmin=parseInt(document.getElementById('l-duree-min').value)||0;
@@ -1267,31 +1575,68 @@ function saveSession(){
     if(fc) s.fc=parseInt(fc);if(fcmax) s.fcmax=parseInt(fcmax);if(deniv) s.deniv=parseInt(deniv);
     s.fracDet=document.getElementById('l-frac-det').value||null;
   }
+
   if(isMuscu){
-    const po=document.getElementById('l-pompes').value,di=document.getElementById('l-dips').value,tr=document.getElementById('l-tractions').value,ga=document.getElementById('l-gainage').value;
-    if(po) s.pompes=parseInt(po);if(di) s.dips=parseInt(di);if(tr) s.tractions=parseInt(tr);if(ga) s.gainage=parseInt(ga);
-    if(s.pompes&&s.pompes>(d.prs.pompes||0)) d.prs.pompes=s.pompes;
-    if(s.dips&&s.dips>(d.prs.dips||0)) d.prs.dips=s.dips;
-    if(s.tractions&&s.tractions>(d.prs.tractions||0)) d.prs.tractions=s.tractions;
-    if(s.gainage&&s.gainage>(d.prs.gainage||0)) d.prs.gainage=s.gainage;
-    s.exDone=[...document.querySelectorAll('.ex-check.done')].length;
-    s.exTotal=document.querySelectorAll('.ex-check').length;
+    // Manual overrides from input fields
+    const po=document.getElementById('l-pompes').value;
+    const di=document.getElementById('l-dips').value;
+    const tr=document.getElementById('l-tractions').value;
+    const ga=document.getElementById('l-gainage').value;
+
+    // Count reps from checked exercises (type metadata)
+    let exPompes=0, exDips=0, exTractions=0, exGainage=0;
+    document.querySelectorAll('.ex-check.done').forEach(el=>{
+      const type=el.dataset.type;
+      const series=parseInt(el.dataset.series)||0;
+      const pct=parseFloat(el.dataset.pct)||0;
+      if(!type||!series||!pct) return;
+      const m=getCurrentMax();
+      const repsPerSet=adaptReps(m[type]||0, pct);
+      const total=repsPerSet*series;
+      if(type==='pompes') exPompes+=total;
+      else if(type==='dips') exDips+=total;
+      else if(type==='tractions') exTractions+=total;
+      else if(type==='gainage') exGainage+=total;
+    });
+
+    // Use manual input if provided, else use exercise totals
+    s.pompes = po ? parseInt(po) : (exPompes||undefined);
+    s.dips   = di ? parseInt(di) : (exDips||undefined);
+    s.tractions = tr ? parseInt(tr) : (exTractions||undefined);
+    s.gainage   = ga ? parseInt(ga) : (exGainage||undefined);
+
+    // Store exercise volume separately for stats
+    s.exPompes=exPompes; s.exDips=exDips; s.exTractions=exTractions;
+
+    // Update PRs only from manual "max test" values
+    if(po && parseInt(po)>(d.prs.pompes||0)) d.prs.pompes=parseInt(po);
+    if(di && parseInt(di)>(d.prs.dips||0)) d.prs.dips=parseInt(di);
+    if(tr && parseInt(tr)>(d.prs.tractions||0)) d.prs.tractions=parseInt(tr);
+    if(ga && parseInt(ga)>(d.prs.gainage||0)) d.prs.gainage=parseInt(ga);
+
+    var doneCount=Object.values(circuitState).reduce(function(a,b){return a+b;},0);
+    var totalCount=circuitExList.reduce(function(a,ex){return a+(parseSetCount(ex.s)||1);},0);
+    s.exDone=doneCount;
+    s.exTotal=totalCount;
   }
+
+  const savedId=s.id;
   if(editingSessionId){
-    // Update existing session
-    const idx=d.sessions.findIndex(s=>s.id===editingSessionId);
+    const idx=d.sessions.findIndex(x=>x.id===editingSessionId);
     if(idx>=0){ s.id=editingSessionId; d.sessions[idx]=s; }
     editingSessionId=null;
     document.getElementById('save-btn').textContent='💾 Enregistrer la Séance';
     document.getElementById('save-btn').style.background='';
-    SD(d);toast('✅ Séance modifiée !');resetLog();resetProto();
+    SD(d);toast('✅ Séance modifiée !');resetLog();resetProto();refreshDash();
+    setTimeout(()=>openModal(s.id),350);
   } else {
     d.sessions.push(s);SD(d);
-    toast('✅ Séance enregistrée !');resetLog();resetProto();
+    toast('✅ Séance enregistrée !');resetLog();resetProto();refreshDash();
+    setTimeout(()=>openModal(savedId),350);
   }
 }
 function resetLog(){
-  ['l-notes','l-dist','l-duree-min','l-duree-sec','l-allure','l-fc','l-fcmax','l-deniv','l-frac-det','l-poids','l-pompes','l-dips','l-tractions','l-gainage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  ['l-notes','l-dist','l-duree-min','l-duree-sec','l-allure','l-fc','l-fcmax','l-deniv','l-frac-det','l-poids','l-pompes','l-dips','l-tractions','l-gainage','repos-poids'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   document.getElementById('l-feeling').value=7;document.getElementById('l-genou').value=0;
   updSlider(document.getElementById('l-feeling'),'rv-feel','feel');
   updSlider(document.getElementById('l-genou'),'rv-genou','genou');
@@ -1402,27 +1747,42 @@ function refreshDash(){
 }
 
 function miniCard(s){
-  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',test_max:'🧪 Test Max',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
-  const tagc={muscu_a:'tag-or',muscu_b:'tag-or',test_max:'tag-pur',z2:'tag-grn',tempo:'tag-blu',frac_court:'tag-yel',frac_long:'tag-yel',pyramidal:'tag-pur',fartlek:'tag-grn',cotes:'tag-grn',longue:'tag-grn',autre:'tag-gray'};
-  const d=new Date(s.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',muscu_c:'💪 Muscu C',test_max:'🧪 Test Max',repos:'😴 Repos',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
+  const tagc={muscu_a:'tag-or',muscu_b:'tag-or',muscu_c:'tag-or',test_max:'tag-pur',repos:'tag-gray',z2:'tag-grn',tempo:'tag-blu',frac_court:'tag-yel',frac_long:'tag-yel',pyramidal:'tag-pur',fartlek:'tag-grn',cotes:'tag-grn',longue:'tag-grn',autre:'tag-gray'};
+  const dd=new Date(s.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   const dots=Array.from({length:10},(_,i)=>`<div class="f-dot ${i<s.feeling?'on':''}"></div>`).join('');
-  const fc=s.feeling>=7?'var(--grn)':s.feeling>=4?'var(--yel)':'var(--red)';
+
+  // For repos: simple card
+  if(s.type==='repos'){
+    return`<div class="j-entry j-entry-rest" onclick="openModal(${s.id})">
+      <div class="j-head"><div class="row" style="gap:8px"><span class="tag tag-gray">😴 Repos</span></div><div class="j-date">${dd}</div></div>
+      ${s.poids?`<div class="j-kpi"><div class="j-kpi-item">⚖ <b>${s.poids} kg</b></div></div>`:''}
+    </div>`;
+  }
+
+  // Show exercise volume (from exercises) or manual values
+  const showPompes=s.exPompes||s.pompes;
+  const showDips=s.exDips||s.dips;
+  const showTractions=s.exTractions||s.tractions;
+
   return`<div class="j-entry" onclick="openModal(${s.id})">
     <div class="j-head">
       <div class="row" style="gap:8px"><span class="tag ${tagc[s.type]||'tag-gray'}">${lbl[s.type]||s.type}</span></div>
-      <div class="j-date">${d}</div>
+      <div class="j-date">${dd}</div>
     </div>
     <div class="j-kpi">
       ${s.distance?`<div class="j-kpi-item">📍 <b>${s.distance}km</b></div>`:''}
       ${s.allure?`<div class="j-kpi-item">⚡ <b>${s.allure}/km</b></div>`:''}
       ${s.fc?`<div class="j-kpi-item">❤ <b>${s.fc}</b>bpm</div>`:''}
-      ${s.pompes?`<div class="j-kpi-item">💪<b>${s.pompes}</b></div>`:''}
-      ${s.dips?`<div class="j-kpi-item">⬇<b>${s.dips}</b></div>`:''}
-      ${s.tractions?`<div class="j-kpi-item">⬆<b>${s.tractions}</b></div>`:''}
+      ${showPompes?`<div class="j-kpi-item">💪<b>${showPompes}</b>${s.exPompes&&s.exPompes!==s.pompes?'<span style="font-size:9px;color:var(--mut)"> vol</span>':''}</div>`:''}
+      ${showDips?`<div class="j-kpi-item">⬇<b>${showDips}</b></div>`:''}
+      ${showTractions?`<div class="j-kpi-item">⬆<b>${showTractions}</b></div>`:''}
       ${s.gainage?`<div class="j-kpi-item">⏱<b>${s.gainage}s</b></div>`:''}
+      ${s.poids?`<div class="j-kpi-item">⚖<b>${s.poids}kg</b></div>`:''}
     </div>
     <div class="feeling-dots">${dots}</div>
     ${s.genou>3?`<div class="txt-xs red mt-8">🦵 Douleur ${s.genou}/10</div>`:''}
+    ${s.exDone&&s.exTotal?`<div style="font-size:10px;color:var(--mut);margin-top:4px">${s.exDone}/${s.exTotal} exo ✓</div>`:''}
   </div>`;
 }
 
@@ -1811,19 +2171,8 @@ function saveOnboarding(){
 let circuitState={};// {exIdx: setsCompleted}
 let circuitExList=[];
 
-function loadExList(t){
-  const week=getCurWeek();
-  const exs=t==='muscu_a'?getMuscuA(week):t==='muscu_b'?getMuscuB(week):t==='test_max'?[
-    {n:'Pompes — MAX absolu',s:'3 essais',note:'Repose 3min entre chaque. Note le meilleur.'},
-    {n:'Dips — MAX absolu',s:'3 essais',note:'Descente complète obligatoire.'},
-    {n:'Tractions — MAX absolu',s:'3 essais',note:'Montée menton au-dessus de la barre.'},
-    {n:'Gainage frontal — MAX durée',s:'2 essais',note:'Note le temps en secondes.'},
-  ]:[];
-  circuitExList=exs;
-  circuitState={};
-  const el=document.getElementById('l-ex-list');
-  if(!exs.length){el.innerHTML='';updateCircuitSummary();return}
-  renderCircuit();
+function loadExListOld_unused(t){
+  // Replaced by loadExList above
 }
 
 function parseSetCount(sStr){
@@ -1832,38 +2181,52 @@ function parseSetCount(sStr){
 }
 
 function renderCircuit(){
-  const el=document.getElementById('l-ex-list');
-  if(!circuitExList.length){el.innerHTML='';return}
-  let html='';
-  circuitExList.forEach((ex,i)=>{
-    const totalSets=parseSetCount(ex.s)||1;
-    const done=circuitState[i]||0;
-    const pct=Math.round((done/totalSets)*100);
-    const allDone=done>=totalSets;
-    html+=`<div style="padding:10px 0;border-bottom:1px solid var(--bd)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="flex:1">
-          <div class="ex-name" style="color:${allDone?'var(--grn)':'var(--txt)'}">${allDone?'✅ ':''} ${ex.n}</div>
-          <div class="ex-note">${ex.note}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div class="ex-sets" style="color:${allDone?'var(--grn)':'var(--or)'}">${done}/${totalSets}</div>
-          <div style="font-size:10px;color:var(--mut)">${ex.s}</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <div style="flex:1">
-          <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${allDone?'var(--grn)':'linear-gradient(90deg,var(--or),var(--or2))'}"></div></div>
-        </div>
-        ${!allDone?`<button onclick="tickSet(${i})" style="background:var(--or);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;flex-shrink:0">✓ Série</button>`:`<span style="color:var(--grn);font-size:18px;flex-shrink:0">🎉</span>`}
-        ${done>0?`<button onclick="unTickSet(${i})" style="background:var(--s3);border:1px solid var(--bd);border-radius:6px;color:var(--mut);font-size:11px;padding:6px 8px;cursor:pointer;flex-shrink:0">↩</button>`:''}
-      </div>
-    </div>`;
-  });
+  var el=document.getElementById('l-ex-list');
+  if(!el)return;
+  if(!circuitExList.length){
+    el.innerHTML='<div style="color:var(--mut);font-size:13px;padding:16px 0">Aucun exercice chargé.</div>';
+    updateCircuitSummary();return;
+  }
+  var html='';
+  for(var i=0;i<circuitExList.length;i++){
+    var ex=circuitExList[i];
+    var total=parseSetCount(ex.s)||1;
+    var done=circuitState[i]||0;
+    var pct=Math.round(done/total*100);
+    var ok=done>=total;
+    var nameCol=ok?'var(--grn)':'var(--txt)';
+    var cntCol=ok?'var(--grn)':'var(--or)';
+    var barCol=ok?'var(--grn)':'var(--or)';
+    var prefix=ok?'<span style="margin-right:5px">✅</span>':'';
+    var actionHtml=ok
+      ?'<span style="font-size:22px">🎯</span>'
+      :'<button onclick="tickSet('+i+')" style="background:var(--or);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:9px 14px;cursor:pointer;letter-spacing:.3px;flex-shrink:0">✓ Série</button>';
+    var undoHtml=done>0
+      ?'<button onclick="unTickSet('+i+')" style="background:var(--s3);border:1px solid var(--bd);border-radius:8px;color:var(--mut);font-size:12px;padding:9px 10px;cursor:pointer;flex-shrink:0">↩</button>'
+      :'';
+    html+='<div style="padding:14px 0;border-bottom:1px solid var(--bd2)">'
+     +'<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">'
+       +'<div style="flex:1;min-width:0">'
+         +'<div style="font-size:14px;font-weight:600;color:'+nameCol+';line-height:1.4">'+prefix+(ex.n||'')+'</div>'
+         +'<div style="font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5">'+(ex.note||'')+'</div>'
+       +'</div>'
+       +'<div style="text-align:right;flex-shrink:0;min-width:52px">'
+         +'<div style="font-size:24px;font-weight:700;color:'+cntCol+';line-height:1">'+done+'<span style="font-size:13px;color:var(--mut)">/'+total+'</span></div>'
+         +'<div style="font-size:10px;color:var(--mut);margin-top:2px;font-weight:500">'+ex.s+'</div>'
+       +'</div>'
+     +'</div>'
+     +'<div style="display:flex;align-items:center;gap:8px">'
+       +'<div style="flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">'
+         +'<div style="height:100%;width:'+pct+'%;background:'+barCol+';border-radius:3px;transition:width .35s"></div>'
+       +'</div>'
+       +actionHtml
+       +undoHtml
+     +'</div>'
+    +'</div>';
+  }
   el.innerHTML=html;
   updateCircuitSummary();
 }
-
 function tickSet(i){
   const totalSets=parseSetCount(circuitExList[i].s)||1;
   circuitState[i]=Math.min((circuitState[i]||0)+1,totalSets);
@@ -1932,15 +2295,113 @@ function savePersoDay(dateStr,checks){
   SD(d);
 }
 
+// ════ LT GOALS ════
+const LT_GOALS_DEFAULT=[
+  {id:'morse',ico:'📡',name:'Apprendre le Morse',desc:'Alphabet, signaux, décodage',sessions:0,target:20},
+  {id:'alphabet',ico:'🔤',name:'Alphabet Universel (API)',desc:'Phonétique internationale',sessions:0,target:15},
+  {id:'pays',ico:'🌍',name:'Tous les Pays du Monde',desc:'197 pays · quiz géo',sessions:0,target:30},
+  {id:'capitales',ico:'🏛',name:'Toutes les Capitales',desc:'Pays + capitale',sessions:0,target:25},
+  {id:'drapeaux',ico:'🏴',name:'Tous les Drapeaux',desc:'Reconnaître chaque drapeau',sessions:0,target:20},
+  {id:'certif',ico:'☁',name:'Certif ISO · AWS · DevOps',desc:'ISO 27001 · AWS SAA · DevOps',sessions:0,target:60},
+  {id:'pompier',ico:'🚒',name:'Devenir Pompier (SPV)',desc:'Candidature + formation initiale',sessions:0,target:50},
+  {id:'bateau',ico:'⛵',name:'Permis Bateau',desc:'Permis côtier + fluvial',sessions:0,target:15},
+  {id:'app',ico:'📱',name:'Monter une Application',desc:'Conception → App Store',sessions:0,target:40},
+];
+function getLTGoals(){var d=D();if(!d.ltGoals){d.ltGoals=LT_GOALS_DEFAULT.map(function(g){return Object.assign({},g);});SD(d);}return d.ltGoals;}
+function saveLTGoals(g){var d=D();d.ltGoals=g;SD(d);}
+function renderLTGoals(){
+  var goals=getLTGoals();
+  var total=goals.reduce(function(a,g){return a+Math.min(g.sessions/g.target,1);},0)/goals.length*100;
+  var tag=document.getElementById('lt-score-tag');
+  var bar=document.getElementById('lt-global-bar');
+  var el=document.getElementById('lt-goals-list');
+  if(tag)tag.textContent=Math.round(total)+' %';
+  if(bar)bar.style.width=total+'%';
+  if(!el)return;
+  var html='';
+  goals.forEach(function(g,i){
+    var pct=Math.min(Math.round(g.sessions/g.target*100),100);
+    var done=g.sessions>=g.target;
+    var barClr=done?'var(--grn)':'linear-gradient(90deg,var(--pur),#CC00FF)';
+    var pctClr=done?'var(--grn)':'var(--pur)';
+    html+='<div style="background:var(--s2);border:1px solid '+(done?'rgba(0,200,83,.25)':'var(--bd)')
+      +';border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="addLTSession('+i+')">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">'
+        +'<span style="font-size:22px;flex-shrink:0">'+g.ico+'</span>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:14px;font-weight:600;color:var(--txt);line-height:1.3">'+g.name+'</div>'
+          +'<div style="font-size:10px;color:var(--mut);margin-top:2px">'+g.desc+'</div>'
+        +'</div>'
+        +'<span style="font-family:monospace;font-size:14px;font-weight:700;color:'+pctClr+';flex-shrink:0">'+pct+'%</span>'
+      +'</div>'
+      +'<div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:5px">'
+        +'<div style="height:100%;width:'+pct+'%;background:'+barClr+';border-radius:2px;transition:width .5s"></div>'
+      +'</div>'
+      +'<div style="font-size:10px;color:var(--mut)">'+g.sessions+' / '+g.target+' sessions'+(done?' · ✅ ATTEINT':'')+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+function addLTSession(idx){
+  var goals=getLTGoals();if(!goals[idx])return;
+  goals[idx].sessions++;saveLTGoals(goals);renderLTGoals();
+  var g=goals[idx];var pct=Math.min(Math.round(g.sessions/g.target*100),100);
+  toast(g.ico+' +1 session — '+pct+'% — '+g.name.slice(0,22));
+  if(g.sessions===g.target)setTimeout(function(){toast('🎉 OBJECTIF ATTEINT : '+g.name.slice(0,20));},1200);
+}
+
+// ════ SAVE INIT DATA ════
+function saveInitData(){
+  var d=D();
+  function iv(id){var e=document.getElementById(id);return e?e.value:'';}
+  var pompes=parseInt(iv('init-pompes'))||0;
+  var dips=parseInt(iv('init-dips'))||0;
+  var tractions=parseInt(iv('init-tractions'))||0;
+  var gainage=parseInt(iv('init-gainage'))||0;
+  d.prs=d.prs||{};
+  if(pompes>0&&(!d.prs.pompes||d.prs.pompes<pompes))d.prs.pompes=pompes;
+  if(dips>0&&(!d.prs.dips||d.prs.dips<dips))d.prs.dips=dips;
+  if(tractions>0&&(!d.prs.tractions||d.prs.tractions<tractions))d.prs.tractions=tractions;
+  if(gainage>0&&(!d.prs.gainage||d.prs.gainage<gainage))d.prs.gainage=gainage;
+  d.settings=d.settings||{};
+  var poids=parseFloat(String(iv('init-poids')).replace(',','.'));
+  var r5k=iv('init-5k');
+  var week=parseInt(iv('init-week'))||0;
+  if(poids>40)d.settings.poidsInit=poids;
+  if(r5k)d.settings.pr5k=r5k;
+  if(week>0){
+    d.settings.manualWeek=week+1;
+    var start=new Date();start.setDate(start.getDate()-(week*7));
+    d.settings.startDate=start.toISOString().split('T')[0];
+  }
+  d.settings.initPrs=d.settings.initPrs||{};
+  if(pompes>0)d.settings.initPrs.pompes=pompes;
+  if(dips>0)d.settings.initPrs.dips=dips;
+  if(tractions>0)d.settings.initPrs.tractions=tractions;
+  if(gainage>0)d.settings.initPrs.gainage=gainage;
+  SD(d);toast('✅ Données S0 enregistrées !');refreshDash();
+}
+
+
 function refreshPerso(){
   const today=getTodayStr();
-  document.getElementById('perso-date-label').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const el=document.getElementById('perso-date-label');
+  if(el)el.textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   const goals=getPersoGoals();
   const checks=getPersoDay(today);
   renderPersoItems(goals,checks,today);
   renderPersoEdit(goals);
   renderPersoHistory(goals);
   updatePersoStats(goals);
+  renderLTGoals();
+  // Pre-fill init form placeholders with existing data
+  const d=D();
+  if(d.prs){
+    var ip=document.getElementById('init-pompes');if(ip&&d.prs.pompes)ip.placeholder=d.prs.pompes;
+    var it=document.getElementById('init-tractions');if(it&&d.prs.tractions)it.placeholder=d.prs.tractions;
+    var id2=document.getElementById('init-dips');if(id2&&d.prs.dips)id2.placeholder=d.prs.dips;
+  }
+  if(d.settings&&d.settings.poidsInit){var ip2=document.getElementById('init-poids');if(ip2)ip2.placeholder=d.settings.poidsInit;}
 }
 
 function renderPersoItems(goals,checks,dateStr){
@@ -2486,6 +2947,45 @@ function toggleGenouAlert(){
   const open=det.style.display==='none';
   det.style.display=open?'block':'none';
   arr.textContent=open?'▴ Masquer':'▾ Voir';
+}
+
+// ════════════════════════════ UPDATE MAX MODAL ════════════════════════════
+function openUpdateMaxModal(){
+  const m=getCurrentMax();
+  document.getElementById('um-pompes').value=m.pompes||'';
+  document.getElementById('um-dips').value=m.dips||'';
+  document.getElementById('um-tractions').value=m.tractions||'';
+  document.getElementById('um-gainage').value=m.gainage||'';
+  document.getElementById('update-max-modal-bg').classList.add('open');
+}
+function closeUpdateMaxModal(){document.getElementById('update-max-modal-bg').classList.remove('open')}
+function saveUpdatedMax(){
+  const d=D();
+  const po=parseInt(document.getElementById('um-pompes').value);
+  const di=parseInt(document.getElementById('um-dips').value);
+  const tr=parseInt(document.getElementById('um-tractions').value);
+  const ga=parseInt(document.getElementById('um-gainage').value);
+  if(po>0) d.prs.pompes=Math.max(d.prs.pompes||0,po);
+  if(di>0) d.prs.dips=Math.max(d.prs.dips||0,di);
+  if(tr>0) d.prs.tractions=Math.max(d.prs.tractions||0,tr);
+  if(ga>0) d.prs.gainage=Math.max(d.prs.gainage||0,ga);
+  SD(d);
+  closeUpdateMaxModal();
+  // Reload exercise list with new maxs
+  loadExList(curType);
+  renderCurrentMaxs();
+  toast('⚡ Maxs mis à jour — exercices recalibrés !');
+}
+
+function renderCurrentMaxs(){
+  const el=document.getElementById('current-maxs-display');
+  if(!el) return;
+  const m=getCurrentMax();
+  el.innerHTML=`
+    <div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px">Pompes</div><div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--or)">${m.pompes}</div></div>
+    <div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px">Dips</div><div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--or)">${m.dips}</div></div>
+    <div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px">Tractions</div><div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--or)">${m.tractions}</div></div>
+    <div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px">Gainage</div><div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--or)">${m.gainage}s</div></div>`;
 }
 
 // ════════════════════════════ PARSEWEIGHT ════════════════════════════

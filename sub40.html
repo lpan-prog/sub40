@@ -361,14 +361,14 @@ select option{background:#1A1A1A}
       <div class="card-title" style="margin:0">Objectifs Muscu</div>
       <button class="btn btn-ghost btn-sm" onclick="openObjModal()">✏ Modifier</button>
     </div>
-    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label"><div>Pompes</div><div class="obj-sub" id="obj-pompes-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-pompes">0</div><div class="obj-tgt" id="obj-pompes-tgt">→ 50</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-pompes" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-pompes-l">0</span><span id="pbl-pompes-r">50</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label"><div>Dips</div><div class="obj-sub" id="obj-dips-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-dips">0</div><div class="obj-tgt" id="obj-dips-tgt">→ 20</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-dips" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-dips-l">0</span><span id="pbl-dips-r">20</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label"><div>Tractions</div><div class="obj-sub" id="obj-tractions-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-tractions">0</div><div class="obj-tgt" id="obj-tractions-tgt">→ 12</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-tractions" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-tractions-l">0</span><span id="pbl-tractions-r">12</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label"><div>Gainage</div><div class="obj-sub" id="obj-gainage-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-gainage">?</div><div class="obj-tgt" id="obj-gainage-tgt">→ 300s</div></div></div>
-    <div class="pbar-wrap" style="padding:0 40px 0"><div class="pbar"><div class="pbar-fill" id="pb-gainage" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-gainage-l">0</span><span id="pbl-gainage-r">300s</span></div></div>
+    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label"><div>Pompes</div><div class="obj-sub" id="obj-pompes-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-pompes">0</div><div class="obj-tgt" id="obj-pompes-tgt">→ 100</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-pompes" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-pompes-l">0</span><span id="pbl-pompes-r">100</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label"><div>Dips</div><div class="obj-sub" id="obj-dips-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-dips">0</div><div class="obj-tgt" id="obj-dips-tgt">→ 50</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-dips" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-dips-l">0</span><span id="pbl-dips-r">50</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label"><div>Tractions</div><div class="obj-sub" id="obj-tractions-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-tractions">0</div><div class="obj-tgt" id="obj-tractions-tgt">→ 20</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 8px"><div class="pbar"><div class="pbar-fill" id="pb-tractions" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-tractions-l">0</span><span id="pbl-tractions-r">20</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label"><div>Gainage</div><div class="obj-sub" id="obj-gainage-sub">—</div></div><div class="obj-val"><div class="obj-cur" id="obj-gainage">?</div><div class="obj-tgt" id="obj-gainage-tgt">→ 600s</div></div></div>
+    <div class="pbar-wrap" style="padding:0 40px 0"><div class="pbar"><div class="pbar-fill" id="pb-gainage" style="width:0%"></div></div><div class="pbar-labels"><span id="pbl-gainage-l">0</span><span id="pbl-gainage-r">600s</span></div></div>
   </div>
 
   <!-- Objectifs course -->
@@ -452,9 +452,9 @@ select option{background:#1A1A1A}
       <div id="subcat-muscu" style="display:none">
         <div style="font-size:11px;color:var(--mut);margin-bottom:8px">Quelle séance muscu ?</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
-          <button onclick="activateType('muscu_a')" class="pill">💪 A — Push</button>
-          <button onclick="activateType('muscu_b')" class="pill">💪 B — Pull</button>
-          <button onclick="activateType('muscu_c')" class="pill">💪 C — Fonctionnel</button>
+          <button onclick="activateType('muscu_a')" class="pill">💪 A — Force</button>
+          <button onclick="activateType('muscu_b')" class="pill">💪 B — Volume</button>
+          <button onclick="activateType('muscu_c')" class="pill">💪 C — Spécifique</button>
           <button onclick="activateType('test_max')" class="pill">🧪 Test Max</button>
         </div>
       </div>
@@ -635,7 +635,7 @@ select option{background:#1A1A1A}
 
 <!-- ═══════════════════════ PROGRAMME ═══════════════════════ -->
 <div id="pg-prog" class="page">
-  <div class="s-head"><div class="s-title">Programme</div><div class="s-sub">6j/semaine — 20 semaines</div></div>
+  <div class="s-head"><div class="s-title">Programme</div><div class="s-sub">7j/semaine — 20 semaines</div></div>
 
   <div class="week-sel">
     <button class="week-btn" onclick="changeWeek(-1)">◀</button>
@@ -706,10 +706,10 @@ select option{background:#1A1A1A}
     <div class="card-title">🎯 Objectifs S20</div>
     <div class="obj-row"><div class="obj-ico">🏁</div><div class="obj-label">10K SUB 40:00</div><div id="g-10k"><span class="tag tag-gray">En cours</span></div></div>
     <div class="obj-row"><div class="obj-ico">⚖</div><div class="obj-label">Poids ≤ 89 kg</div><div id="g-poids"><span class="tag tag-gray">En cours</span></div></div>
-    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label">50 Pompes</div><div id="g-pompes"><span class="tag tag-gray">En cours</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label">20 Dips</div><div id="g-dips"><span class="tag tag-gray">En cours</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label">12 Tractions</div><div id="g-pull"><span class="tag tag-gray">En cours</span></div></div>
-    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label">5 min Gainage</div><div id="g-gainage"><span class="tag tag-gray">En cours</span></div></div>
+    <div class="obj-row"><div class="obj-ico">💪</div><div class="obj-label">100 Pompes</div><div id="g-pompes"><span class="tag tag-gray">En cours</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬇</div><div class="obj-label">50 Dips</div><div id="g-dips"><span class="tag tag-gray">En cours</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⬆</div><div class="obj-label">20 Tractions</div><div id="g-pull"><span class="tag tag-gray">En cours</span></div></div>
+    <div class="obj-row"><div class="obj-ico">⏱</div><div class="obj-label">10 min Gainage</div><div id="g-gainage"><span class="tag tag-gray">En cours</span></div></div>
   </div>
 
   <!-- Analyse 5K test -->
@@ -764,7 +764,7 @@ select option{background:#1A1A1A}
   </div>
 
   <div class="card" style="text-align:center">
-    <div class="txt-xs txt-mut" style="line-height:1.8">LÉO SUB-40 Tracker v2.0<br>Données : localStorage · Fonctionne 100% hors ligne<br>Graphiques : Chart.js CDN (connexion requise)</div>
+    <div class="txt-xs txt-mut" style="line-height:1.8">LÉO SUB-40 Tracker v10.0<br>Données : localStorage · Fonctionne 100% hors ligne<br>Graphiques : Chart.js CDN (connexion requise)</div>
   </div>
 </div>
 
@@ -1041,7 +1041,8 @@ select option{background:#1A1A1A}
 
 <script>
 // ════════════════════════════ DATA ════════════════════════════
-const KEY = 'leo_sub40_v2';
+const KEY = 'leo_sub40_v10';
+const KEY_OLD = 'leo_sub40_v2';
 const DEFAULTS = {
   settings:{ startDate:null, manualWeek:1, poidsInit:null, fcmax:null, pr5k:null, pr10k:null, onboardingDone:false },
   sessions:[],
@@ -1052,22 +1053,26 @@ function D(){ try{ return JSON.parse(localStorage.getItem(KEY))||{...DEFAULTS} }
 function SD(d){ localStorage.setItem(KEY,JSON.stringify(d)) }
 
 // ════════════════════════════ PROGRAMME CONTENT ════════════════════════════
-// Phase 1 (S1-S4): Base aérobie + reprise muscu
-// Phase 2 (S5-S12): Construction + variété course + montée muscu
-// Phase 3 (S13-S20): Spécifique 10K + force
+// Bloc 1 (S1-S4): Fondation agressive
+// Bloc 2 (S5-S8): Montée de charge
+// Bloc 3 (S9-S12): Bloc spécifique
+// Bloc 4 (S13-S16): Intensification
+// Bloc 5 (S17-S20): Pic de forme
 
-function getPhase(w){ return w<=4?1:w<=12?2:3 }
-function getPhaseName(w){ return ['','Phase 1 — Base & Reprise','Phase 2 — Construction','Phase 3 — Spécifique 10K'][getPhase(w)] }
-function getPhaseTag(w){ return ['','tag-grn','tag-blu','tag-or'][getPhase(w)] }
+function getPhase(w){ return w<=4?1:w<=8?2:w<=12?3:w<=16?4:5 }
+function getPhaseName(w){ return ['','Bloc 1 — Fondation','Bloc 2 — Montée de charge','Bloc 3 — Spécifique','Bloc 4 — Intensification','Bloc 5 — Pic de forme'][getPhase(w)] }
+function getPhaseTag(w){ return ['','tag-grn','tag-blu','tag-or','tag-pur','tag-yel'][getPhase(w)] }
 
 // ════════════════════════════ ADAPTIVE MUSCU ════════════════════════════
 function getCurrentMax(){
   const d=D();
   return {
     pompes: d.prs?.pompes || d.settings?.initPrs?.pompes || 19,
-    dips:   d.prs?.dips   || d.settings?.initPrs?.dips   || 3,
+    dips:   d.prs?.dips   || d.settings?.initPrs?.dips   || 2,
     tractions: d.prs?.tractions || d.settings?.initPrs?.tractions || 1,
-    gainage: d.prs?.gainage || d.settings?.initPrs?.gainage || 45,
+    gainage: d.prs?.gainage || d.settings?.initPrs?.gainage || 60,
+    dipsAssist: d.prs?.dipsAssist || 6,
+    tracAssist: d.prs?.tracAssist || 5,
   };
 }
 
@@ -1075,199 +1080,327 @@ function adaptReps(max, pct){
   if(!max || max<=0) return '?';
   return Math.max(1, Math.round(max * pct));
 }
-
 function exSets(series, max, pct, unit=''){
   const r = adaptReps(max, pct);
   return `${series}×${r}${unit} (${Math.round(pct*100)}%)`;
 }
+function exSetsSec(series, max, pct){
+  const r = adaptReps(max, pct);
+  return `${series}×${r}s (${Math.round(pct*100)}%)`;
+}
+
+// ════════════════════════════ 20-WEEK PROGRAM DATA ════════════════════════════
+// Muscu A — Force relative (Lundi)
+const MUSCU_A_DATA = {
+  1:{ds:3,ts:4,po:{s:6,p:.55},di:{s:6,p:.50},tr:{s:6,p:.45},neg:true,row:'4×10',bulg:'3×8/j',gf:{s:4,p:.50},gl:'3×25s/côté'},
+  2:{ds:4,ts:4,po:{s:6,p:.60},di:{s:6,p:.55},tr:{s:6,p:.50},neg:true,row:'4×10',bulg:'3×8',gf:{s:4,p:.55},gl:'3×25s/côté'},
+  3:{ds:4,ts:4,po:{s:7,p:.60},di:{s:7,p:.60},tr:{s:7,p:.55},neg:true,row:'4×8-10',bulg:'3×8',gf:{s:4,p:.60},gl:'3×25s/côté'},
+  4:{ds:0,ts:0,po:{s:4,p:.50},di:{s:4,p:.50},tr:{s:4,p:.45},neg:false,row:'',bulg:'',gf:{s:3,p:.50},gl:'',deload:true},
+  5:{ds:4,ts:4,po:{s:6,p:.60},di:{s:6,p:.55},tr:{s:6,p:.50},neg:true,row:'4×8-10',bulg:'',gf:{s:4,p:.60},gl:'3×25s/côté'},
+  6:{ds:0,ts:0,po:{s:6,p:.65},di:{s:6,p:.60},tr:{s:6,p:.58},neg:false,row:'',bulg:'',gf:{s:4,p:.65},gl:''},
+  7:{ds:0,ts:0,po:{s:7,p:.65},di:{s:7,p:.65},tr:{s:7,p:.60},neg:false,row:'',bulg:'',gf:{s:4,p:.70},gl:''},
+  8:{ds:0,ts:0,po:{s:4,p:.50},di:{s:4,p:.50},tr:{s:4,p:.50},neg:false,row:'',bulg:'',gf:{s:3,p:.50},gl:'',deload:true},
+  9:{ds:0,ts:0,po:{s:6,p:.65},di:{s:6,p:.60},tr:{s:6,p:.60},neg:false,row:'',bulg:'',gf:{s:4,p:.70},gl:''},
+  10:{ds:0,ts:0,po:{s:7,p:.65},di:{s:7,p:.65},tr:{s:7,p:.65},neg:false,row:'',bulg:'',gf:{s:4,p:.75},gl:''},
+  11:{ds:0,ts:0,po:{s:7,p:.70},di:{s:7,p:.70},tr:{s:7,p:.70},neg:false,row:'',bulg:'',gf:{s:4,p:.80},gl:''},
+  12:{ds:0,ts:0,po:{s:4,p:.55},di:{s:4,p:.55},tr:{s:4,p:.53},neg:false,row:'',bulg:'',gf:{s:3,p:.60},gl:'',deload:true},
+  13:{ds:0,ts:0,po:{s:6,p:.70},di:{s:6,p:.65},tr:{s:6,p:.65},neg:false,row:'',bulg:'',gf:{s:4,p:.75},gl:''},
+  14:{ds:0,ts:0,po:{s:7,p:.70},di:{s:7,p:.70},tr:{s:7,p:.70},neg:false,row:'',bulg:'',gf:{s:4,p:.80},gl:''},
+  15:{ds:0,ts:0,po:{s:7,p:.75},di:{s:7,p:.75},tr:{s:7,p:.75},neg:false,row:'',bulg:'',gf:{s:4,p:.85},gl:''},
+  16:{ds:0,ts:0,po:{s:4,p:.55},di:{s:4,p:.55},tr:{s:4,p:.55},neg:false,row:'',bulg:'',gf:{s:3,p:.60},gl:'',deload:true},
+  17:{ds:0,ts:0,po:{s:6,p:.75},di:{s:6,p:.70},tr:{s:6,p:.70},neg:false,row:'',bulg:'',gf:{s:4,p:.80},gl:''},
+  18:{ds:0,ts:0,po:{s:6,p:.80},di:{s:6,p:.75},tr:{s:6,p:.75},neg:false,row:'',bulg:'',gf:{s:4,p:.85},gl:''},
+  19:{ds:0,ts:0,po:{s:4,p:.60},di:{s:4,p:.60},tr:{s:4,p:.60},neg:false,row:'',bulg:'',gf:{s:3,p:.65},gl:'',deload:true},
+  20:{ds:0,ts:0,po:{s:3,p:.50},di:{s:3,p:.50},tr:{s:3,p:.50},neg:false,row:'',bulg:'',gf:{s:2,p:.50},gl:'',deload:true},
+};
 
 function getMuscuA(w){
-  const p=getPhase(w);
   const m=getCurrentMax();
-  const phase=p===1?1:p===2?2:3;
-  // pompe pct by phase
-  const pp=[0,.60,.65,.70][phase];
-  const dp=[0,.60,.65,.70][phase];
-
-  const base=[
-    {n:'Squat excentrique 🦵',s:'3×15',note:'Descente 5 sec LENTE — obligatoire'},
-    {n:'Hip thrust poids du corps',s:'3×20',note:'Contracte les fessiers au max'},
-    {n:'Activation scapulaire',s:'3×15 + 10s hang',note:'Rétractions + dead hang — prépare les tendons'},
+  const d=MUSCU_A_DATA[w]||MUSCU_A_DATA[1];
+  const warmup=[
+    {n:'Échauffement',s:'5 min',note:'Corde ou rameur léger'},
+    {n:'Scapular push-ups',s:'2×10',note:'Activation épaules'},
+    {n:'Scapular pull-ups',s:'2×8',note:'Rétractions scapulaires'},
+    {n:'Air squats',s:'2×10',note:'Activation jambes'},
+    {n:'Rotations externes élastique',s:'2×15',note:'Protection coiffe des rotateurs'},
   ];
-
-  if(p===1) return [...base,
-    {n:'Pompes larges',s:exSets(5,m.pompes,.60),note:'Mains 1.5× largeur épaules · descente 2s · explosif',type:'pompes',pct:.60,series:5},
-    {n:'Pompes pieds surélevés',s:exSets(4,m.pompes,.55),note:'Pieds sur chaise ~45cm · haut poitrine',type:'pompes',pct:.55,series:4},
-    {n:'Pike push-ups',s:exSets(4,m.pompes,.55),note:'Hanches hautes en V · deltoides',type:'pompes',pct:.55,series:4},
-    {n:'Bench dips',s:exSets(4,m.dips,.60)+' + 3 négatifs 7s',note:'P1 : chaise uniquement · coudes vers l\'arrière',type:'dips',pct:.60,series:4},
-    {n:'Pompes diamant',s:exSets(3,m.pompes,.55),note:'Index-pouce se touchent · triceps',type:'pompes',pct:.55,series:3},
-    {n:'Gainage frontal',s:`4×${adaptReps(m.gainage,.55)}s`,note:'Note ton total → objectif 300s',type:'gainage',pct:.55,series:4},
-    {n:'Gainage latéral',s:'3×25s/côté',note:'Hanches hautes, corps aligné'},
-    {n:'Hollow body',s:`3×${adaptReps(m.gainage,.50)}s`,note:'Lombaires collées au sol',type:'gainage',pct:.50,series:3},
-  ];
-  if(p===2) return [...base,
-    {n:'Pompes larges',s:exSets(5,m.pompes,.65),note:'Corps rigide · fessiers serrés · 3 reps avant l\'échec',type:'pompes',pct:.65,series:5},
-    {n:'Pompes pieds surélevés',s:exSets(4,m.pompes,.60),note:'Progression +1 rep/semaine',type:'pompes',pct:.60,series:4},
-    {n:'Pike push-ups',s:exSets(4,m.pompes,.60),note:'Contrôle total · pause 1s en bas',type:'pompes',pct:.60,series:4},
-    {n:'Dips complets',s:exSets(4,m.dips,.65),note:'Plus de bench dips · coudes vers l\'arrière',type:'dips',pct:.65,series:4},
-    {n:'Pompes explosives',s:`3×6`,note:'Mains quittent le sol · atterrissage souple'},
-    {n:'Gainage frontal',s:`4×${adaptReps(m.gainage,.60)}s`,note:'Chaque set compte · note le total',type:'gainage',pct:.60,series:4},
-    {n:'Gainage dynamique (rocking)',s:'3×20',note:'Avant/arrière sur avant-bras · contrôle'},
-    {n:'L-sit chaise',s:`3×${adaptReps(m.gainage,.45)}s`,note:'Jambes tendues si possible',type:'gainage',pct:.45,series:3},
-  ];
-  return [...base,
-    {n:'Pompes larges',s:exSets(5,m.pompes,.70),note:'Objectif proche des 50 · 3 reps avant l\'échec',type:'pompes',pct:.70,series:5},
-    {n:'Pompes archer (1 bras partial)',s:'3×6/côté',note:'Travail unilatéral force'},
-    {n:'Dips lesté',s:exSets(4,m.dips,.70),note:'Sac à dos si possible',type:'dips',pct:.70,series:4},
-    {n:'Pompes déclinées lestées',s:exSets(4,m.pompes,.65),note:'Sac à dos · haut pectoraux',type:'pompes',pct:.65,series:4},
-    {n:'Gainage frontal',s:`3×${adaptReps(m.gainage,.70)}s min`,note:'Progression vers 5 min total',type:'gainage',pct:.70,series:3},
-    {n:'Gainage dragon flag négatif',s:'3×5',note:'Sur banc · avancé'},
-    {n:'Core circuit',s:'2 rounds',note:'20 crunch + 20 leg raise + 20 russian twist'},
-  ];
+  const exs=[...warmup];
+  if(d.ds>0) exs.push({n:'Dips stricts',s:`${d.ds}×1`,note:'Singles propres · contrôle total',type:'dips',pct:0,series:d.ds});
+  if(d.ts>0) exs.push({n:'Tractions strictes',s:`${d.ts}×1`,note:'Singles propres · menton au-dessus',type:'tractions',pct:0,series:d.ts});
+  exs.push({n:'Pompes',s:exSets(d.po.s,m.pompes,d.po.p),note:'Travail principal · poitrine basse, bras tendus en haut',type:'pompes',pct:d.po.p,series:d.po.s,rest:120});
+  exs.push({n:'Dips (assistés ou stricts)',s:exSets(d.di.s,m.dips>5?m.dips:m.dipsAssist,d.di.p),note:m.dips>=5?'Stricts — % sur max strict':'Assistés — ajuste l\'assistance',type:'dips',pct:d.di.p,series:d.di.s,rest:120});
+  exs.push({n:'Tractions (assistées ou strictes)',s:exSets(d.tr.s,m.tractions>5?m.tractions:m.tracAssist,d.tr.p),note:m.tractions>=5?'Strictes — % sur max strict':'Assistées — bande élastique',type:'tractions',pct:d.tr.p,series:d.tr.s,rest:120});
+  if(d.neg) exs.push({n:'Tractions négatives',s:'3×2',note:'Descente 5 à 8 sec · contrôle excentrique',type:'tractions',pct:0,series:3,rest:90});
+  if(d.row) exs.push({n:'Rowing',s:d.row,note:'Traction horizontale · rétraction scapulaire',rest:75});
+  if(d.bulg) exs.push({n:'Fentes bulgares',s:d.bulg,note:'3×8 par jambe · force unilatérale',rest:75});
+  exs.push({n:'Gainage face',s:exSetsSec(d.gf.s,m.gainage,d.gf.p),note:'Bassin fixe, fessiers serrés, pas de cassure lombaire',type:'gainage',pct:d.gf.p,series:d.gf.s,isTimer:true,timerSec:adaptReps(m.gainage,d.gf.p),rest:60});
+  if(d.gl) exs.push({n:'Gainage latéral',s:d.gl,note:'Hanches hautes, corps aligné',isTimer:true,timerSec:25,series:3,rest:45});
+  return exs;
 }
+
+// Muscu B — Volume (Jeudi)
+const MUSCU_B_DATA = {
+  1:{ds:2,ts:3,po:{s:5,p:.60},di:{s:5,p:.50},tr:{s:6,p:.45},ser:'3×8',rdl:'3×8',scap:'3×10',hol:20,gf:{s:4,sec:45}},
+  2:{ds:0,ts:0,po:{s:6,p:.65},di:{s:6,p:.55},tr:{s:6,p:.50},ser:'3×9',rdl:'3×8',scap:'',hol:22,gf:{s:4,sec:50}},
+  3:{ds:0,ts:0,po:{s:6,p:.70},di:{s:6,p:.60},tr:{s:6,p:.58},ser:'3×10',rdl:'3×9',scap:'',hol:25,gf:{s:4,sec:55}},
+  4:{ds:0,ts:0,po:{s:3,p:.50},di:{s:3,p:.50},tr:{s:3,p:.45},ser:'',rdl:'',scap:'',hol:20,gf:{s:0,sec:0},deload:true},
+  5:{ds:0,ts:0,po:{s:6,p:.65},di:{s:6,p:.60},tr:{s:6,p:.55},ser:'3×8-10',rdl:'3×8',scap:'',hol:25,gf:{s:4,p:.65}},
+  6:{ds:0,ts:0,po:{s:6,p:.70},di:{s:6,p:.65},tr:{s:6,p:.60},ser:'',rdl:'',scap:'',hol:28,gf:{s:4,p:.70}},
+  7:{ds:0,ts:0,po:{s:6,p:.75},di:{s:6,p:.70},tr:{s:6,p:.65},ser:'',rdl:'',scap:'',hol:30,gf:{s:4,p:.75}},
+  8:{ds:0,ts:0,po:{s:3,p:.55},di:{s:3,p:.50},tr:{s:3,p:.50},ser:'',rdl:'',scap:'',hol:0,gf:{s:0,sec:0},deload:true},
+  9:{ds:0,ts:0,po:{s:6,p:.70},di:{s:6,p:.65},tr:{s:6,p:.65},ser:'',rdl:'',scap:'',hol:30,gf:{s:4,p:.75}},
+  10:{ds:0,ts:0,po:{s:6,p:.75},di:{s:6,p:.70},tr:{s:6,p:.70},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.80}},
+  11:{ds:0,ts:0,po:{s:6,p:.80},di:{s:6,p:.75},tr:{s:6,p:.73},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.85}},
+  12:{ds:0,ts:0,po:{s:3,p:.55},di:{s:3,p:.50},tr:{s:3,p:.50},ser:'',rdl:'',scap:'',hol:0,gf:{s:0,sec:0},deload:true},
+  13:{ds:0,ts:0,po:{s:6,p:.75},di:{s:6,p:.70},tr:{s:6,p:.70},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.80}},
+  14:{ds:0,ts:0,po:{s:6,p:.80},di:{s:6,p:.75},tr:{s:6,p:.75},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.85}},
+  15:{ds:0,ts:0,po:{s:6,p:.83},di:{s:6,p:.80},tr:{s:6,p:.78},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.90}},
+  16:{ds:0,ts:0,po:{s:3,p:.55},di:{s:3,p:.55},tr:{s:3,p:.53},ser:'',rdl:'',scap:'',hol:0,gf:{s:0,sec:0},deload:true},
+  17:{ds:0,ts:0,po:{s:6,p:.80},di:{s:6,p:.75},tr:{s:6,p:.75},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.85}},
+  18:{ds:0,ts:0,po:{s:5,p:.85},di:{s:5,p:.80},tr:{s:5,p:.80},ser:'',rdl:'',scap:'',hol:0,gf:{s:4,p:.90}},
+  19:{ds:0,ts:0,po:{s:3,p:.55},di:{s:3,p:.55},tr:{s:3,p:.55},ser:'',rdl:'',scap:'',hol:0,gf:{s:0,sec:0},deload:true},
+  20:{ds:0,ts:0,po:{s:0,p:0},di:{s:0,p:0},tr:{s:0,p:0},ser:'',rdl:'',scap:'',hol:0,gf:{s:0,sec:0},deload:true},
+};
 
 function getMuscuB(w){
-  const p=getPhase(w);
   const m=getCurrentMax();
-
-  const base=[
-    {n:'Dead hang passif',s:'3×20s + 10 rétractions',note:'Tendons · OBLIGATOIRE avant tractions'},
-    {n:'Squat excentrique 🦵',s:'3×15',note:'TOUJOURS — descente 5 secondes'},
-    {n:'Nordic curl assisté',s:'3×6',note:'Protection ischio-jambiers — crucial pour la course'},
+  const d=MUSCU_B_DATA[w]||MUSCU_B_DATA[1];
+  if(w===20) return [{n:'Mobilité + footing très léger',s:'20 min',note:'4 lignes droites · pas de muscu cette semaine'}];
+  const warmup=[
+    {n:'Échauffement',s:'5 min',note:'Corde ou rameur léger'},
+    {n:'Scapular push-ups',s:'2×10',note:'Activation épaules'},
+    {n:'Scapular pull-ups',s:'2×8',note:'Rétractions scapulaires'},
+    {n:'Air squats',s:'2×10',note:'Activation jambes'},
+    {n:'Rotations externes élastique',s:'2×15',note:'Protection coiffe des rotateurs'},
   ];
-
-  // Tractions protocol based on current max
-  const tMax=m.tractions;
-  let tracNote,tracSets;
-  if(tMax<=1){tracSets='5×(1 négatif 7s + essai 1 full)';tracNote='Sauter en haut, descendre LENTEMENT en 7s';}
-  else if(tMax<=3){tracSets=`5×(2 négatifs + ${tMax<=2?1:2} full)`;tracNote='2 chin-ups supination + négatifs 7s';}
-  else if(tMax<=5){tracSets=exSets(5,tMax,.60);tracNote='Bande élastique épaisse · fin de série sans bande si possible';}
-  else if(tMax<=8){tracSets=exSets(5,tMax,.60);tracNote='Sans assistance · bande fine option';}
-  else{tracSets=exSets(5,tMax,.65);tracNote='Overhand · ajouter chin-ups en complément';}
-
-  if(p===1) return [...base,
-    {n:'Tractions / Variante',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.60:0,series:5},
-    {n:'Chin-ups (supination)',s:exSets(3,tMax,.60),note:'Prise paumes vers soi · plus facile · biceps',type:'tractions',pct:.60,series:3},
-    {n:'Rétraction suspendue',s:'4×12-15',note:'Descendre les épaules SANS plier les bras'},
-    {n:'Rowing australien',s:exSets(4,m.pompes,.60),note:'Corps incliné · tirer poitrine vers barre',type:'pompes',pct:.60,series:4},
-    {n:'Superman / extension dos',s:'3×15',note:'3s contraction en haut'},
-    {n:'Ab wheel',s:`3×${adaptReps(m.gainage,.55)}s equivalent`,note:'Ou planche si pas de roue'},
-  ];
-  if(p===2) return [...base,
-    {n:'Tractions / Variante',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.60:0,series:5},
-    {n:'Chin-ups (supination)',s:exSets(3,tMax,.65),note:'Biceps · complément direct tractions',type:'tractions',pct:.65,series:3},
-    {n:'Rétraction suspendue',s:'4×12',note:'Exercice N°1 préparation tractions'},
-    {n:'Rowing australien',s:exSets(4,m.pompes,.65),note:'Rétraction scapulaire complète',type:'pompes',pct:.65,series:4},
-    {n:'Fentes marchées',s:'3×10/jambe',note:'Psoas + fessiers = moteurs de la foulée'},
-    {n:'Pont fessier unilatéral',s:'3×12/jambe',note:'Prévention genou + activation fessiers'},
-    {n:'Core circuit finisher',s:'2 rounds',note:'15 leg raise + 15 russian twist + 30s planche'},
-  ];
-  return [...base,
-    {n:'Tractions complètes',s:tracSets,note:tracNote,type:'tractions',pct:tMax>3?.65:0,series:5},
-    {n:'Chin-ups lents (3-1-3)',s:exSets(4,tMax,.65),note:'3s montée · 1s haut · 3s descente · force max',type:'tractions',pct:.65,series:4},
-    {n:'Rowing australien lesté',s:exSets(4,m.pompes,.70),note:'Sac à dos · dorsaux et rhomboïdes',type:'pompes',pct:.70,series:4},
-    {n:'Pistol squat assisté',s:'3×5/jambe',note:'Tient une corde/porte'},
-    {n:'Nordic curl libre',s:'3×8',note:'Excentrique + concentrique'},
-    {n:'Dragon flag progressif',s:'3×5',note:'Sur banc'},
-    {n:'Finisher tabata',s:'8 rounds 20s/10s',note:'Burpees ou mountain climbers'},
-  ];
+  const exs=[...warmup];
+  if(d.ds>0) exs.push({n:'Dips stricts',s:`${d.ds}×1`,note:'Singles propres',type:'dips',pct:0,series:d.ds});
+  if(d.ts>0) exs.push({n:'Tractions strictes',s:`${d.ts}×1`,note:'Singles propres',type:'tractions',pct:0,series:d.ts});
+  if(d.po.s>0) exs.push({n:'Pompes',s:exSets(d.po.s,m.pompes,d.po.p),note:'Travail principal',type:'pompes',pct:d.po.p,series:d.po.s,rest:120});
+  if(d.di.s>0) exs.push({n:'Dips (assistés/stricts)',s:exSets(d.di.s,m.dips>5?m.dips:m.dipsAssist,d.di.p),note:'Volume dips',type:'dips',pct:d.di.p,series:d.di.s,rest:120});
+  if(d.tr.s>0) exs.push({n:'Tractions (assistées/strictes)',s:exSets(d.tr.s,m.tractions>5?m.tractions:m.tracAssist,d.tr.p),note:'Volume tractions',type:'tractions',pct:d.tr.p,series:d.tr.s,rest:120});
+  if(d.ser) exs.push({n:'Pompes serrées / Dév. militaire',s:d.ser,note:'Triceps · complément pompes',rest:75});
+  if(d.rdl) exs.push({n:'Soulevé de terre roumain',s:d.rdl,note:'Ischio-jambiers + chaîne postérieure',rest:75});
+  if(d.scap) exs.push({n:'Scapular pull-ups',s:d.scap,note:'Rétractions suspendues',rest:60});
+  if(d.hol>0) exs.push({n:'Hollow hold',s:`4×${d.hol}s`,note:'Lombaires collées au sol',isTimer:true,timerSec:d.hol,series:4,rest:45});
+  if(d.gf.s>0){
+    const gSec=d.gf.sec||adaptReps(m.gainage,d.gf.p||.50);
+    const gLabel=d.gf.p?exSetsSec(d.gf.s,m.gainage,d.gf.p):`${d.gf.s}×${d.gf.sec}s`;
+    exs.push({n:'Gainage face',s:gLabel,note:'Gainage frontal',type:'gainage',pct:d.gf.p||0,series:d.gf.s,isTimer:true,timerSec:gSec,rest:60});
+  }
+  return exs;
 }
+
+// Muscu C — Spécifique objectifs (Samedi)
+const MUSCU_C_DATA = {
+  1:{emom:{min:10,reps:5},dd:10,td:10,dh:'4×20s',circ:{face:'3×30s',lat:'2×20s/côté',hol:'3×15s'},foot:{min:25,pace:'5:50-6:10/km'}},
+  2:{emom:{min:12,reps:5},dd:12,td:10,dh:'4×22s',circ:null,foot:{min:30,pace:'5:50-6:10/km'}},
+  3:{emom:{min:14,reps:6},dd:12,td:12,dh:'4×25s',circ:null,foot:{min:30,pace:'5:50-6:10/km'}},
+  4:{test:true},
+  5:{emom:{min:12,reps:0,p:.30},dd:12,td:12,dh:'4×25-30s',circ:null,foot:{min:30,pace:'5:50-6:10/km'}},
+  6:{emom:{min:14,reps:0,p:.30},dd:12,td:12,dh:null,circ:null,foot:{min:30,pace:'5:50-6:10/km'}},
+  7:{emom:{min:15,reps:0,p:.33},dd:14,td:12,dh:null,circ:null,foot:{min:35,pace:'5:50-6:10/km'}},
+  8:{test:true},
+  9:{emom:{min:14,reps:0,p:.35},dd:14,td:14,dh:null,circ:null,foot:{min:30,pace:'5:40-6:00/km'}},
+  10:{emom:{min:15,reps:0,p:.35},dd:14,td:14,dh:null,circ:null,foot:{min:35,pace:'5:40-6:00/km'}},
+  11:{emom:{min:16,reps:0,p:.35},dd:15,td:14,dh:null,circ:null,foot:{min:35,pace:'5:40-6:00/km'}},
+  12:{test:true},
+  13:{emom:{min:14,reps:0,p:.35},dd:15,td:15,dh:null,circ:null,foot:{min:30,pace:'5:30-5:50/km'}},
+  14:{emom:{min:15,reps:0,p:.35},dd:15,td:15,dh:null,circ:null,foot:{min:35,pace:'5:30-5:50/km'}},
+  15:{emom:{min:16,reps:0,p:.38},dd:16,td:15,dh:null,circ:null,foot:{min:30,pace:'5:30-5:50/km'}},
+  16:{test:true},
+  17:{emom:{min:14,reps:0,p:.40},dd:14,td:14,dh:null,circ:null,foot:{min:30,pace:'5:30-5:50/km'}},
+  18:{emom:{min:12,reps:0,p:.35},dd:12,td:12,dh:null,circ:null,foot:{min:25,pace:'5:30-5:50/km'}},
+  19:{test:true},
+  20:{light:true},
+};
 
 function getMuscuC(w){
-  // Session C — Fonctionnel (vendredi) selon le doc
-  const p=getPhase(w);
   const m=getCurrentMax();
-  const base=[
-    {n:'Échauffement cardio',s:'8 min step/corde/escaliers',note:'Activation système nerveux avant force'},
-    {n:'Squat excentrique 🦵',s:'3×15',note:'Descente 5s — TOUJOURS'},
+  const d=MUSCU_C_DATA[w]||MUSCU_C_DATA[1];
+  if(d.test) return [
+    {n:'💥 TESTS MAX',s:'',note:'Ordre : pompes → 8 min repos → dips → 8 min repos → tractions → 8 min repos → gainage'},
+    {n:'Pompes MAX',s:'À fond',note:'Poitrine basse, bras tendus en haut · noter le meilleur',rest:480},
+    {n:'Dips MAX strict',s:'À fond',note:'Descente contrôlée, verrouillage complet',rest:480},
+    {n:'Tractions MAX strict',s:'À fond',note:'Départ bras tendus, menton au-dessus',rest:480},
+    {n:'Gainage MAX',s:'À fond',note:'Bassin fixe, fessiers serrés',isTimer:true,timerSec:0},
   ];
-  if(p===1) return [...base,
-    {n:'Fentes marchées',s:'3×10/jambe',note:'Grand pas · genou arrière ~5cm du sol'},
-    {n:'Step-up sur banc/chaise',s:'3×12/jambe',note:'Force fonctionnelle genou'},
-    {n:'Pont fessier unilatéral',s:'3×12/jambe',note:'Dos au sol · hanches hautes · serrer fessier'},
-    {n:'Pompes déclinées (pieds sur banc)',s:exSets(3,m.pompes,.55),note:'Haut poitrine + épaules',type:'pompes',pct:.55,series:3},
-    {n:'Mollets (debout)',s:'4×20 + 3×10 lent',note:'2s montée · 3s descente · amplitude complète'},
-    {n:'Gainage latéral',s:'3×30s/côté',note:'Hanches hautes'},
-    {n:'Dead bug',s:'3×8/côté',note:'Lombaires collées au sol'},
+  if(d.light) return [
+    {n:'Pompes',s:exSets(3,m.pompes,.50),note:'Léger · affûtage',type:'pompes',pct:.50,series:3,rest:90},
+    {n:'Dips',s:exSets(3,m.dips>5?m.dips:m.dipsAssist,.50),note:'Léger',type:'dips',pct:.50,series:3,rest:90},
+    {n:'Tractions',s:exSets(3,m.tractions>5?m.tractions:m.tracAssist,.50),note:'Léger',type:'tractions',pct:.50,series:3,rest:90},
+    {n:'Gainage',s:exSetsSec(2,m.gainage,.50),note:'Léger',type:'gainage',pct:.50,series:2,isTimer:true,timerSec:adaptReps(m.gainage,.50),rest:60},
   ];
-  if(p===2) return [...base,
-    {n:'Squat bulgare (chaise)',s:'4×10/jambe',note:'Pied arrière surélevé · descente 3s · genou dans l\'axe'},
-    {n:'Fentes sautées',s:'3×8/jambe',note:'SKIP si douleur genou'},
-    {n:'Pont fessier unilatéral',s:'3×15/jambe',note:'Progression +3 reps/semaine'},
-    {n:'Pompes déclinées',s:exSets(4,m.pompes,.60),note:'Progression +1 rep/semaine',type:'pompes',pct:.60,series:4},
-    {n:'Mollets lestés (sac)',s:'4×15',note:'Sac à dos · amplitude maximale'},
-    {n:'Gainage + abducteurs',s:'3×20/côté',note:'Clam shell · bande élastique si dispo'},
-    {n:'Core circuit',s:'2 rounds',note:'20 crunch + 20 leg raise + 20 russian twist'},
-  ];
-  return [...base,
-    {n:'Pistol squat assisté',s:'4×5/jambe',note:'Progression vers libre'},
-    {n:'Nordic curl libre',s:'3×8',note:'Excentrique + concentrique'},
-    {n:'Pont fessier lesté',s:'3×15',note:'Poids sur les hanches'},
-    {n:'Pompes déclinées lestées',s:exSets(4,m.pompes,.65),note:'Sac à dos · haut pectoraux',type:'pompes',pct:.65,series:4},
-    {n:'Mollets unilatéraux',s:'4×12/jambe',note:'Sur une marche · amplitude max'},
-    {n:'L-sit progression',s:`3×${adaptReps(m.gainage,.50)}s`,note:'Jambes groupées puis tendues',type:'gainage',pct:.50,series:3},
-    {n:'Finisher tabata',s:'8 rounds 20s/10s',note:'Burpees / mountain climbers'},
-  ];
+  const exs=[];
+  exs.push({n:'Échauffement court + mobilité épaules',s:'5 min',note:'Prépare les tendons'});
+  // EMOM pompes
+  const emomReps=d.emom.reps||adaptReps(m.pompes,d.emom.p||.25);
+  exs.push({n:`EMOM Pompes`,s:`${d.emom.min} min × ${emomReps} reps/min`,note:'Every Minute On the Minute — fais les reps au début de chaque minute, récupère le reste',type:'pompes',pct:d.emom.p||0,series:d.emom.min,isEmom:true,emomMin:d.emom.min,emomReps:emomReps});
+  // Dips density
+  exs.push({n:'Dips density block',s:`${d.dd} min`,note:'Mini-séries de 2-3 reps · récup courte · accumule du volume',type:'dips',series:1,isDensity:true,densityMin:d.dd});
+  // Tractions density
+  exs.push({n:'Tractions density block',s:`${d.td} min`,note:'Mini-séries de 1-2 reps · accumule du volume',type:'tractions',series:1,isDensity:true,densityMin:d.td});
+  // Dead hang
+  if(d.dh) exs.push({n:'Dead hang',s:d.dh,note:'Grip + décompression épaules',series:4,rest:45});
+  // Circuit gainage
+  if(d.circ){
+    exs.push({n:'Gainage face',s:d.circ.face,note:'Circuit gainage',type:'gainage',isTimer:true,timerSec:30,series:3,rest:30});
+    exs.push({n:'Gainage latéral',s:d.circ.lat,note:'2 séries par côté',isTimer:true,timerSec:20,series:2,rest:30});
+    exs.push({n:'Hollow hold',s:d.circ.hol,note:'Lombaires collées',isTimer:true,timerSec:15,series:3,rest:30});
+  } else {
+    exs.push({n:'Circuit gainage',s:'face + latéral + hollow',note:'Enchaîner sans repos entre les positions',type:'gainage',series:1,isTimer:true,timerSec:45,rest:60});
+  }
+  // Footing
+  if(d.foot) exs.push({n:'Footing léger',s:`${d.foot.min} min`,note:`Allure ${d.foot.pace} · récupération active`});
+  return exs;
 }
 
-// Running sessions by week
+// ════════════════════════════ RUNNING SESSIONS PER WEEK ════════════════════════════
+const RUN_DATA = {
+  1:{
+    frac:'10×200m en 51-52 sec · Récup 1 min à 1:15 trot/marche · 15 min échauffement footing facile + 4 lignes droites',
+    seuil:'3×8 min à 4:42-4:48/km · Récup 2 min trot · 15 min échauffement + 10 min retour calme',
+    footing:'45 min à 5:40-5:55/km · Mobilité 10 min',
+    longue:'65 min à 5:45-6:05/km',
+  },
+  2:{
+    frac:'8×400m en 1:42-1:44 · Récup 75 sec',
+    seuil:'2×12 min à 4:42-4:48/km · Récup 3 min',
+    footing:'50 min à 5:40-5:55/km',
+    longue:'70 min à 5:45-6:05/km',
+  },
+  3:{
+    frac:'10×400m en 1:42-1:44 · Récup 75 sec',
+    seuil:'20 min tempo continu à 4:45-4:48/km · Puis 4×30 sec relâchées',
+    footing:'50 min à 5:40-5:55/km',
+    longue:'75 min à 5:45-6:05/km',
+  },
+  4:{
+    frac:'6×200m en 50-51 sec · Récup 1 min (allégée)',
+    seuil:'3×6 min à 4:42-4:48/km · Récup 2 min',
+    footing:'40 min facile',
+    longue:'60 min facile',
+  },
+  5:{
+    frac:'6×600m en 2:30-2:33 · Récup 90 sec',
+    seuil:'3×10 min à 4:38-4:45/km · Récup 2 min',
+    footing:'50 min à 5:35-5:55/km',
+    longue:'75 min',
+  },
+  6:{
+    frac:'5×800m en 3:20-3:24 · Récup 2 min',
+    seuil:'25 min tempo continu à 4:40-4:45/km',
+    footing:'50 min',
+    longue:'80 min',
+  },
+  7:{
+    frac:'12×400m en 1:40-1:42 · Récup 60-75 sec',
+    seuil:'2×15 min à 4:38-4:42/km · Récup 3 min',
+    footing:'55 min',
+    longue:'85 min',
+  },
+  8:{
+    frac:'8×200m en 49-50 sec (allégée)',
+    seuil:'20 min tempo léger à 4:42-4:45/km',
+    footing:'40 min',
+    longue:'65 min facile',
+  },
+  9:{
+    frac:'6×800m en 3:16-3:20 · Récup 2 min',
+    seuil:'4×8 min à 4:34-4:40/km · Récup 2 min',
+    footing:'55 min',
+    longue:'85 min',
+  },
+  10:{
+    frac:'5×1000m en 4:05-4:10 · Récup 2 min',
+    seuil:'3×10 min à 4:32-4:38/km · Récup 2 min',
+    footing:'55 min',
+    longue:'90 min',
+  },
+  11:{
+    frac:'4×1200m en 4:54-4:58 · Récup 2:30',
+    seuil:'25 min tempo à 4:32-4:36/km · Puis 5 min un peu plus vite',
+    footing:'60 min',
+    longue:'90 min',
+  },
+  12:{
+    frac:'8×300m en 73-75 sec · Récup 1 min (allégée)',
+    seuil:'3×6 min à 4:34-4:40/km',
+    footing:'45 min',
+    longue:'70 min',
+  },
+  13:{
+    frac:'6×1000m en 4:00-4:06 · Récup 2 min',
+    seuil:'3×12 min à 4:28-4:34/km · Récup 2 min',
+    footing:'60 min',
+    longue:'90 min',
+  },
+  14:{
+    frac:'5×1200m en 4:48-4:52 · Récup 2:30',
+    seuil:'2×20 min à 4:30-4:34/km · Récup 4 min',
+    footing:'60 min',
+    longue:'95 min',
+  },
+  15:{
+    frac:'4×1600m en 6:28-6:34 · Récup 3 min',
+    seuil:'8 km progressif : 2km@4:40 → 2km@4:32 → 2km@4:24 → 2km@4:18',
+    footing:'60 min',
+    longue:'95 min',
+  },
+  16:{
+    frac:'10×200m en 48-49 sec · Récup 1 min (allégée)',
+    seuil:'20 min seuil léger à 4:28-4:32/km',
+    footing:'45 min',
+    longue:'75 min',
+  },
+  17:{
+    frac:'5×1000m en 3:58-4:02 · Récup 2 min',
+    seuil:'3×2 km à 4:08-4:10/km · Récup 3 min',
+    footing:'55 min',
+    longue:'90 min',
+  },
+  18:{
+    frac:'3×1600m en 6:24-6:27 · Récup 3 min',
+    seuil:'Bloc spécifique : 2km@4:10 + 2min récup + 2km@4:06 + 2min récup + 1km@4:02',
+    footing:'50 min',
+    longue:'80 min facile',
+  },
+  19:{
+    frac:'6×400m en 1:34-1:36 · Récup 75 sec',
+    seuil:'20 min tempo à 4:24-4:28/km',
+    footing:'45 min',
+    longue:'60 min facile',
+  },
+  20:{
+    frac:'4×400m en 1:34-1:36 · Récup 90 sec',
+    seuil:'Repos ou 20 min très léger',
+    footing:'35 min facile',
+    longue:'🏁 TEST 10 KM ! Plan : km1-2 @4:10 → km3-4 @4:06 → km5-6 @4:03 → km7-8 @4:00 → km9-10 : tu tiens ou tu attaques !',
+  },
+};
+
 function getRunSessions(w){
-  const p=getPhase(w);
-  if(p===1) return {
-    z2:{label:'💚 Zone 2',tip:'45-55 min STRICTEMENT à 152-162 bpm (Z2). Si ta FC monte, marche. Allure ~6:30-7:00/km attendue. C\'est normal, c\'est l\'objectif. Construit ton moteur aérobie.'},
-    fartlek:{label:'🌀 Fartlek',tip:`Fartlek S${w} : 5min échauffement Z2 → 8 accélérations 30s fort / 90s récup → 5min retour Z2. Total ~30 min. Libre, pas de chrono exact.`},
-    longue:{label:'🌄 Sortie Longue',tip:`60-75 min à 6:30-7:00/km. UNIQUEMENT en Z2 (152-162 bpm). Si tu dois marcher, tu marches. Pas de chrono, pas de pression. C'est la séance qui construit le moteur.`},
-  };
-  if(p===2){
-    const sessions={
-      5:{frac:'⚡ Fractionné court : 10×400m @ 4:15/km · Récup 1:30 marchée · Échauffement 10min Z2 · Retour 5min',tempo:'🎯 Tempo : 10min Z2 → 20min @ 4:45/km (Zone 3-4, FC ~172) → 10min Z2'},
-      6:{frac:'⚡ Pyramidal : 400m-800m-1200m-1600m-1200m-800m-400m @ 4:20/km · Récup = moitié du temps · Échiné mais pas mort',tempo:'🎯 Tempo progressif : 3×10min (4:50 → 4:40 → 4:30) · 3min Z2 entre chaque'},
-      7:{frac:'⚡ Fractionné long : 5×1000m @ 4:15/km · Récup 2min marchée',tempo:'🎯 Tempo continu : 25min @ 4:45/km · Allure race proche'},
-      8:{frac:'⚡ 3×2000m @ 4:10/km · Récup 3min',tempo:'🎯 Tempo en côtes douces : 20min progression 5:00 → 4:30/km'},
-      9:{frac:'⚡ Court/Long : 6×(200m @3:50 + 400m @4:20) · Récup 1min entre les 2 / 2min entre les séries',tempo:'🎯 Tempo long : 30min @ 4:45/km · Rester juste sous le seuil'},
-      10:{frac:'⚡ Pyramidal inversé : 1600m-1200m-800m-600m-400m-200m · Allures 4:20→4:00 · Récup = distance',tempo:'🎯 Tempo race : 2×15min @ 4:30/km · 5min Z2 entre'},
-      11:{frac:'⚡ 4×1500m @ 4:05/km · Récup 2:30',tempo:'🎯 Tempo long : 35min @ 4:40/km'},
-      12:{frac:'⚡ 10×400m @ 4:05/km · Récup 1min',tempo:'🎯 2×20min @ 4:35/km · 4min récup'},
-    };
-    const ws=sessions[w]||sessions[12];
-    return {
-      frac:{label:'⚡ Fractionné',tip:ws.frac},
-      tempo:{label:'🎯 Tempo',tip:ws.tempo},
-      longue:{label:'🌄 Sortie Longue',tip:`${w<=6?'75-85':w<=9?'85-95':'95-105'} min à 6:00-6:15/km strictement en Z2. La séance la plus importante de la semaine — ne la zappe jamais.`},
-    };
-  }
-  // Phase 3
-  const sp={
-    13:{frac:'⚡ 4×2000m @ 4:05/km · Récup 2:30 marchée',tempo:'🎯 5K race sim : 3km @ 4:00/km + 2km @ 3:55/km'},
-    14:{frac:'⚡ 6×1000m @ 4:00/km · Récup 1:30',tempo:'🎯 Tempo long : 40min @ 4:30/km'},
-    15:{frac:'⚡ 2×4000m @ 4:00/km · Récup 5min',tempo:'🎯 10K sim : 7km @ 4:05/km (allure légèrement sous cible)'},
-    16:{frac:'⚡ 8×400m @ 3:50/km · Récup 1:30',tempo:'🎯 Tempo : 30min @ 4:20/km'},
-    17:{frac:'⚡ Pyramidal race : 1km-2km-3km-2km-1km @ 4:02/km · Récup 3min',tempo:'🎯 2×20min @ 4:15/km'},
-    18:{frac:'⚡ 6×800m @ 3:55/km · Récup 1:30',tempo:'🎯 10K TENTATIVE — donne tout 🔥'},
-    19:{frac:'⚡ Récup active : 8×200m @ 4:00/km · Récup 2min',tempo:'🎯 30min footing facile Z2'},
-    20:{frac:'🏁 SEMAINE DE RACE — 2×10min @ 4:00/km mardi (garder les jambes)',tempo:'🔥 JOUR J — 10K SUB-40 !'},
-  };
-  const sw=sp[w]||sp[20];
-  return {
-    frac:{label:'⚡ Fractionné',tip:sw.frac},
-    tempo:{label:'🎯 Tempo/Race',tip:sw.tempo},
-    longue:{label:'🌄 Sortie Longue',tip:`${w<=16?'100-110':w<=18?'90':'60'} min à 5:45-6:00/km. ${w===19||w===20?'⚠️ Réduis le volume — semaine de décharge avant la race.':''}`},
-  };
+  const r=RUN_DATA[w]||RUN_DATA[1];
+  return r;
 }
+
+// ════════════════════════════ SCHEDULE ════════════════════════════
+// Lun=Muscu A, Mar=Fractionné, Mer=Footing facile, Jeu=Muscu B, Ven=Seuil/Tempo, Sam=Muscu C+footing, Dim=Sortie longue
 
 function getDays(w){
   const run=getRunSessions(w);
-  const p=getPhase(w);
+  const isTest=[4,8,12,16,19].includes(w);
   return [
-    {day:'LUN',type:'💪 Muscu A',tag:'tag-or',ex:getMuscuA(w),desc:`Renforcement complet. Protocole genoux AVANT.`},
-    {day:'MAR',type:run.frac?.label||'💚 Zone 2',tag:'tag-grn',ex:[],run:true,desc:run.frac?.tip||run.z2?.tip},
-    {day:'MER',type:'😴 Repos actif',tag:'tag-gray',ex:[],desc:'Marche 20-30 min. Étirements 10 min. Récupération musculaire.'},
-    {day:'JEU',type:run.tempo?.label||'🌀 Fartlek',tag:'tag-blu',ex:[],run:true,desc:run.tempo?.tip||run.fartlek?.tip},
-    {day:'VEN',type:'💪 Muscu B',tag:'tag-or',ex:getMuscuB(w),desc:`Renforcement axé ischio + tractions + core. Protocole genoux AVANT.`},
-    {day:'SAM',type:run.longue?.label||'🌄 Longue',tag:'tag-grn',ex:[],run:true,desc:run.longue?.tip},
-    {day:'DIM',type:'😴 Repos',tag:'tag-gray',ex:[],desc:'Repos total. Récupération. Mange bien, hydrate-toi.'},
+    {day:'LUN',type:'💪 Muscu A — Force',tag:'tag-or',ex:getMuscuA(w),desc:`Force relative · singles stricts + travail principal % max · Phase ${getPhase(w)}`},
+    {day:'MAR',type:'⚡ Fractionné',tag:'tag-yel',ex:[],run:true,desc:run.frac},
+    {day:'MER',type:'💚 Footing facile',tag:'tag-grn',ex:[],run:true,desc:run.footing+' · Mobilité 10 min'},
+    {day:'JEU',type:'💪 Muscu B — Volume',tag:'tag-or',ex:getMuscuB(w),desc:`Volume · sets à % du max + accessoires · Phase ${getPhase(w)}`},
+    {day:'VEN',type:'🎯 Seuil / Tempo',tag:'tag-blu',ex:[],run:true,desc:run.seuil},
+    {day:'SAM',type:isTest?'🧪 Tests Max':'💪 Muscu C + Footing',tag:isTest?'tag-pur':'tag-or',ex:getMuscuC(w),desc:isTest?'Tests max : pompes, dips, tractions, gainage — recalcule tes % après':`Spécifique objectifs · EMOM pompes + density blocks + footing léger · Phase ${getPhase(w)}`},
+    {day:'DIM',type:w===20?'🏁 TEST 10K':'🌄 Sortie longue',tag:w===20?'tag-pur':'tag-grn',ex:[],run:true,desc:run.longue},
   ];
 }
+
 
 // ════════════════════════════ KNEE PROTOCOL ════════════════════════════
 let protoChecked=[false,false,false,false];
@@ -1336,46 +1469,43 @@ function getCurWeek(){
 let curType='muscu_a';
 
 const TYPE_TIPS={
-  muscu_a:'💪 Muscu A — Push. Protocole genoux AVANT. Pompes larges, pike push-ups, dips, gainage.',
-  muscu_b:'💪 Muscu B — Pull. Tractions, chin-ups, rowing. Protocole genoux AVANT.',
-  muscu_c:'💪 Muscu C — Fonctionnel. Squat bulgare, fentes, mollets, core. Critique à 97kg.',
-  test_max:'🧪 Test Max — Pompes / Dips / Tractions / Gainage à fond. Met à jour tes maxs pour recalibrer tous les exos.',
+  muscu_a:'💪 Muscu A — Force relative. Singles dips/tractions + travail principal pompes, dips, tractions à % du max.',
+  muscu_b:'💪 Muscu B — Volume. Pompes, dips, tractions à % du max + accessoires.',
+  muscu_c:'💪 Muscu C — Spécifique objectifs. EMOM pompes + density blocks dips/tractions + circuit gainage + footing léger.',
+  test_max:'🧪 Test Max — Pompes / Dips / Tractions / Gainage à fond. Recalcule tes % avec les nouveaux max.',
   repos:'',
-  z2:'💚 Zone 2 — STRICTEMENT 125-145 bpm. Allure secondaire. Tu dois pouvoir parler normalement.',
-  tempo:'🎯 Tempo — Zone 3 (154-168 bpm). "Inconfortablement confortable".',
-  frac_court:'⚡ Fractionné Court — Voir détail ci-dessous.',
-  frac_long:'⚡ Fractionné Long — Voir détail ci-dessous.',
-  pyramidal:'🔺 Pyramidal — Distances croissantes puis décroissantes.',
-  fartlek:'🌀 Fartlek — Course libre avec variations d\'allure intuitives.',
-  cotes:'⛰ Côtes — 8-12 répétitions de 100-200m en côte.',
-  longue:'🌄 Sortie Longue — Z2 UNIQUEMENT. Durée selon programme.',
+  fractionne:'⚡ Fractionné — Intervalles selon programme de la semaine.',
+  seuil:'🎯 Seuil / Tempo — Allure soutenue selon programme.',
+  footing:'💚 Footing facile — Allure confortable + mobilité.',
+  longue:'🌄 Sortie Longue — Durée selon programme.',
+  z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac.',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',
 };
-const COURSE_TYPES=['z2','tempo','frac_court','frac_long','pyramidal','fartlek','cotes','longue'];
+const COURSE_TYPES=['z2','tempo','frac_court','frac_long','pyramidal','fartlek','cotes','longue','fractionne','seuil','footing'];
 const MUSCU_TYPES=['muscu_a','muscu_b','muscu_c','test_max'];
 const REPOS_TYPE='repos';
 
 // ════ PLANNING PAR JOUR DE LA SEMAINE ════
-// Lun=MusA, Mar=Z2+foulées, Mer=MusB, Jeu=Course variable, Ven=MusC, Sam=Longue, Dim=Repos
+// Lun=Muscu A, Mar=Fractionné, Mer=Footing, Jeu=Muscu B, Ven=Seuil/Tempo, Sam=Muscu C, Dim=Sortie longue
 function getTodayPlan(){
   const w=getCurWeek();
-  const dow=new Date().getDay(); // 0=dim,1=lun...6=sam
-  const run=getRunSessions(w)||{};
+  const dow=new Date().getDay();
+  const run=getRunSessions(w);
+  const isTest=[4,8,12,16,19].includes(w);
   const DAYS={
-    1:{ico:'💪',type:'muscu_a',label:'Muscu A — Push',
-       desc:`Session A · Pompes larges, pike push-ups, dips, gainage · 65 min · Phase ${getPhase(w)}`},
-    2:{ico:'💚',type:'z2',label:'Zone 2 + Foulées',
-       desc:(run.z2?.tip||'45-55 min à 125-145 bpm · Allure ~6:30-7:00/km')+' · 6 foulées progressives en fin'},
-    3:{ico:'💪',type:'muscu_b',label:'Muscu B — Pull',
-       desc:`Session B · Tractions, chin-ups, rowing · 65 min · Phase ${getPhase(w)}`},
-    4:{ico:'⚡',type:w<=4?'z2':w<=12?'frac_court':'frac_long',
-       label:w<=2?'Zone 2 40min':w===3?'4×800m Z4':w===4?'Zone 2 récup':w<=12?'Fractionné':'Fractionné Long',
-       desc:(run.frac?.tip||run.z2?.tip||'Course intensive selon programme')},
-    5:{ico:'💪',type:'muscu_c',label:'Muscu C — Fonctionnel',
-       desc:`Session C · Squat bulgare, fentes, mollets, core · 60 min · Critique à ${getCurrentMax&&getCurrentMax().poids||97}kg`},
-    6:{ico:'🌄',type:'longue',label:'Sortie Longue',
-       desc:(run.longue?.tip||'60-90 min à 6:30-7:00/km · Z2 uniquement')},
-    0:{ico:'😴',type:'repos',label:'Repos',
-       desc:'Récupération active · Étirements · Sommeil · Pesée du matin'},
+    1:{ico:'💪',type:'muscu_a',label:'Muscu A — Force relative',
+       desc:'Singles stricts + travail principal à % du max · Bloc '+getPhase(w)},
+    2:{ico:'⚡',type:'fractionne',label:'Fractionné',
+       desc:run.frac},
+    3:{ico:'💚',type:'footing',label:'Footing facile + Mobilité',
+       desc:run.footing+' · Mobilité 10 min'},
+    4:{ico:'💪',type:'muscu_b',label:'Muscu B — Volume',
+       desc:'Volume pompes/dips/tractions à % du max + accessoires · Bloc '+getPhase(w)},
+    5:{ico:'🎯',type:'seuil',label:'Seuil / Tempo / Allure 10K',
+       desc:run.seuil},
+    6:{ico:isTest?'🧪':'💪',type:isTest?'test_max':'muscu_c',label:isTest?'Tests Max':'Muscu C + Footing léger',
+       desc:isTest?'Tests max · pompes → dips → tractions → gainage · Recalcule tes % après':'EMOM pompes + density blocks + circuit gainage + footing · Bloc '+getPhase(w)},
+    0:{ico:'🌄',type:'longue',label:w===20?'🏁 TEST 10K':'Sortie Longue',
+       desc:run.longue},
   };
   return{...DAYS[dow],week:w,dow};
 }
@@ -1440,7 +1570,7 @@ function activateForm(t){
   const isCourse=COURSE_TYPES.includes(t);
   const isMuscu=MUSCU_TYPES.includes(t);
   const isRepos=t===REPOS_TYPE;
-  const isFrac=['frac_court','frac_long','pyramidal'].includes(t);
+  const isFrac=['frac_court','frac_long','pyramidal','fractionne'].includes(t);
 
   // Show form zone
   document.getElementById('form-zone').style.display='block';
@@ -1495,12 +1625,7 @@ function loadExList(t){
   var week=getCurWeek();
   var exs;
   if(t==='test_max'){
-    exs=[
-      {n:'Pompes — MAX absolu',s:'3 essais',note:'Repos 3 min entre. Note le meilleur.'},
-      {n:'Dips — MAX absolu',s:'3 essais',note:'Descente complète bras à 90°.'},
-      {n:'Tractions — MAX absolu',s:'3 essais',note:'Menton au-dessus de la barre.'},
-      {n:'Gainage frontal — MAX durée',s:'2 essais',note:'Note le temps en secondes.'},
-    ];
+    exs=getMuscuC(week); // Tests are handled by getMuscuC for test weeks
   } else if(t==='muscu_a'){exs=getMuscuA(week);}
   else if(t==='muscu_c'){exs=getMuscuC(week);}
   else{exs=getMuscuB(week);}
@@ -1665,7 +1790,7 @@ function refreshDash(){
   document.getElementById('d-phase-badge').className='tag bebas '+getPhaseTag(curWeek);
 
   // Muscu objectives with editable targets
-  const p=d.prs||{}, tgt=d.targets||{pompes:50,dips:20,tractions:12,gainage:300};
+  const p=d.prs||{}, tgt=d.targets||{pompes:100,dips:50,tractions:20,gainage:600};
   const ini=d.settings.initPrs||{pompes:0,dips:0,tractions:0,gainage:0};
   const muscuItems=[
     {id:'pompes',cur:p.pompes||0,tgt:tgt.pompes||50,init:ini.pompes||0},
@@ -1747,8 +1872,8 @@ function refreshDash(){
 }
 
 function miniCard(s){
-  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',muscu_c:'💪 Muscu C',test_max:'🧪 Test Max',repos:'😴 Repos',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
-  const tagc={muscu_a:'tag-or',muscu_b:'tag-or',muscu_c:'tag-or',test_max:'tag-pur',repos:'tag-gray',z2:'tag-grn',tempo:'tag-blu',frac_court:'tag-yel',frac_long:'tag-yel',pyramidal:'tag-pur',fartlek:'tag-grn',cotes:'tag-grn',longue:'tag-grn',autre:'tag-gray'};
+  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',muscu_c:'💪 Muscu C',fractionne:'⚡ Frac.',seuil:'🎯 Seuil',footing:'💚 Footing',test_max:'🧪 Test Max',repos:'😴 Repos',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
+  const tagc={muscu_a:'tag-or',muscu_b:'tag-or',muscu_c:'tag-or',test_max:'tag-pur',repos:'tag-gray',fractionne:'tag-yel',seuil:'tag-blu',footing:'tag-grn',z2:'tag-grn',tempo:'tag-blu',frac_court:'tag-yel',frac_long:'tag-yel',pyramidal:'tag-pur',fartlek:'tag-grn',cotes:'tag-grn',longue:'tag-grn',autre:'tag-gray'};
   const dd=new Date(s.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   const dots=Array.from({length:10},(_,i)=>`<div class="f-dot ${i<s.feeling?'on':''}"></div>`).join('');
 
@@ -1828,7 +1953,7 @@ function refreshJournal(){
   const d=D();let ss=[...d.sessions].sort((a,b)=>b.date.localeCompare(a.date));
   if(jFilter==='muscu') ss=ss.filter(s=>s.type.startsWith('muscu'));
   if(jFilter==='course') ss=ss.filter(s=>COURSE_TYPES.includes(s.type)&&!s.type.includes('frac')&&s.type!=='pyramidal');
-  if(jFilter==='fractionne') ss=ss.filter(s=>['frac_court','frac_long','pyramidal'].includes(s.type));
+  if(jFilter==='fractionne') ss=ss.filter(s=>['frac_court','frac_long','pyramidal','fractionne'].includes(s.type));
   document.getElementById('j-count').textContent=ss.length+' séance'+(ss.length>1?'s':'');
   const el=document.getElementById('journal-list');
   el.innerHTML=ss.length?ss.map(s=>miniCard(s)).join(''):'<div class="empty"><div class="empty-ico">📖</div><div class="empty-txt">Aucune séance trouvée.</div></div>';
@@ -1943,10 +2068,10 @@ function refreshPRs(){
   // Muscu PRs
   const p=d.prs;
   const muscuData=[
-    {lbl:'💪 Pompes',val:p.pompes||18,tgt:50},
-    {lbl:'⬇ Dips',val:p.dips||2,tgt:20},
-    {lbl:'⬆ Tractions',val:p.tractions||1,tgt:12},
-    {lbl:'⏱ Gainage',val:p.gainage||0,tgt:300,unit:'s'},
+    {lbl:'💪 Pompes',val:p.pompes||19,tgt:100},
+    {lbl:'⬇ Dips',val:p.dips||2,tgt:50},
+    {lbl:'⬆ Tractions',val:p.tractions||1,tgt:20},
+    {lbl:'⏱ Gainage',val:p.gainage||0,tgt:600,unit:'s'},
   ];
   let mt='<tr><th>Exercice</th><th>Record</th><th>→ Objectif</th><th>%</th></tr>';
   muscuData.forEach(({lbl,val,tgt,unit=''})=>{
@@ -1961,17 +2086,17 @@ function refreshPRs(){
   const best10kRaw=getBestRawMin(ss,10,.7);
   setGoal('g-10k',best10kRaw&&best10kRaw<40);
   setGoal('g-poids',lastW<=89);
-  setGoal('g-pompes',(p.pompes||0)>=50);
-  setGoal('g-dips',(p.dips||0)>=20);
-  setGoal('g-pull',(p.tractions||0)>=12);
-  setGoal('g-gainage',(p.gainage||0)>=300);
+  setGoal('g-pompes',(p.pompes||0)>=100);
+  setGoal('g-dips',(p.dips||0)>=50);
+  setGoal('g-pull',(p.tractions||0)>=20);
+  setGoal('g-gainage',(p.gainage||0)>=600);
 }
 function setGoal(id,done){document.getElementById(id).innerHTML=done?'<span class="tag tag-grn">✅ ATTEINT !</span>':'<span class="tag tag-gray">En cours</span>'}
 
 // ════════════════════════════ MODAL ════════════════════════════
 function openModal(id){
   const d=D(),s=d.sessions.find(s=>s.id===id);if(!s)return;
-  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',test_max:'🧪 Test Max',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
+  const lbl={muscu_a:'💪 Muscu A',muscu_b:'💪 Muscu B',muscu_c:'💪 Muscu C',test_max:'🧪 Test Max',repos:'😴 Repos',fractionne:'⚡ Frac.',seuil:'🎯 Seuil',footing:'💚 Footing',z2:'💚 Zone 2',tempo:'🎯 Tempo',frac_court:'⚡ Frac. Court',frac_long:'⚡ Frac. Long',pyramidal:'🔺 Pyramidal',fartlek:'🌀 Fartlek',cotes:'⛰ Côtes',longue:'🌄 Longue',autre:'✏ Autre'};
   const dt=new Date(s.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const fc=s.feeling>=7?'var(--grn)':s.feeling>=4?'var(--yel)':'var(--red)';
   const gc=s.genou<=2?'var(--grn)':s.genou<=4?'var(--yel)':'var(--red)';
@@ -2016,8 +2141,7 @@ function editSession(id){
   editingSessionId=id;
   goTo('log');
   // Pre-fill type
-  const pill=document.querySelector(`#type-pills .pill[onclick*="${s.type}"]`);
-  if(pill) setType(s.type,pill);
+  setType(s.type);
   // Pre-fill date & weight
   document.getElementById('l-date').value=s.date;
   if(s.poids) document.getElementById('l-poids').value=s.poids;
@@ -2191,6 +2315,7 @@ function renderCircuit(){
   for(var i=0;i<circuitExList.length;i++){
     var ex=circuitExList[i];
     var total=parseSetCount(ex.s)||1;
+    if(ex.isEmom||ex.isDensity) total=1; // single block exercises
     var done=circuitState[i]||0;
     var pct=Math.round(done/total*100);
     var ok=done>=total;
@@ -2198,16 +2323,22 @@ function renderCircuit(){
     var cntCol=ok?'var(--grn)':'var(--or)';
     var barCol=ok?'var(--grn)':'var(--or)';
     var prefix=ok?'<span style="margin-right:5px">✅</span>':'';
+    // Timer badge for timed exercises
+    var timerBadge='';
+    if(ex.isTimer&&ex.timerSec>0&&!ok) timerBadge='<span style="font-size:10px;color:var(--yel);margin-left:4px">⏱'+ex.timerSec+'s</span>';
+    var btnLabel=ex.isTimer?'⏱ Go':'✓ Série';
+    if(ex.isEmom) btnLabel='▶ EMOM';
+    if(ex.isDensity) btnLabel='▶ Density';
     var actionHtml=ok
       ?'<span style="font-size:22px">🎯</span>'
-      :'<button onclick="tickSet('+i+')" style="background:var(--or);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:9px 14px;cursor:pointer;letter-spacing:.3px;flex-shrink:0">✓ Série</button>';
+      :'<button onclick="tickSet('+i+')" style="background:'+(ex.isTimer?'var(--yel)':'var(--or)')+';border:none;border-radius:8px;color:'+(ex.isTimer?'#000':'#fff')+';font-size:12px;font-weight:700;padding:9px 14px;cursor:pointer;letter-spacing:.3px;flex-shrink:0">'+btnLabel+'</button>';
     var undoHtml=done>0
       ?'<button onclick="unTickSet('+i+')" style="background:var(--s3);border:1px solid var(--bd);border-radius:8px;color:var(--mut);font-size:12px;padding:9px 10px;cursor:pointer;flex-shrink:0">↩</button>'
       :'';
     html+='<div style="padding:14px 0;border-bottom:1px solid var(--bd2)">'
      +'<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">'
        +'<div style="flex:1;min-width:0">'
-         +'<div style="font-size:14px;font-weight:600;color:'+nameCol+';line-height:1.4">'+prefix+(ex.n||'')+'</div>'
+         +'<div style="font-size:14px;font-weight:600;color:'+nameCol+';line-height:1.4">'+prefix+(ex.n||'')+timerBadge+'</div>'
          +'<div style="font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5">'+(ex.note||'')+'</div>'
        +'</div>'
        +'<div style="text-align:right;flex-shrink:0;min-width:52px">'
@@ -2227,11 +2358,77 @@ function renderCircuit(){
   el.innerHTML=html;
   updateCircuitSummary();
 }
+
+// Pending set index for timed exercises
+let pendingTickIdx=null;
+
 function tickSet(i){
-  const totalSets=parseSetCount(circuitExList[i].s)||1;
+  const ex=circuitExList[i];
+  const totalSets=ex.isEmom||ex.isDensity?1:(parseSetCount(ex.s)||1);
+
+  // EMOM: open chrono for the EMOM duration
+  if(ex.isEmom){
+    circuitState[i]=1;
+    renderCircuit();
+    openTimer();
+    setTimerMode('countdown');
+    setCountdown(ex.emomMin*60);
+    document.getElementById('timer-label-top').textContent='EMOM Pompes — '+ex.emomReps+' reps/min';
+    timerContext='emom';
+    setTimeout(()=>startTimer(),300);
+    return;
+  }
+
+  // Density: open chrono for the density duration
+  if(ex.isDensity){
+    circuitState[i]=1;
+    renderCircuit();
+    openTimer();
+    setTimerMode('countdown');
+    setCountdown(ex.densityMin*60);
+    document.getElementById('timer-label-top').textContent=ex.n+' — '+ex.densityMin+' min';
+    timerContext='density';
+    setTimeout(()=>startTimer(),300);
+    return;
+  }
+
+  // Timer exercises (gainage, hollow, etc.): start countdown FIRST, then mark done when finished
+  if(ex.isTimer&&ex.timerSec>0){
+    pendingTickIdx=i;
+    openTimer();
+    setTimerMode('countdown');
+    setCountdown(ex.timerSec);
+    document.getElementById('timer-label-top').textContent=ex.n;
+    timerContext='exercise_timer';
+    setTimeout(()=>startTimer(),300);
+    return;
+  }
+
+  // Normal exercise: mark set done immediately, then show rest timer
+  doTickSet(i);
+  showRestTimer(ex);
+}
+
+function doTickSet(i){
+  const ex=circuitExList[i];
+  const totalSets=ex.isEmom||ex.isDensity?1:(parseSetCount(ex.s)||1);
   circuitState[i]=Math.min((circuitState[i]||0)+1,totalSets);
   renderCircuit();
+  beep(660,.08,.3);
 }
+
+function showRestTimer(ex){
+  const restSec=ex.rest||90;
+  if(restSec<10) return; // skip very short rest
+  openTimer();
+  setTimerMode('countdown');
+  setCountdown(restSec);
+  document.getElementById('timer-label-top').textContent='Repos — '+ex.n;
+  document.getElementById('timer-label-bot').textContent='Appuie ✕ pour passer';
+  timerContext='rest';
+  setTimeout(()=>startTimer(),400);
+}
+
 function unTickSet(i){
   circuitState[i]=Math.max((circuitState[i]||0)-1,0);
   renderCircuit();
@@ -2239,16 +2436,19 @@ function unTickSet(i){
 function updateCircuitSummary(){
   const sum=document.getElementById('l-circuit-summary');if(!sum)return;
   if(!circuitExList.length){sum.textContent='';return}
-  const totalSeries=circuitExList.reduce((a,ex)=>a+(parseSetCount(ex.s)||1),0);
+  const totalSeries=circuitExList.reduce((a,ex)=>{
+    if(ex.isEmom||ex.isDensity) return a+1;
+    return a+(parseSetCount(ex.s)||1);
+  },0);
   const doneSeries=Object.values(circuitState).reduce((a,b)=>a+b,0);
   const remaining=totalSeries-doneSeries;
-  sum.textContent=remaining>0?`${doneSeries}/${totalSeries} séries — ${remaining} restante${remaining>1?'s':''}` :'🎉 Toutes les séries complétées !';
+  sum.textContent=remaining>0?doneSeries+'/'+totalSeries+' séries — '+remaining+' restante'+(remaining>1?'s':'') :'🎉 Toutes les séries complétées !';
   sum.style.color=remaining===0?'var(--grn)':'var(--mut)';
 }
 
 // ════════════════════════════ OBJECTIVES MODAL ════════════════════════════
 function openObjModal(){
-  const d=D(),tgt=d.targets||{pompes:50,dips:20,tractions:12,gainage:300};
+  const d=D(),tgt=d.targets||{pompes:100,dips:50,tractions:20,gainage:600};
   document.getElementById('om-pompes').value=tgt.pompes||50;
   document.getElementById('om-dips').value=tgt.dips||20;
   document.getElementById('om-tractions').value=tgt.tractions||12;
@@ -2259,10 +2459,10 @@ function closeObjModal(){document.getElementById('obj-modal-bg').classList.remov
 function saveObjTargets(){
   const d=D();
   d.targets=d.targets||{};
-  d.targets.pompes=parseInt(document.getElementById('om-pompes').value)||50;
-  d.targets.dips=parseInt(document.getElementById('om-dips').value)||20;
-  d.targets.tractions=parseInt(document.getElementById('om-tractions').value)||12;
-  d.targets.gainage=parseInt(document.getElementById('om-gainage').value)||300;
+  d.targets.pompes=parseInt(document.getElementById('om-pompes').value)||100;
+  d.targets.dips=parseInt(document.getElementById('om-dips').value)||50;
+  d.targets.tractions=parseInt(document.getElementById('om-tractions').value)||20;
+  d.targets.gainage=parseInt(document.getElementById('om-gainage').value)||600;
   SD(d);closeObjModal();refreshDash();toast('✅ Objectifs mis à jour');
 }
 
@@ -2793,10 +2993,11 @@ const CAL_MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Ao
 
 const TYPE_COLOR={
   muscu_a:'var(--or)',muscu_b:'var(--or)',
-  z2:'var(--grn)',longue:'var(--yel)',
-  tempo:'var(--pur)',fartlek:'var(--grn)',cotes:'var(--grn)',
-  frac_court:'var(--blu)',frac_long:'var(--blu)',pyramidal:'var(--blu)',
-  autre:'var(--mut)'
+  muscu_c:'var(--or)',test_max:'var(--pur)',repos:'var(--mut2)',
+  z2:'var(--grn)',tempo:'var(--blu)',
+  frac_court:'var(--yel)',frac_long:'var(--yel)',pyramidal:'var(--pur)',
+  fartlek:'var(--grn)',cotes:'var(--grn)',longue:'var(--grn)',
+  fractionne:'var(--yel)',seuil:'var(--blu)',footing:'var(--grn)',
 };
 
 function calChangeMonth(delta){
@@ -3133,6 +3334,27 @@ function startTimer(){
         document.getElementById('timer-label-bot').textContent='✅ Terminé !';
         beepDone();
         if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+        // Handle timed exercise completion → mark set done → show rest timer
+        if(timerContext==='exercise_timer'&&pendingTickIdx!==null){
+          const exIdx=pendingTickIdx;
+          pendingTickIdx=null;
+          doTickSet(exIdx);
+          const ex=circuitExList[exIdx];
+          if(ex&&ex.rest&&ex.rest>=10){
+            setTimeout(()=>{
+              showRestTimer(ex);
+            },1200);
+          } else {
+            setTimeout(()=>closeTimer(),1500);
+          }
+        } else if(timerContext==='rest'){
+          setTimeout(()=>closeTimer(),1000);
+        } else {
+          // For EMOM/density, just auto-close after a bit
+          if(timerContext==='emom'||timerContext==='density'){
+            setTimeout(()=>closeTimer(),1500);
+          }
+        }
         return;
       }    }
     updateTimerDisplay();
@@ -3295,9 +3517,40 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('ob-start').value=lastMonday.toISOString().split('T')[0];
   updSlider(document.getElementById('l-feeling'),'rv-feel','feel');
   updSlider(document.getElementById('l-genou'),'rv-genou','genou');
-  setType('muscu_a',document.querySelector('#type-pills .pill'));
-  const d=D();
-  // Show onboarding if first launch
+
+  // ═══ MIGRATION v2 → v10 : garde tes anciennes sessions/PRs ═══
+  let d=D();
+  if(!d.settings.onboardingDone){
+    try{
+      const oldRaw=localStorage.getItem(KEY_OLD);
+      if(oldRaw){
+        const old=JSON.parse(oldRaw);
+        if(old.sessions&&old.sessions.length>0){
+          d.sessions=old.sessions;
+          d.prs=old.prs||d.prs;
+          d.poidsLog=old.poidsLog||[];
+          d.settings.poidsInit=old.settings?.poidsInit||null;
+          d.settings.fcmax=old.settings?.fcmax||null;
+          d.settings.pr5k=old.settings?.pr5k||null;
+          d.settings.pr10k=old.settings?.pr10k||null;
+          d.persoGoals=old.persoGoals||null;
+          d.persoLogs=old.persoLogs||null;
+          d.formeLog=old.formeLog||null;
+          d.ltGoals=old.ltGoals||null;
+          d.targets=old.targets||null;
+          // Force startDate to this Monday → S1
+          d.settings.startDate=lastMonday.toISOString().split('T')[0];
+          d.settings.manualWeek=1;
+          d.settings.onboardingDone=true;
+          SD(d);
+          console.log('✅ Migré '+d.sessions.length+' séances depuis v2 → v10. Programme redémarre S1.');
+        }
+      }
+    }catch(e){console.warn('Migration error:',e)}
+    d=D(); // re-read after potential migration
+  }
+
+  // Show onboarding if first launch (and no migration happened)
   if(!d.settings.onboardingDone){
     document.getElementById('onboard-bg').style.display='flex';
   }

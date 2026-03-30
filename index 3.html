@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jax & Kled Bible</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0f;--bg2:#12141c;--bg3:#181b28;--bg4:#0d0e14;--bd:#1e2235;--t:#c8cad4;--td:#6b6f82;--tb:#eef0f7;--a:#c8aa6e;--ag:rgba(200,170,110,.25);--e:#2ecc71;--m:#f1c40f;--h:#e67e22;--x:#e74c3c;--s:#9b59b6}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--t);font-family:'Rajdhani',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(200,170,110,.05),transparent 60%);pointer-events:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#282c42;border-radius:3px}
+.hdr{padding:1.2rem;text-align:center;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,rgba(200,170,110,.04),transparent)}
+.hdr h1{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:4px;color:var(--a)}
+.hdr .sub{font-size:.72rem;color:var(--td);letter-spacing:2px;text-transform:uppercase;margin-top:.15rem}
+.cs{display:flex;justify-content:center;gap:.8rem;padding:.8rem;border-bottom:1px solid var(--bd);background:var(--bg4)}
+.csb{display:flex;align-items:center;gap:.5rem;padding:.5rem 1.2rem;border-radius:10px;border:2px solid var(--bd);background:var(--bg2);cursor:pointer;transition:.2s}
+.csb:hover{border-color:var(--a)}.csb.on{border-color:var(--a);background:rgba(200,170,110,.08);box-shadow:0 0 12px var(--ag)}
+.csb img{width:38px;height:38px;border-radius:50%;border:2px solid var(--bd)}.csb.on img{border-color:var(--a)}
+.csb span{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.8rem;color:var(--td);letter-spacing:2px}.csb.on span{color:var(--a)}
+/* TABS */
+.vtabs{display:flex;justify-content:center;gap:0;border-bottom:1px solid var(--bd);background:var(--bg4)}
+.vtab{padding:.5rem 1rem;font-weight:700;font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:.2s}
+.vtab:hover{color:var(--t)}.vtab.on{color:var(--a);border-bottom-color:var(--a)}
+.vpanel{display:none}.vpanel.on{display:block}
+.ctrl{position:sticky;top:0;z-index:150;background:rgba(10,11,15,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);padding:.5rem .8rem;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;justify-content:center}
+.sb{position:relative;flex:1 1 160px;max-width:250px}
+.sb input{width:100%;padding:.4rem .7rem .4rem 1.8rem;background:var(--bg4);border:1px solid var(--bd);border-radius:8px;color:var(--tb);font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:500;outline:none}
+.sb input:focus{border-color:var(--a)}.sb::before{content:'\2315';position:absolute;left:.55rem;top:50%;transform:translateY(-50%);color:var(--td);font-size:.9rem}
+.fb{padding:.25rem .6rem;border:1px solid var(--bd);border-radius:5px;background:var(--bg2);color:var(--td);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.2s}
+.fb:hover{background:var(--bg3);color:var(--t)}.fb.on{border-color:var(--a);color:var(--a)}
+.tbn{padding:.25rem .5rem;border:1px solid var(--bd);border-radius:5px;background:var(--bg2);color:var(--td);font-size:.75rem;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;transition:.2s}
+.tbn:hover{border-color:var(--a);color:var(--a)}
+.stb{display:flex;justify-content:center;gap:.8rem;padding:.35rem;font-size:.72rem;font-weight:600;flex-wrap:wrap}
+.sp{display:flex;align-items:center;gap:.2rem}.dot{width:7px;height:7px;border-radius:50%}
+.dot.c1{background:var(--e)}.dot.c2{background:var(--m)}.dot.c3{background:var(--s)}.dot.c4{background:var(--h)}.dot.c5{background:var(--x)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;padding:.8rem;max-width:1400px;margin:0 auto}
+.mc{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:.5rem .4rem;cursor:pointer;transition:.2s;text-align:center;position:relative}
+.mc:hover{transform:translateY(-2px);background:var(--bg3);border-color:var(--a)}
+.mc img{width:48px;height:48px;border-radius:10px;border:2px solid var(--bd);margin-bottom:.2rem}
+.mc:hover img{border-color:var(--a)}
+.mc .mn{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:1px;color:var(--tb);line-height:1}
+.mc .md{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:.1rem}
+.mc .dnum{font-family:'Orbitron',sans-serif;font-weight:900;font-size:.7rem}
+.mc.c1{border-color:rgba(46,204,113,.2)}.mc.c1 .md{color:var(--e)}
+.mc.c2{border-color:rgba(241,196,15,.2)}.mc.c2 .md{color:var(--m)}
+.mc.c3{border-color:rgba(155,89,182,.2)}.mc.c3 .md{color:var(--s)}
+.mc.c4{border-color:rgba(230,126,34,.2)}.mc.c4 .md{color:var(--h)}
+.mc.c5{border-color:rgba(231,76,60,.2)}.mc.c5 .md{color:var(--x)}
+.mc .wl{position:absolute;top:3px;right:4px;font-size:.55rem;font-weight:700;color:var(--td)}
+.mc .wl .w{color:var(--e)}.mc .wl .l{color:var(--x)}
+.mc .ban-star{position:absolute;top:3px;left:4px;font-size:.7rem;color:var(--x);display:none}
+.mc .ban-star.show{display:block}
+.empty{grid-column:1/-1;text-align:center;padding:2rem;color:var(--td)}
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);overflow-y:auto;padding:.5rem}
+.mbg.open{display:block}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;width:100%;max-width:680px;margin:1.5rem auto;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.mh{display:flex;align-items:center;gap:.8rem;padding:1rem 1.2rem;border-bottom:1px solid var(--bd);background:linear-gradient(135deg,rgba(200,170,110,.05),transparent)}
+.mh img{width:56px;height:56px;border-radius:10px;border:3px solid var(--a)}
+.mh .mi h2{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--tb);letter-spacing:2px;line-height:1}
+.mh .mi .ms{font-size:.72rem;color:var(--td)}
+.mx{margin-left:auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--bg);color:var(--td);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mx:hover{border-color:var(--x);color:var(--x)}
+.mb{padding:1rem 1.2rem}
+.ms2{margin-bottom:.8rem}
+.mt{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:2.5px;color:var(--a);text-transform:uppercase;margin-bottom:.4rem;display:flex;align-items:center;gap:.3rem}
+.mt::after{content:'';flex:1;height:1px;background:var(--bd)}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.sbox{background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:6px;padding:.4rem;text-align:center}
+.sbox .sk{font-family:'Orbitron',sans-serif;font-weight:900;font-size:.65rem;color:var(--a);margin-bottom:.15rem}
+.sbox .sd{font-size:.62rem;color:var(--td);line-height:1.2}
+.br{display:flex;gap:.35rem;flex-wrap:wrap}
+.bi{display:flex;align-items:center;gap:.2rem;background:rgba(255,255,255,.025);border:1px solid var(--bd);border-radius:5px;padding:.12rem .35rem .12rem .15rem}
+.bi img{width:24px;height:24px;border-radius:3px}.bi span{font-size:.72rem;font-weight:600;color:var(--t)}
+.bi.cr{border-color:rgba(200,170,110,.3)}.bi.cr span{color:var(--a)}
+.bi.st{border-color:rgba(46,204,113,.25)}.bi.st span{color:var(--e)}
+.rr{display:flex;gap:.35rem;flex-wrap:wrap}
+.rp{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:5px;padding:.15rem .45rem;font-size:.72rem;font-weight:600;color:var(--t)}
+.rp.ks{border-color:rgba(200,170,110,.3);color:var(--a);background:rgba(200,170,110,.06)}
+.tl{list-style:none}.tl li{font-size:.82rem;font-weight:500;line-height:1.35;padding-left:.7rem;position:relative;margin-bottom:.15rem}
+.tl li::before{content:'\25B8';position:absolute;left:0;color:var(--a)}
+.lb{background:rgba(200,170,110,.04);border:1px solid rgba(200,170,110,.1);border-radius:6px;padding:.6rem;font-size:.82rem;line-height:1.45}
+.wlr{display:flex;gap:.5rem;align-items:center;margin-top:.3rem}
+.wlb{padding:.35rem .8rem;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer;border:none;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+.wlb.win{background:rgba(46,204,113,.15);color:var(--e);border:1px solid rgba(46,204,113,.3)}
+.wlb.win:hover{background:rgba(46,204,113,.25)}
+.wlb.loss{background:rgba(231,76,60,.15);color:var(--x);border:1px solid rgba(231,76,60,.3)}
+.wlb.loss:hover{background:rgba(231,76,60,.25)}
+.wlb.rst2{background:transparent;color:var(--td);border:1px solid var(--bd);font-size:.7rem;padding:.25rem .5rem}
+.wls{font-size:.85rem;font-weight:700;color:var(--tb)}
+.nb textarea{width:100%;min-height:40px;padding:.35rem;background:var(--bg4);border:1px solid var(--bd);border-radius:5px;color:var(--t);font-family:'Rajdhani',sans-serif;font-size:.8rem;resize:vertical;outline:none;margin-top:.2rem}
+.nb textarea:focus{border-color:var(--a)}
+.banb{padding:.3rem .7rem;border-radius:5px;font-weight:700;font-size:.72rem;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--td);font-family:'Rajdhani',sans-serif;letter-spacing:1px;margin-top:.3rem}
+.banb:hover{border-color:var(--x);color:var(--x)}
+.banb.banned{background:rgba(231,76,60,.1);border-color:var(--x);color:var(--x)}
+/* COUNTER PICK */
+.cp-panel{max-width:800px;margin:0 auto;padding:1rem}
+.cp-grid{display:grid;grid-template-columns:1fr 60px 1fr;gap:.5rem;align-items:start}
+.cp-col h3{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--a);text-align:center;margin-bottom:.5rem}
+.cp-vs{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--td);text-align:center;padding-top:1.5rem}
+.cp-card{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:.6rem;text-align:center}
+.cp-card img{width:48px;height:48px;border-radius:8px;border:2px solid var(--bd)}
+.cp-card .cpn{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--tb);margin-top:.2rem}
+.cp-card .cpd{font-size:.75rem;font-weight:700;margin-top:.1rem}
+.cp-select{width:100%;padding:.4rem;background:var(--bg4);border:1px solid var(--bd);border-radius:6px;color:var(--tb);font-family:'Rajdhani',sans-serif;font-size:.85rem;outline:none;margin-bottom:.5rem}
+.cp-select:focus{border-color:var(--a)}
+.cp-rec{background:rgba(200,170,110,.04);border:1px solid rgba(200,170,110,.1);border-radius:8px;padding:.8rem;margin-top:.5rem;text-align:center}
+.cp-rec h4{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:2px;color:var(--a);margin-bottom:.3rem}
+.cp-rec .pick{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--tb)}
+.cp-rec .reason{font-size:.78rem;color:var(--td);margin-top:.2rem}
+.credit{text-align:center;padding:.8rem;font-size:.65rem;color:var(--td);border-top:1px solid var(--bd)}
+@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.3rem;padding:.5rem}.sg{grid-template-columns:repeat(2,1fr)}.cp-grid{grid-template-columns:1fr}.cp-vs{display:none}}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>Jax & Kled Bible</h1><p class="sub">Guide Matchups Top Lane AZERTY — Vallheim GM Rank 1 Jax</p></div>
+<div class="cs">
+<div class="csb on" onclick="sw('jax')"><img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Jax.png"><span>Jax</span></div>
+<div class="csb" onclick="sw('kled')"><img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Kled.png"><span>Kled</span></div>
+</div>
+<div class="vtabs">
+<button class="vtab on" data-v="matchups">Matchups</button>
+<button class="vtab" data-v="counter">Counter-Pick</button>
+</div>
+<div class="vpanel on" id="vp-matchups">
+<div class="ctrl">
+<div class="sb"><input type="text" id="search" placeholder="Rechercher..." autocomplete="off"></div>
+<button class="fb on" data-f="all">Tous</button><button class="fb" data-f="c1">1-3</button><button class="fb" data-f="c2">4-5</button><button class="fb" data-f="c3">6-7</button><button class="fb" data-f="c4">8-9</button><button class="fb" data-f="c5">10</button>
+<button class="tbn" onclick="xp()">Export</button><button class="tbn" onclick="document.getElementById('imp').click()">Import</button>
+<input type="file" id="imp" accept=".json" style="display:none" onchange="ipm(event)">
+</div>
+<div class="stb" id="stats"></div>
+<div class="grid" id="grid"></div>
+</div>
+<div class="vpanel" id="vp-counter">
+<div class="cp-panel">
+<p style="text-align:center;color:var(--td);font-size:.82rem;margin-bottom:.8rem">L'ennemi a pick un champion? Vois qui jouer entre Jax et Kled.</p>
+<select class="cp-select" id="cpsel" onchange="cpCalc()"><option value="">-- Choisis le champion ennemi --</option></select>
+<div id="cpResult"></div>
+</div>
+</div>
+<div class="mbg" id="modal" onclick="if(event.target===this)closeM()">
+<div class="modal"><div class="mh"><img id="mImg"><div class="mi"><h2 id="mName"></h2><div class="ms" id="mSub"></div></div><button class="mx" onclick="closeM()">&times;</button></div><div class="mb" id="mBody"></div></div>
+</div>
+<div class="credit">Jax: Vallheim GM 960LP Rank 1 EUW+World (MaJ 15/03/2026) | Kled: lolmatchups.net + MobaFire | Images: Riot Data Dragon</div>
+<script>
+const DD="https://ddragon.leagueoflegends.com/cdn/14.10.1/img",IM=c=>`${DD}/champion/${c}.png`,II=id=>`${DD}/item/${id}.png`;
+const DL=["","Facile","Facile","Facile","Moyen","Moyen","Skill","Skill","Dur","Dur","Extreme"];
+const CL=d=>d<=3?"c1":d<=5?"c2":d<=7?"c3":d<=9?"c4":"c5";
+const IT={"Gantelet":"6662","Sundered Sky":"6698","Tabis":"3047","Mercs":"3111","Sterak":"3053","Death's Dance":"6333","BORK":"3153","Randuin":"3143","Frozen Heart":"3110","Hexdrinker":"3155","Wit's End":"3091","Maw":"3156","Bramble":"3076","Doran's Blade":"1055","Doran's Shield":"1054","Doran's Ring":"1056","Tiamat":"3077","Hullbreaker":"3181","Zhonya":"3157","Titanic Hydra":"3748","Black Cleaver":"3071","Serylda":"6694","Overlord":"2501"};
+function ib(n,cl){const t=n.trim(),i=IT[t];return i?`<div class="bi ${cl||''}"><img src="${II(i)}" loading="lazy"><span>${t}</span></div>`:`<div class="bi ${cl||''}"><span>${t}</span></div>`;}
+
+const J=[
+{i:"Kayle",n:"Kayle",d:1,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Ne la laisse jamais farm free", "Freeze devant ta tour pour all-in/gank", "Tu gagnes le 1v1 des le lvl 1", "Crash wave 3, freeze sur bounce", "Spikes dangereux: lvl 6 (range), 11, 16"],l:"Zone-la du farm. Freeze + all-in pres de ta tour. Crash wave 3 en dive si possible. Ne jamais se faire freeze par Kayle."},
+{i:"Camille",n:"Camille",d:2,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Push pour lvl 2 advantage", "Trade quand elle Z: jump dans son Z", "E avant son AA pour bloquer shield passive", "Loin des murs pour eviter son E", "Cancel son E grappin avec stun au mur"],l:"Jump dans son Z pour eviter l'extremite. Active E avant son auto. Eloigne-toi des murs."},
+{i:"Irelia",n:"Irelia",d:2,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Prio lvl 2, crash wave 3 canon", "Trade pres de ta tour, sidestep E", "Post-6: all-in quand wave petite sans stacks", "Garde E longtemps pour ses dashes"],l:"Pre-6: gestion de wave = cle. Trade pres de ta tour. Post-6: all-in quand petite wave et pas de stacks passive."},
+{i:"Nasus",n:"Nasus",d:2,p:"Oui",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Ne pas laisser farm. Freeze pres de tour", "Trade: A > AA + Z, garde E si A", "Le sortir de lane avant qu'il scale"],l:"Freeze + zone du farm. Trade A > AA + Z. Garde E au cas ou. Le sortir de lane."},
+{i:"Sion",n:"Sion",d:2,p:"Oui",k:"Lethal Tempo",r:"Demolish, Overgrowth",s:"Doran's Blade",b:"Gantelet, Sundered Sky, Hullbreaker",t:["Attention bush lvl 1 apres leash", "Garde A pour repartir", "Lateralement pendant qu'il charge A"],l:"Attention bush lvl 1. Facile a all-in mais garde A pour repartir."},
+{i:"Gwen",n:"Gwen",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Tout se joue lvl 1, attention portee E", "Trade quand elle A la wave", "Passe derriere elle pour full trade", "Garde E longtemps pour bait"],l:"Trade quand elle A la wave. Passe derriere instantanement. Garde E longtemps."},
+{i:"Hecarim",n:"Hecarim",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Pas trop loin sur la lane", "Trade pres de ta tour apres A ou Z utilise", "Garde E sinon il burst"],l:"Trade pres de ta tour. Garde E sinon burst."},
+{i:"Lilia",n:"Lillia",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Jump dans son A pour reduire degats", "Stun quand elle sort de range E", "Post-6: attention sommeil"],l:"Jump dans son A comme vs Darius. Stun quand elle essaie de sortir. Attention sommeil post-6."},
+{i:"Ornn",n:"Ornn",d:3,p:"Oui",k:"Lethal Tempo",r:"Demolish, Overgrowth",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["E quand il auto apres Z pour annuler Brittle", "Garde A pour esquiver son E", "All-in quand plus de Z"],l:"E pour annuler Brittle. Garde A pour esquiver son E. All-in sans Z."},
+{i:"Trundle",n:"Trundle",d:3,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Son A = counter avec E. Trade libre", "Ne gaspille pas E: il chase sinon", "E le plus tard en all-in, max AA+Z"],l:"Son A est son principal sort: counter avec E. Trade librement si bien gere."},
+{i:"Volibear",n:"Volibear",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Courts trades, Voli gagne longs", "E bloque son A et Z", "Si touche par Z: recule"],l:"Courts trades. E bloque son A et Z. Repete le pattern."},
+{i:"Wukong",n:"MonkeyKing",d:3,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Son A portee > Z: attention poke", "A+AA+Z, pas E sinon il Z out", "E seulement s'il dash sur toi"],l:"A+AA+Z reset. Ne mets pas E sinon il Z out et re-dash. E seulement defensif."},
+{i:"Yasuo",n:"Yasuo",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Attends lvl 6 pour bully", "Force bouclier sans full commit", "Garde E intelligemment"],l:"Attends lvl 6. Force son bouclier. Post-6: garde E longtemps."},
+{i:"Yone",n:"Yone",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Pre-6 peut etre dur, post-6 tu gagnes", "Prio lvl 1-2, crash wave 3", "A sans E: s'il E tu punis quand il revient"],l:"Pre-6 il peut prendre avantage. Post-6 tu gagnes. A sans E pour bait son E."},
+{i:"Yorick",n:"Yorick",d:3,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["E pour dodge son A Grasp", "Si E touche: hors portee Z, tue goules", "Garde A, engage sans si possible"],l:"E pour dodge A Grasp. Garde A. Post-6: plus dur avec Maiden."},
+{i:"Aatrox",n:"Aatrox",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Skill matchup, leger avantage Aatrox", "Esquive A, utilise bushes", "Trade lvl 1 en rentrant dans son A", "Post-6: engage quand sort en CD"],l:"Esquive ses A. Avant lvl 6: A+AA+Z. Post-6: engage quand sort CD, longs trades en dodgeant A edge."},
+{i:"Darius",n:"Darius",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Rentre dans son A + E, recule", "A dans son A lvl 2, E dodge autos+Z", "Cle: A dans son A", "E revient plus vite (24s Darius)"],l:"CLE: A (jump) dans son A (Decimate). E dodge ses autos. Tu recuperes E plus vite."},
+{i:"DrMundo",n:"DrMundo",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Fight prio early, retire passif", "Avantage lvl 2, crash 3e vague", "Freeze + all-in", "Derriere sbires sous tour vs A"],l:"Fight pour prio early. Avantage lvl 2. Freeze + all-in. Derriere sbires vs ses A."},
+{i:"Mordekaiser",n:"Mordekaiser",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Punir E (24s CD)", "Longs trades, attention R post-6", "R apres son R pour garder resistances"],l:"Punir son E (24s CD). Longs trades. Post-6: R apres son R."},
+{i:"Ryze",n:"Ryze",d:4,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Avantage Ryze jusqu'a lvl 6", "Loin des sbires vs E>A combo", "Engage cote ta tour", "A>E, reactive E quand il cage"],l:"Avantage Ryze jusqu'a lvl 6. Loin des sbires. Engage du cote de ta tour pour le trainer."},
+{i:"Shen",n:"Shen",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Pas laisser lame passer a travers", "Distance pour react taunt avec E", "Sans Z: long trade gagne"],l:"Ne laisse pas sa lame passer. Garde distance. Sans Z: tu gagnes le long trade."},
+{i:"Warwick",n:"Warwick",d:4,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky, Bramble",t:["Jamais long trade early", "Bramble = longs trades viables", "Sheen: courts trades mal. 2 puis all-in", "Outscale fort"],l:"Arrete le trade apres le stun. Bramble rend les longs trades viables. Outscale tres fort."},
+{i:"Swain",n:"Swain",d:4,p:"Non",k:"Lethal Tempo",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Lvl 2 + 80% PV + cote tour: all-in", "Passe derriere lui", "Post-6: tu gagnes, colle-le", "Jamais cote sa tour"],l:"Lvl 2 + 80% PV + cote ta tour: all-in. Passe derriere. Post-6: tu gagnes toujours."},
+{i:"Zaahen",n:"Zaahen",d:4,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Pas de tres longs trades (stack passif)", "Trade des lvl 1, colle pour suivre dash", "Attention trades devant sa tour", "Post-6: esquive R pour eviter regen"],l:"Pas de tres longs trades. Trade des lvl 1. Colle pour suivre dash. Esquive R post-6."},
+{i:"Aurora",n:"Aurora",d:5,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Auto-win a partir de Gantelet", "Lvl 1: laisse prio", "Trades a partir lvl 4 si +80% PV", "Bait spells aux last-hits"],l:"Auto-win a partir de Gantelet. Lvl 1: laisse prio. Trades lvl 4+ sur bounce wave."},
+{i:"Fiora",n:"Fiora",d:5,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Attends dash A lvl 1 pour E", "Freeze + courts trades devant tour", "Post-6: poke Z+passif R", "Lateralement pendant E vs parade"],l:"Freeze + courts trades. Post-6: poke Z+passif R. Deplace-toi lateralement pendant E."},
+{i:"Gnar",n:"Gnar",d:5,p:"Even",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Prio pour lvl 2, crash wave canon", "Attends A utilise pour engager", "Stun pendant son saut = cancel", "Evite Mega sauf stun rate/low"],l:"Prio pour lvl 2. Attends son A utilise. Tu peux stun pendant son saut."},
+{i:"Kled",n:"Kled",d:5,p:"Even",k:"Lethal Tempo",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Dodge A (11s CD lvl 1)", "E bloque TOUTES autos de son Z", "Demonte: garde sorts pour finir", "Post-Gantelet: matchup free"],l:"E bloque toutes les autos de son Z = empeche remount Skaarl. Post-1 item c'est free."},
+{i:"Maokai",n:"Maokai",d:5,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Chiant: A et CC", "Engage apres A (8s CD)", "Laisse push devant ta tour"],l:"Engage apres son A (8s CD). Laisse-le push devant ta tour."},
+{i:"Olaf",n:"Olaf",d:5,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Dangereux lvl 1: pas de run down", "Hache pour poke: jump instant", "Pas 100-0: regen avec Z", "Son lvl 6 plus fort"],l:"Dangereux lvl 1. S'il utilise hache pour poke: jump instant. Son lvl 6 est plus fort."},
+{i:"Renekton",n:"Renekton",d:5,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Empeche stack fury lvl 1", "Trade avec E avant fury", "JAMAIS trade full fury", "Post-6: R genere fury, vigilance"],l:"Empeche fury des lvl 1. Trade avec E avant fury. JAMAIS full fury."},
+{i:"Sett",n:"Sett",d:5,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Trade stun puis recule vs E+Z", "JAMAIS A sauf sans E ou Z", "Sheen bon. Outscale"],l:"Approche, stun, recule. JAMAIS A sauf sans E ou Z. Tu outscales."},
+{i:"Tryndamere",n:"Tryndamere",d:5,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Laisse prio, focus farm", "E bloque auto > E out sous tour", "Sans fury: deny wave", "Post-6: poke Z+passif R repetes"],l:"Laisse prio. E pour bloquer auto sous tour. Sans fury: deny. Post-6: poke Z+passif R."},
+{i:"ChoGath",n:"Chogath",d:6,p:"Oui",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Prio lvl 1 avec E", "Focus farm prioritaire", "Evite E (cone piques), engage apres", "Tourne pour dodge A, full all-in", "Post-6: attention R = 400-500 PV"],l:"Prio lvl 1 avec E. Focus farm. Evite son E cone, engage apres. Tourne pour dodge son A."},
+{i:"Garen",n:"Garen",d:6,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["S'il E: reponds E + full AA + stun, recule", "Attention lvl 2-3: A+E+Ignite", "Trade si sort gaspille (A, E, Z)", "Short: Z puis A out. Long: seulement sans Z"],l:"S'il E: reponds E+AA+stun. Ne trade que si sort gaspille. Short: Z puis A out."},
+{i:"Illaoi",n:"Illaoi",d:6,p:"Oui",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Prio+XP+pression tot", "Trade pre-6 recommande", "Quand elle E: dodge tentacules", "Post-6: pas de full commit", "Courts trades + A pour repartir"],l:"Prends prio et pression tot. Trade pre-6. Quand elle E: dodge tentacules. Post-6: pas full commit."},
+{i:"Karma",n:"Karma",d:6,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Poke constant + escape facile", "Surveille R (40s CD lvl 1)", "Engage lvl 2-3 possible", "Si link Z: stun au moment de l'immobilisation"],l:"Poke + escape. Surveille R (40s CD). Engage lvl 2-3 si pas gros avantage sbires."},
+{i:"Malphite",n:"Malphite",d:6,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Rendre coup pour coup vs A poke", "Ou full farm, back 450g cristal rubis", "Engage sous tour apres clean wave"],l:"2 options: 1) Rendre coup pour coup vs A poke. 2) Full farm et scale. Engage quand il avance sous tour."},
+{i:"Poppy",n:"Poppy",d:6,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Son kit counter Jax mais avantage lvl 1", "Passif 16s CD, E 17s: E bloque passif", "Attends passif utilise puis trade CaC", "Pas contre un mur ou sous tour"],l:"Son passif 16s CD, ton E 17s: E bloque son passif. Attends passif utilise. Pas contre mur."},
+{i:"Singed",n:"Singed",d:6,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Tiamat possible vs proxy", "Approche CaC puis A apres son flip", "Post-6: plus gros powerspike que toi"],l:"Tiamat vs proxy. Approche CaC puis A apres flip. Post-6: powerspike ennemi."},
+{i:"Urgot",n:"Urgot",d:6,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Laisse prio, lvl 3-4 pour trade", "A>AA>Z, recule, attends son E", "E apres le sien, jamais en meme temps", "En all-in: pas tourner autour (passive)"],l:"Laisse prio. A>AA>Z, recule. E apres son E. En all-in: pas tourner autour."},
+{i:"Varus",n:"Varus",d:6,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["80%+ PV: full engage lvl 2", "A puis E, pas engage avec E", "Post-6: il R quand tu A. E+recule. Re-engage"],l:"80%+ PV: full engage lvl 2. Post-6: il R quand tu A. E et recule puis re-engage."},
+{i:"Udyr",n:"Udyr",d:6,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["D.Shield + Second Wind proc sur ticks R", "All-in si barre eveille pas remplie", "Sheen simplifie trade", "Evite ticks R et R charge"],l:"D.Shield + Second Wind proc sur ticks R. All-in si barre pas remplie. Sheen simplifie."},
+{i:"TahmKench",n:"TahmKench",d:7,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Ring",b:"Gantelet, Sundered Sky",t:["Derriere CS vs langue", "A+E+AA+Z puis recule en boucle", "Post-6: attention marques, R sous tour", "Pas extend sauf cote ta tour + dodge A"],l:"Derriere CS. Pattern: A+E+AA+Z recule. Post-6: attention marques R."},
+{i:"Gangplank",n:"Gangplank",d:7,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Bushes vs A poke", "E dodge ses A. Farm pour Gantelet", "JAMAIS pres d'un baril", "Garde E max pour bait Z Orange"],l:"Bushes. E pour dodge A. Farm pour Gantelet. JAMAIS pres d'un baril."},
+{i:"Gragas",n:"Gragas",d:7,p:"Oui",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["E = 14s CD (-3s si touche)", "Derriere sbires vs stun", "Opportunite: E dans le vent", "Jamais trade pres de sa tour: R"],l:"Son E a 14s CD. Derriere sbires. Opportunite si E rate. Jamais trade pres de sa tour."},
+{i:"Pantheon",n:"Pantheon",d:7,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Tabis",t:["Stacks pour poke A", "Canon seulement avec E actif", "Bait ses A pour forcer push", "All-in si Z ou E mal utilise"],l:"Lane tres dure. Canon avec E actif. Bait ses A. All-in si Z ou E mal utilise."},
+{i:"Rengar",n:"Rengar",d:7,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Faveur Rengar avant lvl 6", "Loin des bushes, farm sous tour", "Surveille stacks passif", "Post-6: trade back au jump"],l:"Eloigne-toi des bushes. Farm sous tour. Post-6: trade back immediatement au jump."},
+{i:"Riven",n:"Riven",d:7,p:"Non",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Tabis",t:["Permaban Vallheim 3 ans", "E jamais a l'aveugle", "Anticipe stun quand elle A", "Tuer: procs Z+passif R, all-in apres sort"],l:"Permaban Vallheim. E jamais a l'aveugle. Procs Z+passif R pour tuer."},
+{i:"Akali",n:"Akali",d:8,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Long trade lvl 1 pour mettre low", "Pattern: A+AA+Z boucle", "Pas E si elle a E up", "Post-6: consideration R"],l:"Long trade lvl 1. A+AA+Z en boucle. Ne pas E si elle a E up."},
+{i:"Ambessa",n:"Ambessa",d:8,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Prio lvl 1 cheater recall", "A+AA+Z si elle a claque un spell", "Extend avec E si portee", "Gros shield + options sortir E"],l:"Prio lvl 1. A+AA+Z si elle a claque un spell. Attention gros shield."},
+{i:"KSante",n:"KSante",d:8,p:"Oui",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Gantelet, Sundered Sky",t:["Tu gagnes AA mais il kite pour marques", "Trade auto, E, A out quand il charge Z", "Pas devant sa tour: insec", "Sheen aide enormement"],l:"Tu gagnes les AA. Trade auto+E, A out quand il Z. Pas devant sa tour. Sheen aide."},
+{i:"Teemo",n:"Teemo",d:8,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Wit's End",t:["Bushes pour poke+XP", "Pas Ignite: trade quand A CD", "S'il rate A: force flash/kill", "Post-6: punir erreurs sous tour"],l:"Bushes. Si pas Ignite: trade quand A (blind) CD. S'il rate A: force flash ou kill."},
+{i:"Vayne",n:"Vayne",d:8,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Tabis",t:["Bushes vs autos gratuites", "E inutile: A free", "E le plus tard, long trade", "Pas coller murs. A toutes 3 autos"],l:"Bushes. Si E inutile: A free. E le plus tard. Post-6: A toutes 3 autos pour Z+passif R."},
+{i:"Kennen",n:"Kennen",d:9,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Hexdrinker",t:["1 cs pour 1 auto", "A + Sheen proc, stun quand E", "Engage si 1/3 sorts utilise", "Jamais devant sa tour"],l:"1 cs pour 1 auto. A avec Sheen stun quand il E. Engage si 1 sort utilise."},
+{i:"Quinn",n:"Quinn",d:9,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Tabis",t:["JAMAIS A+E: salto = mort", "Attends salto ou lvl 6", "Lvl 6: A sans E, auto, salto, flash-in", "Post-6: attention roam instant"],l:"JAMAIS A+E direct. Attends salto ou lvl 6. Lvl 6: A sans E, auto, bait salto, flash-in."},
+{i:"Rumble",n:"Rumble",d:9,p:"Oui",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky, Hexdrinker",t:["Poke lance-flamme te sort de lane", "Approche wave, recule quand A actif", "Cle: jauge de surchauffe", "Engage proche du rouge: 1 sort avant surchauffe", "Surchauffe = que AA: counter avec E"],l:"Joue autour de sa jauge de surchauffe. Engage quand proche du rouge."},
+{i:"Vladimir",n:"Vladimir",d:9,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Start A lvl 1 possible", "A-in auto tour, re-A quand retourne", "Pool 28s CD: E engage, re-engage", "Allers-retours pour gratter"],l:"Start A lvl 1. Jump-in, auto jusqu'a tour, re-jump. Pool 28s CD: engage, re-engage."},
+{i:"Cassiopeia",n:"Cassiopeia",d:10,p:"Non",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Win selon positionnement+timing", "Laisse prio lvl 1, attends lvl 2-3", "Pres de ta tour pour chase", "All-in: colle, intercale, esquive A", "Post-6: dodge R = cle"],l:"Laisse prio. Engage du cote de ta tour. Colle et esquive ses A. Post-6: dodge R."},
+{i:"Heimerdinger",n:"Heimerdinger",d:10,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Dodge E (11s CD) pour engage", "Sous tour: que melee", "Jungler = meilleure chance"],l:"Dodge E pour fenetre. Sous tour: que melee. Jungler est ta chance."},
+{i:"Jayce",n:"Jayce",d:10,p:"Non",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Marteau repousse = counter", "Dodge A charge fog sous tour", "Switch forme distance: trade", "Colle mur vs repousse"],l:"Marteau counter Jax. Laisse prio. Dodge A charge. Switch distance = trade possible. Colle mur."},
+{i:"Jax Mirror",n:"Jax",d:10,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Shield",b:"Gantelet, Sundered Sky",t:["Timing E + fondamentaux", "Celui qui E en premier perd"],l:"Miroir: timing du E = tout. Celui qui gaspille E en premier perd."}
+];
+const K=[
+{i:"Aatrox",n:"Aatrox",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Gros avantage lvl 1-3", "E pour dodge sweetspots A et coller", "S'il rate A il ne peut rien faire", "Garde 2e E pour 3e A", "Anti-heal innee"],l:"Meilleur matchup. Aatrox perd le early. E a travers ses A et colle. Anti-heal innee."},
+{i:"DrMundo",n:"DrMundo",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Tu gagnes a chaque stade", "All-in permanent", "Black Cleaver si tanky"],l:"Tu gagnes a tous les stades. All-in Mundo tout le temps."},
+{i:"Ornn",n:"Ornn",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver, Hullbreaker",t:["Dodge Z surtout Brittle final", "E pour sidestep/dash", "Marche devant pour garder A attache"],l:"Dodge Z Brittle. E pour esquiver. Marche devant pour garder le lien A."},
+{i:"Mordekaiser",n:"Mordekaiser",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["AP Darius mais plus tanky", "Pas de A gratuits, bait in/out", "Courts trades frequents = cle", "E a travers A ou E"],l:"Courts trades frequents. Bait en entrant/sortant de sa range. Z long CD: abuse."},
+{i:"Sion",n:"Sion",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Hullbreaker",t:["Facile. Il ne peut pas te tuer", "Hullbreaker pour repondre split", "Punish quand il charge A"],l:"Sion ne peut pas te tuer. Punish son A charge. Hullbreaker possible."},
+{i:"Ambessa",n:"Ambessa",d:2,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["57% WR. Trade agressif", "Attention mobilite"],l:"57% WR. Trade agressivement des le debut."},
+{i:"Zaahen",n:"Zaahen",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Favorable", "Pas laisser stack passif", "Courts trades"],l:"Favorable. Courts trades pour pas laisser stack passif."},
+{i:"Yasuo",n:"Yasuo",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis",t:["Ton A passe a travers mur de vent", "All-in quand il dash sur toi"],l:"A passe a travers windwall. All-in quand il dash sur toi."},
+{i:"Nasus",n:"Nasus",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Zone-le des stacks", "All-in permanent", "Freeze devant ta tour"],l:"Zone des stacks. All-in permanent. Freeze + punish."},
+{i:"Kayle",n:"Kayle",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Tres faible early", "All-in des lvl 1", "Ne la laisse pas scale"],l:"All-in des lvl 1. Ne la laisse pas farm."},
+{i:"Gangplank",n:"Gangplank",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Il ne peut pas trade vs toi", "Dodge barils en les AA", "All-in facilement"],l:"Il ne peut pas trade. Dodge/AA barils. All-in facilement."},
+{i:"Gwen",n:"Gwen",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Tu la bats a tous les stades", "Son Z n'aide pas assez vs Kled", "Force trades dans ton Z"],l:"Tu la bats a tous les stades. Force trades quand ton Z est up."},
+{i:"Gragas",n:"Gragas",d:3,p:"Easy",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Kled counter Gragas (84% WR high elo)", "Dodge son E, all-in", "Punish sous sa tour possible"],l:"Kled counter Gragas fort. Dodge E et all-in."},
+{i:"Olaf",n:"Olaf",d:4,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Courts trades seulement", "S'il rate hache: window all-in", "Post-6: R inarretable"],l:"Courts trades. Si hache ratee: all-in. Attention R post-6."},
+{i:"Volibear",n:"Volibear",d:4,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Courts trades en early", "E esquive son A charge", "Pas sous sa tour quand R"],l:"Courts trades. E pour esquiver A charge. Pas sous sa tour quand R."},
+{i:"Gnar",n:"Gnar",d:4,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Dodge A, engage entre CD", "Evite Mega sauf stun rate", "Surestimation Mega: profite"],l:"Dodge A puis engage. Evite Mega sauf si stun rate ou low HP."},
+{i:"Renekton",n:"Renekton",d:5,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis",t:["Pas trade full fury", "Trade quand peu de fury", "Attention stun sous tour"],l:"Pas trade full fury. Trade quand faible fury. Attention stun sous tour."},
+{i:"Sett",n:"Sett",d:5,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Evite Z centre true damage", "Courts trades E out", "Bonne regen ennemi"],l:"Evite Z centre. Courts trades + E out."},
+{i:"Garen",n:"Garen",d:5,p:"Medium",k:"Press the Attack",r:"Bone Plating, Demolish",s:"Doran's Blade",b:"Titanic Hydra, Tabis, Black Cleaver",t:["Garde 2e E vs Phase Rush", "Zone avec A quand il avance", "Bait Z avant full all-in", "Pas sur lui pendant E"],l:"Garde 2e E pour re-engager apres Phase Rush. Bait Z avant all-in."},
+{i:"Trundle",n:"Trundle",d:5,p:"Even",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Courts trades, E out", "Son A counter par mobilite", "Attention post-6 son R"],l:"Courts trades. Son A counter par ta mobilite. Attention R post-6."},
+{i:"Camille",n:"Camille",d:6,p:"Medium",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Engage quand shield+BP down", "One-shot pre-Tabis possible", "Entre elle et mur pour bloquer E", "Post-Sunderer+Tabis: elle gagne"],l:"Engage sans shield passive et sans Bone Plating. Between elle et mur. Post-Sunderer elle gagne."},
+{i:"Illaoi",n:"Illaoi",d:6,p:"Medium",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Black Cleaver",t:["Dodge E a tout prix", "Si R: disengage", "Courts trades E out"],l:"Dodge E. Si R: disengage. Courts trades + E pour repartir."},
+{i:"Urgot",n:"Urgot",d:6,p:"Medium",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Dodge son E, seul hard engage", "Courts trades entre CD", "Attention R sous 25% PV"],l:"Dodge E. Courts trades. Attention R execute."},
+{i:"Teemo",n:"Teemo",d:6,p:"Medium",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Hexdrinker",t:["Range poke dur", "All-in quand blind CD", "E pour gap close"],l:"Range poke. All-in quand blind CD. E pour gap close."},
+{i:"Akali",n:"Akali",d:6,p:"Medium",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Hexdrinker",t:["Shroud annule pattern", "Trade quand shroud CD", "All-in possible sans shroud"],l:"Shroud pose probleme. Trade quand CD. All-in possible."},
+{i:"Singed",n:"Singed",d:7,p:"Hard",k:"Conqueror",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Black Cleaver",t:["Counter Kled. Ne chase pas poison", "Proxy facile pour lui", "Focus farm et group"],l:"Counter Kled. Ne chase pas dans poison. Focus farm et group."},
+{i:"Poppy",n:"Poppy",d:7,p:"Hard",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["Z bloque E et R", "Trade quand Z en CD", "Tres difficile"],l:"Son Z bloque E et R. Trade seulement quand Z CD. Tres dur."},
+{i:"Quinn",n:"Quinn",d:7,p:"Hard",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Tabis",t:["Elle kite en lane", "Farm sous tour, attends jungler", "E gap close attention salto"],l:"Elle kite. Farm sous tour. E pour gap close mais attention salto."},
+{i:"Riven",n:"Riven",d:6,p:"Medium",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis",t:["Trade entre ses CD", "Attention burst combo", "Courts trades, E out", "Post-6: attention R execute"],l:"Trade entre CD. Courts trades + E out. Attention burst et R post-6."},
+{i:"Darius",n:"Darius",d:8,p:"Very Hard",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis, Black Cleaver",t:["Ne te fais pas freeze", "A pour poke, courts trades", "E out s'il extend", "5 stacks dismount = perdu"],l:"A pour poke. Courts trades E out. 5 stacks bleed au dismount = perdu."},
+{i:"Jax",n:"Jax",d:8,p:"Hard",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Black Cleaver",t:["E bloque toutes autos Z = pas remount", "Pre-6 = le plus important", "17s CD son E: abuse fenetre", "S'il A+E sur toi: E away"],l:"Tres dur. Son E bloque ton Z = empeche remount. Abuse les 17s CD de son E. Si A+E: E away."},
+{i:"Fiora",n:"Fiora",d:9,p:"Extreme",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis",t:["Z parade bloque toujours pull A", "Moitie des degats en moins sans stun", "Seul moyen: elle rate Z", "Dodge si pas confiant"],l:"Z parade bloque toujours le pull du A. Le SEUL moyen de gagner: elle rate son Z."},
+{i:"Vayne",n:"Vayne",d:8,p:"Very Hard",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Tabis",t:["Kite + condemn mur", "Bushes vs autos gratuites", "Ganks. Farm + group"],l:"Kited en permanence. Bushes. Demande ganks. Farm et group."},
+{i:"Kennen",n:"Kennen",d:7,p:"Hard",k:"Fleet Footwork",r:"Second Wind, Unflinching",s:"Doran's Shield",b:"Titanic Hydra, Hexdrinker",t:["Range harass dur", "All-in si E utilise", "Flash son R si necessaire"],l:"Range harass. All-in si E utilise. Flash R si necessaire."},
+{i:"Irelia",n:"Irelia",d:7,p:"Hard",k:"Conqueror",r:"Bone Plating, Unflinching",s:"Doran's Blade",b:"Titanic Hydra, Tabis",t:["Depend de la mecanique Irelia", "Punish A sur minions", "Post-6: attention stacks passif"],l:"Depend de la mecanique. Punish A sur minions. Attention stacks passif."}
+];
+let cur='jax',flt='all';
+function M(){return cur==='jax'?J:K;}
+function ld(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return {};}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function gWL(){return ld('wl-'+cur);}
+function sWL(d){sv('wl-'+cur,d);}
+function gN(){return ld('notes-'+cur);}
+function sN(d){sv('notes-'+cur,d);}
+function gB(){return ld('bans-'+cur);}
+function sB(d){sv('bans-'+cur,d);}
+
+function sw(c){cur=c;document.querySelectorAll('.csb').forEach(b=>b.classList.remove('on'));event.currentTarget.classList.add('on');render();cpPop();}
+
+document.querySelectorAll('.vtab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.vtab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.vpanel').forEach(x=>x.classList.remove('on'));t.classList.add('on');document.getElementById('vp-'+t.dataset.v).classList.add('on');});});
+
+function render(){
+  const g=document.getElementById('grid');g.innerHTML='';const s=document.getElementById('search').value.toLowerCase();
+  let list=M();if(flt!=='all')list=list.filter(m=>CL(m.d)===flt);if(s)list=list.filter(m=>m.n.toLowerCase().includes(s)||m.i.toLowerCase().includes(s));
+  list.sort((a,b)=>a.d-b.d);const wl=gWL();const bans=gB();
+  if(!list.length){g.innerHTML='<div class="empty">Aucun matchup</div>';uSt();return;}
+  list.forEach((m,i)=>{const cat=CL(m.d);const c=document.createElement('div');c.className=`mc ${cat}`;c.style.animationDelay=`${i*.015}s`;
+  c.onclick=()=>openM(m);const w=wl[m.i]||{w:0,l:0};const isBan=bans[m.i];
+  let wlH='';if(w.w||w.l)wlH=`<span class="w">${w.w}W</span>/<span class="l">${w.l}L</span>`;
+  c.innerHTML=`<div class="ban-star ${isBan?'show':''}">\u2716</div><div class="wl">${wlH}</div><img src="${IM(m.n)}" loading="lazy" onerror="this.src='${IM(m.i)}'"><div class="mn">${m.i.replace('DrMundo','Dr.Mundo').replace('MonkeyKing','Wukong').replace('Chogath',"Cho'Gath").replace('TahmKench','T.Kench').replace('Lillia','Lilia').replace('KSante',"K'Sante")}</div><div class="md"><span class="dnum">${m.d}/10</span> ${DL[m.d]||''}</div>`;
+  g.appendChild(c);});uSt();
+}
+
+function openM(m){
+  const notes=gN();const wl=gWL();const bans=gB();const cat=CL(m.d);const w=wl[m.i]||{w:0,l:0};
+  document.getElementById('mImg').src=IM(m.n);document.getElementById('mImg').onerror=function(){this.src=IM(m.i);};
+  const dName=m.i.replace('DrMundo','Dr. Mundo').replace('MonkeyKing','Wukong').replace('Chogath',"Cho'Gath").replace('TahmKench','Tahm Kench').replace('Lillia','Lilia').replace('KSante',"K'Sante").replace('Jax Mirror','Jax (Mirror)');
+  document.getElementById('mName').textContent=dName;
+  document.getElementById('mSub').textContent=`${m.d}/10 ${DL[m.d]} | ${m.p} | ${cur==='jax'?'Jax':'Kled'}`;
+  const ksH=m.k?`<span class="rp ks">${m.k}</span>`:'';
+  const r2H=m.r?m.r.split(',').map(r=>`<span class="rp">${r.trim()}</span>`).join(''):'';
+  const stH=ib(m.s||"Doran's Blade",'st');
+  const crH=(m.b||'').split(',').map(x=>ib(x.trim(),'cr')).join('');
+  const tH=(m.t||[]).map(t=>`<li>${t}</li>`).join('');
+  const isBan=bans[m.i];
+
+  document.getElementById('mBody').innerHTML=`
+    <div class="ms2"><div class="mt">Runes a prendre</div><div class="rr">${ksH}${r2H}</div></div>
+    <div class="ms2"><div class="mt">Item de depart</div><div class="br">${stH}</div></div>
+    <div class="ms2"><div class="mt">Build adapte</div><div class="br">${crH}</div></div>
+    <div class="ms2"><div class="mt">Tips (AZERTY)</div><ul class="tl">${tH}</ul></div>
+    <div class="ms2"><div class="mt">Comment jouer la lane</div><div class="lb">${m.l||'-'}</div></div>
+    <div class="ms2"><div class="mt">Win/Loss Tracker</div>
+      <div class="wlr"><button class="wlb win" onclick="addWL('${m.i}','w')">+ Win</button><button class="wlb loss" onclick="addWL('${m.i}','l')">+ Loss</button><span class="wls" id="wlDisplay">${w.w}W / ${w.l}L ${(w.w+w.l)>0?'('+Math.round(w.w/(w.w+w.l)*100)+'% WR)':''}</span><button class="wlb rst2" onclick="rstWL('${m.i}')">Reset</button></div>
+    </div>
+    <div class="ms2"><div class="mt">Notes perso</div><div class="nb"><textarea placeholder="Tes notes..." oninput="sNote('${m.i}',this.value)">${notes[m.i]||''}</textarea></div></div>
+    <button class="banb ${isBan?'banned':''}" onclick="togBan('${m.i}')">${isBan?'\u2716 Retirer du banlist':'\u2716 Ajouter au banlist'}</button>
+  `;
+  document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden';
+}
+
+function addWL(id,type){const d=gWL();if(!d[id])d[id]={w:0,l:0};d[id][type]++;sWL(d);const w=d[id];document.getElementById('wlDisplay').textContent=`${w.w}W / ${w.l}L ${(w.w+w.l)>0?'('+Math.round(w.w/(w.w+w.l)*100)+'% WR)':''}`;render();}
+function rstWL(id){const d=gWL();d[id]={w:0,l:0};sWL(d);document.getElementById('wlDisplay').textContent='0W / 0L';render();}
+function sNote(id,v){const d=gN();d[id]=v;sv('notes-'+cur,d);}
+function togBan(id){const d=gB();d[id]=!d[id];sB(d);render();openM(M().find(m=>m.i===id));}
+
+function closeM(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+
+function uSt(){const m=M();const c={c1:0,c2:0,c3:0,c4:0,c5:0};m.forEach(x=>c[CL(x.d)]++);
+const labels={c1:'1-3 Facile',c2:'4-5 Moyen',c3:'6-7 Skill',c4:'8-9 Dur',c5:'10 Extreme'};
+document.getElementById('stats').innerHTML=Object.entries(c).map(([k,v])=>`<div class="sp"><span class="dot ${k}"></span>${labels[k]}: ${v}</div>`).join('');}
+
+document.querySelectorAll('.fb').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));b.classList.add('on');flt=b.dataset.f;render();});});
+document.getElementById('search').addEventListener('input',()=>render());
+
+// COUNTER-PICK
+function cpPop(){const sel=document.getElementById('cpsel');sel.innerHTML='<option value="">-- Champion ennemi --</option>';
+const allNames=new Set();J.forEach(m=>allNames.add(m.i));K.forEach(m=>allNames.add(m.i));
+[...allNames].sort().forEach(n=>{sel.innerHTML+=`<option value="${n}">${n.replace('DrMundo','Dr.Mundo').replace('MonkeyKing','Wukong').replace('Chogath',"Cho'Gath").replace('TahmKench','T.Kench').replace('KSante',"K'Sante")}</option>`;});}
+
+function cpCalc(){const enemy=document.getElementById('cpsel').value;const res=document.getElementById('cpResult');
+if(!enemy){res.innerHTML='';return;}
+const jm=J.find(m=>m.i===enemy);const km=K.find(m=>m.i===enemy);
+let html2='<div class="cp-grid">';
+html2+='<div class="cp-col"><h3>Jax</h3>';
+if(jm){html2+=`<div class="cp-card"><img src="${IM('Jax')}"><div class="cpn">Jax vs ${enemy}</div><div class="cpd" style="color:${jm.d<=5?'var(--e)':jm.d<=7?'var(--m)':'var(--x)'}">${jm.d}/10 ${DL[jm.d]}</div><div style="font-size:.72rem;color:var(--td);margin-top:.3rem">${jm.p}</div></div>`;}
+else{html2+='<div class="cp-card"><div class="cpn">Pas de data</div></div>';}
+html2+='</div><div class="cp-vs">VS</div><div class="cp-col"><h3>Kled</h3>';
+if(km){html2+=`<div class="cp-card"><img src="${IM('Kled')}"><div class="cpn">Kled vs ${enemy}</div><div class="cpd" style="color:${km.d<=5?'var(--e)':km.d<=7?'var(--m)':'var(--x)'}">${km.d}/10 ${DL[km.d]}</div><div style="font-size:.72rem;color:var(--td);margin-top:.3rem">${km.p}</div></div>`;}
+else{html2+='<div class="cp-card"><div class="cpn">Pas de data</div></div>';}
+html2+='</div></div>';
+
+// Recommendation
+let pick='',reason='';
+if(jm&&km){if(jm.d<km.d){pick='JAX';reason=`Jax a un matchup plus facile (${jm.d}/10 vs ${km.d}/10)`;}else if(km.d<jm.d){pick='KLED';reason=`Kled a un matchup plus facile (${km.d}/10 vs ${jm.d}/10)`;}else{pick='EGAL';reason=`Meme difficulte (${jm.d}/10). Joue ton main.`;}}
+else if(jm){pick='JAX';reason='Pas de data Kled pour ce matchup.';}
+else if(km){pick='KLED';reason='Pas de data Jax pour ce matchup.';}
+else{pick='?';reason='Pas de data pour les deux.';}
+
+html2+=`<div class="cp-rec"><h4>Recommandation</h4><div class="pick">${pick}</div><div class="reason">${reason}</div></div>`;
+res.innerHTML=html2;
+}
+
+// EXPORT/IMPORT
+function xp(){const data={jaxNotes:ld('notes-jax'),kledNotes:ld('notes-kled'),jaxWL:ld('wl-jax'),kledWL:ld('wl-kled'),jaxBans:ld('bans-jax'),kledBans:ld('bans-kled')};
+const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jax-kled-bible-backup.json';a.click();}
+
+function ipm(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{const d=JSON.parse(ev.target.result);
+if(d.jaxNotes)sv('notes-jax',d.jaxNotes);if(d.kledNotes)sv('notes-kled',d.kledNotes);
+if(d.jaxWL)sv('wl-jax',d.jaxWL);if(d.kledWL)sv('wl-kled',d.kledWL);
+if(d.jaxBans)sv('bans-jax',d.jaxBans);if(d.kledBans)sv('bans-kled',d.kledBans);
+render();alert('Import OK!');}catch(err){alert('Fichier invalide');}};r.readAsText(f);e.target.value='';}
+
+render();cpPop();
+</script>
+</body>
+</html>

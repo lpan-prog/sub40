@@ -78,36 +78,37 @@ body {
 .countdown {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 6px;
   margin-top: 20px;
   position: relative;
+  padding: 0 12px;
 }
 .countdown-unit {
   text-align: center;
 }
 .countdown-val {
   font-family: 'Space Mono', monospace;
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-size: clamp(1.3rem, 5vw, 2.2rem);
   font-weight: 700;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 8px 14px;
-  min-width: 60px;
+  padding: 8px 10px;
+  min-width: 48px;
   display: block;
   line-height: 1;
 }
 .countdown-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text2);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   margin-top: 6px;
 }
 .countdown-sep {
   font-family: 'Space Mono', monospace;
-  font-size: 2rem;
+  font-size: 1.4rem;
   color: var(--text2);
   align-self: flex-start;
   padding-top: 8px;
@@ -197,26 +198,27 @@ body {
 .weight-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .weight-input {
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   color: var(--text);
   font-family: 'Space Mono', monospace;
-  font-size: 1.1rem;
-  width: 100px;
+  font-size: 1rem;
+  width: 80px;
   text-align: center;
   outline: none;
 }
 .weight-input:focus { border-color: var(--accent); }
 .weight-date {
-  width: 140px;
-  font-size: 0.9rem;
+  width: 130px;
+  font-size: 0.85rem;
   color-scheme: dark;
+  text-align: left;
 }
 .weight-btn {
   background: var(--accent-dim);

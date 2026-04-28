@@ -213,6 +213,11 @@ body {
   outline: none;
 }
 .weight-input:focus { border-color: var(--accent); }
+.weight-date {
+  width: 140px;
+  font-size: 0.9rem;
+  color-scheme: dark;
+}
 .weight-btn {
   background: var(--accent-dim);
   border: 1px solid var(--accent);
@@ -788,6 +793,7 @@ function renderWeight() {
   document.getElementById('weightSection').innerHTML = `
     <h3>Suivi poids · Objectif 98 → 89–91 kg</h3>
     <div class="weight-row">
+      <input type="date" class="weight-input weight-date" id="weightDate" value="${new Date().toISOString().split('T')[0]}">
       <input type="number" class="weight-input" id="weightInput" placeholder="kg" step="0.1" min="60" max="150">
       <button class="weight-btn" onclick="addWeight()">Enregistrer</button>
       ${latest ? `<span class="weight-tag current">${latest} kg</span>` : ''}
@@ -951,10 +957,13 @@ function renderWeightChart() {
 
 function addWeight() {
   const input = document.getElementById('weightInput');
+  const dateInput = document.getElementById('weightDate');
   const val = parseFloat(input.value);
   if (!val || val < 60 || val > 150) return;
-  const date = new Date().toLocaleDateString('fr-FR', {day:'2-digit', month:'short'});
-  state.weights.push({val, date, ts: Date.now()});
+  const chosenDate = new Date(dateInput.value + 'T12:00:00');
+  const date = chosenDate.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'});
+  state.weights.push({val, date, ts: chosenDate.getTime()});
+  state.weights.sort((a, b) => (a.ts || 0) - (b.ts || 0));
   save();
   renderWeight();
   renderStats();

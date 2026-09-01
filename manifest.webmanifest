@@ -1,0 +1,17 @@
+{
+  "name": "Carnet de chien — coach",
+  "short_name": "Mon chien",
+  "description": "Observe, comprends et fais progresser ton chien : balades, exercices guidés et suivi des axes de comportement.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F4FD",
+  "theme_color": "#4B62F0",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Carnet de chien</title>
-<meta name="description" content="Carnet de bord complet pour suivre les balades, l'entraînement, la santé et l'évolution émotionnelle de son chien.">
+<title>Comprends ton chien</title>
+<meta name="description" content="Observe, comprends et fais progresser ton chien : l'application lit tes balades, repère ce qui bloque et te dit quel exercice travailler aujourd'hui.">
 <meta name="theme-color" content="#4B62F0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -363,6 +363,9 @@ html[data-theme="sombre"] .opt.on{color:var(--moss)}
 .obj-exo{background:var(--surface-2);border-radius:var(--r-m);padding:17px 18px;margin-top:16px}
 .btn.gros{padding:14px 26px;font-size:.95rem}
 .axe .fl{font-size:.85rem;margin-left:2px;opacity:.75}
+.axe .verdict{font-size:.76rem;font-weight:700;color:var(--ink-3);white-space:nowrap}
+.axe.bon .verdict{color:var(--vert)} .axe.moyen .verdict{color:var(--moss)}
+.axe.bas .verdict{color:var(--ochre)} .axe.critique .verdict{color:var(--rouge)}
 
 /* ---------- Exercice guidé ---------- */
 .guide{position:fixed;inset:0;z-index:130;background:var(--paper);display:flex;flex-direction:column}
@@ -521,71 +524,41 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .livebar .btn:hover{background:rgba(255,255,255,.34)}
 .livebar .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.55);color:#fff}
 
-/* ---------- Carte du parcours ---------- */
-/* Fond de carte volontairement sombre, y compris en thème clair : le tracé
-   ressort, et le bloc se lit comme une pièce à part dans la page. */
-.carte{position:relative;overflow:hidden;border-radius:var(--r-l);background:#0C1226;
-  display:flex;align-items:center;justify-content:center;max-width:100%;
-  box-shadow:inset 0 0 0 1px rgba(139,155,255,.14)}
-.carte.sans-fond{background:#0C1226}
-.carte-in{position:relative;flex:0 0 auto}
-.carte .tuile{position:absolute;width:256px;height:256px;user-select:none;pointer-events:none;
-  filter:invert(1) grayscale(1) brightness(.52) contrast(1.35)}
-/* Teinte bleu nuit par-dessus les tuiles inversées, pour rester dans la palette */
+/* ---------- Carte du parcours ----------
+   Le bloc prend la largeur de son conteneur et impose son ratio : plus aucune
+   mesure de la fenêtre, donc plus de débordement sur les blocs voisins. */
+.carte{position:relative;width:100%;overflow:hidden;border-radius:var(--r-l);
+  background:var(--surface-2);margin:14px 0;box-shadow:inset 0 0 0 1px var(--line)}
+.carte.sans-fond{background:var(--moss-soft)}
+.carte-in{position:absolute;inset:0}
+.carte .tuile{position:absolute;user-select:none;pointer-events:none;
+  filter:grayscale(1) brightness(1.1) contrast(.72)}
+/* Voile bleu très léger : la carte reste claire et sobre, le tracé domine */
 .carte-in::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(160deg,#2B3A7A,#131B3A 70%);opacity:.55;mix-blend-mode:color}
-.carte-in::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 45%,transparent 40%,rgba(8,12,28,.55));}
-.carte svg{position:relative;z-index:2}
-.chien{transition:opacity .25s}
-.chien .corps{fill:var(--moss-deep)}
-html[data-theme="sombre"] .chien .corps{fill:var(--moss)}
-.chien .patte{stroke:var(--moss-deep);stroke-width:2.2;stroke-linecap:round}
-html[data-theme="sombre"] .chien .patte{stroke:var(--moss)}
-.chien .oreille,.chien .queue{stroke:var(--moss-deep);stroke-width:2;fill:none;stroke-linecap:round}
-html[data-theme="sombre"] .chien .oreille,html[data-theme="sombre"] .chien .queue{stroke:var(--moss)}
-.chien .oeil{fill:#fff}
-.chien .ombre{fill:rgba(20,26,51,.18)}
-@media (prefers-reduced-motion:no-preference){
-  .chien .patte{animation:trotte .34s linear infinite}
-  .chien.arrive .patte{animation:none}
-  .chien .queue{transform-origin:-9px 1px;animation:queue .5s ease-in-out infinite alternate}
-}
-@keyframes trotte{0%,100%{transform:skewX(0deg)}25%{transform:skewX(13deg)}75%{transform:skewX(-13deg)}}
-@keyframes queue{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+  background:var(--moss);opacity:.09;mix-blend-mode:multiply}
+html[data-theme="sombre"] .carte{background:#161B2E;box-shadow:inset 0 0 0 1px var(--line)}
+html[data-theme="sombre"] .carte .tuile{filter:invert(1) grayscale(1) brightness(.72) contrast(.95)}
+html[data-theme="sombre"] .carte-in::after{opacity:.22;mix-blend-mode:screen;background:#26325E}
+.carte svg{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.carte .trace-fond{opacity:.9}
+html[data-theme="sombre"] .carte .trace-fond{stroke:#0D1020}
 .carte-pied{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:10px;
-  justify-content:space-between;align-items:center;padding:10px 14px;font-size:.78rem;
-  background:linear-gradient(transparent,rgba(8,12,28,.85));color:#fff;font-weight:640;
-  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.carte-pied .attr{font-weight:400;color:rgba(255,255,255,.45);font-size:.68rem;display:none}
+  justify-content:space-between;align-items:flex-end;padding:12px 16px;font-size:.95rem;
+  color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  background:linear-gradient(transparent,rgba(255,255,255,.9) 65%)}
+html[data-theme="sombre"] .carte-pied{color:#fff;background:linear-gradient(transparent,rgba(13,16,32,.92) 65%)}
+.carte-pied .attr{font-weight:400;color:var(--ink-3);font-size:.66rem;display:none}
 .carte.avec-tuiles .carte-pied .attr{display:inline}
-/* Le chien passe en blanc : il doit rester lisible sur le fond nuit */
-.carte .chien .corps{fill:#fff}
-.carte .chien .patte,.carte .chien .oreille,.carte .chien .queue{stroke:#fff}
-.carte .chien .oeil{fill:#2B3A7A}
-.carte .chien .ombre{fill:rgba(0,0,0,.35)}
-
-/* ---------- Balade : quatre grandes cibles ---------- */
-.gros-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.gros-tap{min-height:118px;padding:18px 16px;gap:6px}
-.gros-tap .ct{font-size:2.4rem}
-.gros-tap .lb{font-size:.92rem;font-weight:640;color:var(--ink)}
-.intensite{position:fixed;left:0;right:0;bottom:0;z-index:135;padding:0 16px calc(16px + env(safe-area-inset-bottom,0px));
-  display:flex;justify-content:center;pointer-events:none}
-@media (prefers-reduced-motion:no-preference){
-  .intensite{animation:monte .18s cubic-bezier(.22,.61,.36,1) both}
-  .intensite.sort{animation:monte .16s reverse both}
-}
-@keyframes monte{from{opacity:0;transform:translate3d(0,26px,0)}to{opacity:1;transform:none}}
-.int-in{background:var(--ink);color:var(--paper);border-radius:var(--r-l);padding:14px 18px;
-  display:flex;align-items:center;gap:16px;pointer-events:auto;box-shadow:var(--shadow)}
-.int-in .lb{font-size:.86rem;font-weight:600;white-space:nowrap}
-.int-row{display:flex;gap:8px}
-.int-row button{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.14);
-  color:var(--paper);font-size:1rem;font-weight:700;cursor:pointer}
-.int-row button:active{transform:scale(.9);background:var(--moss)}
-.fin-ligne{margin-bottom:22px}
-.fin-ligne input[type=range]{margin:4px 0 2px}
+.carte .chien .corps{fill:var(--moss-deep)}
+.carte .chien .patte,.carte .chien .oreille,.carte .chien .queue{stroke:var(--moss-deep)}
+.carte .chien .oeil{fill:#fff}
+.carte .chien .ombre{fill:rgba(20,26,51,.16)}
+.carte .chien{filter:drop-shadow(0 2px 4px rgba(20,26,51,.28))}
+html[data-theme="sombre"] .carte .chien .corps{fill:#fff}
+html[data-theme="sombre"] .carte .chien .patte,
+html[data-theme="sombre"] .carte .chien .oreille,
+html[data-theme="sombre"] .carte .chien .queue{stroke:#fff}
+html[data-theme="sombre"] .carte .chien .oeil{fill:#2B3A7A}
 
 /* ---------- Compteurs : correction d'un tap ---------- */
 .tap-wrap{position:relative;display:flex}
@@ -642,7 +615,7 @@ html[data-theme="sombre"] .chien .oreille,html[data-theme="sombre"] .chien .queu
   <aside class="side">
     <div class="brand">
       <div class="dot" id="brandDot"></div>
-      <div><b id="brandName">Carnet de chien</b><span id="brandSub">Suivi complet</span></div>
+      <div><b id="brandName">Comprends ton chien</b><span id="brandSub">Coach au quotidien</span></div>
     </div>
     <nav class="nav" id="navDesk"></nav>
   </aside>
@@ -652,7 +625,7 @@ html[data-theme="sombre"] .chien .oreille,html[data-theme="sombre"] .chien .queu
       <div class="row1">
         <div class="brand">
           <div class="dot" id="brandDot2"></div>
-          <div><b id="brandName2">Carnet de chien</b><span id="brandSub2">Suivi complet</span></div>
+          <div><b id="brandName2">Comprends ton chien</b><span id="brandSub2">Coach au quotidien</span></div>
         </div>
         <button class="icon-btn" id="themeBtn2" title="Changer le thème">◐</button>
       </div>
@@ -2250,8 +2223,8 @@ function avatarHTML(size){
   return `<div class="avatar ${size||'md'}">${p?`<img src="${p}" alt="${esc(S.chien.nom||'photo du chien')}">`:ico('profil')}</div>`;
 }
 function refreshBrand(){
-  const n = S.chien.nom ? S.chien.nom : 'Carnet de chien';
-  const sub = S.chien.nom ? (S.chien.race || 'Carnet de bord') : 'Aucun chien enregistré';
+  const n = S.chien.nom ? S.chien.nom : 'Comprends ton chien';
+  const sub = S.chien.nom ? (S.chien.race || 'Coach au quotidien') : 'Aucun chien enregistré';
   ['#brandName','#brandName2'].forEach(s=>{ if($(s)) $(s).textContent = n; });
   ['#brandSub','#brandSub2'].forEach(s=>{ if($(s)) $(s).textContent = sub; });
   const ph = S.chien && S.chien.photo;
@@ -2259,7 +2232,7 @@ function refreshBrand(){
     el.innerHTML = ph ? `<img src="${ph}" alt="">` : ico('profil');
     el.style.background = ph ? 'transparent' : 'var(--moss)'; });
   if (ph) { const ic = document.querySelector("link[rel='icon']"); if (ic) ic.href = ph; }
-  document.title = S.chien.nom ? S.chien.nom + ' — carnet' : 'Carnet de chien';
+  document.title = S.chien.nom ? S.chien.nom + ', où il en est' : 'Comprends ton chien';
 }
 
 /* ---- Lecture + compression d'une photo : carré centré, 512 px, JPEG ---- */
@@ -2488,31 +2461,59 @@ const merX = lo => (lo + 180) / 360;
 const merY = la => { const s = Math.sin(la*Math.PI/180);
   return 0.5 - Math.log((1+s)/(1-s)) / (4*Math.PI); };
 
+/* Lissage : moyenne glissante pondérée sur trois points. Assez pour effacer les
+   zigzags de mauvais signal, trop faible pour déformer un vrai virage. */
+function lisser(pts){
+  if (pts.length < 4) return pts.slice();
+  const out = [pts[0]];
+  for (let i=1;i<pts.length-1;i++){
+    const a = pts[i-1], b = pts[i], c = pts[i+1];
+    out.push([ +(a[0]*0.25 + b[0]*0.5 + c[0]*0.25).toFixed(6),
+               +(a[1]*0.25 + b[1]*0.5 + c[1]*0.25).toFixed(6), b[2] ]);
+  }
+  out.push(pts[pts.length-1]);
+  return out;
+}
+/* Écarte les points qui s'éloignent brutalement de leurs voisins */
+function nettoyer(pts){
+  if (pts.length < 5) return pts.slice();
+  const out = [pts[0]];
+  for (let i=1;i<pts.length-1;i++){
+    const d1 = distM(pts[i-1], pts[i]), d2 = distM(pts[i], pts[i+1]), direct = distM(pts[i-1], pts[i+1]);
+    if (d1 + d2 > 4 * Math.max(direct, 8) && d1 > 25) continue;   // aller-retour aberrant
+    out.push(pts[i]);
+  }
+  out.push(pts[pts.length-1]);
+  return out;
+}
+
+/* ---- Carte ----
+   Le rendu est entièrement proportionnel : le SVG et les tuiles sont exprimés
+   en pourcentages d'un repère logique, et le bloc prend la largeur de son
+   conteneur. Aucune mesure de la fenêtre, donc aucun débordement possible. */
 function carteHTML(pts, opt){
-  opt = Object.assign({h:260, fond:true, id:''}, opt||{});
+  opt = Object.assign({ratio:'4 / 3', fond:true, id:'', anim:false}, opt||{});
   if (!pts || pts.length < 2) return '';
-  /* La carte est dessinée à la largeur réelle disponible : mettre à l'échelle
-     après coup rendrait les tuiles floues et faisait déborder le cadre. */
-  let dispo = 640;
-  try { dispo = Math.max(260, Math.min(640, (window.innerWidth || 640) - (window.innerWidth < 901 ? 66 : 110))); } catch(e){}
-  const W = Math.round(dispo), H = opt.h, PAD = 14;
+  const [rw, rh] = opt.ratio.split('/').map(x=>parseFloat(x));
+  const W = 800, H = Math.round(800 * rh / rw), PAD = Math.round(W * 0.11);
+
   const b = bbox(pts);
-  /* Un parcours de quelques mètres ne doit pas remplir l'écran : on impose une
-     fenêtre minimale d'environ 150 m de côté. */
-  const MIN = 0.00055;   // fenêtre plancher d'environ 60 m de côté
+  const MIN = 0.0006;                                   // fenêtre plancher, environ 65 m
   const cLa = (b.laMin + b.laMax)/2, cLo = (b.loMin + b.loMax)/2;
   const eLa = Math.max(b.laMax - b.laMin, MIN)/2;
   const eLo = Math.max(b.loMax - b.loMin, MIN / Math.max(0.25, Math.cos(cLa*Math.PI/180)))/2;
   b.laMin = cLa - eLa; b.laMax = cLa + eLa;
   b.loMin = cLo - eLo; b.loMax = cLo + eLo;
+
   const dx = Math.max(1e-7, merX(b.loMax) - merX(b.loMin));
   const dy = Math.max(1e-7, merY(b.laMin) - merY(b.laMax));
   let z = Math.floor(Math.min(Math.log2((W-2*PAD)/(dx*256)), Math.log2((H-2*PAD)/(dy*256))));
-  z = Math.max(1, Math.min(19, z));   // 19 est le dernier niveau servi par OSM
+  z = Math.max(1, Math.min(19, z));
   const S2 = 256 * Math.pow(2, z);
   const cx = (merX(b.loMin)+merX(b.loMax))/2 * S2, cy = (merY(b.laMin)+merY(b.laMax))/2 * S2;
   const ox = cx - W/2, oy = cy - H/2;
   const PX = p => [merX(p[1])*S2 - ox, merY(p[0])*S2 - oy];
+  const pc = (v, tot) => (v/tot*100).toFixed(4) + '%';
 
   let tuiles = '';
   const fond = opt.fond && S.reglages.carte !== 'off';
@@ -2524,35 +2525,36 @@ function carteHTML(pts, opt){
       if (ty < 0 || ty >= max) continue;
       const wx = ((tx % max) + max) % max;
       tuiles += `<img class="tuile" src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png"
-        style="left:${(tx*256-ox)}px;top:${(ty*256-oy)}px" alt="" loading="lazy"
-        onload="this.parentNode.parentNode.classList.add('avec-tuiles')"
+        style="left:${pc(tx*256-ox, W)};top:${pc(ty*256-oy, H)};width:${pc(256, W)};height:${pc(256, H)}"
+        alt="" loading="lazy" onload="this.closest('.carte').classList.add('avec-tuiles')"
         onerror="this.style.display='none'">`;
     }
   }
+
   const d = pts.map((p,i)=>{ const q = PX(p); return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1); }).join(' ');
   const a = PX(pts[0]), f = PX(pts[pts.length-1]);
   const km = (longueurTrace(pts)/1000).toFixed(2);
   const tr = (typeof preparerTrace === 'function') ? preparerTrace(pts, PX) : null;
   const anim = !!opt.anim;
 
-  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}" style="height:${H}px"
-      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}' ${tr?`data-tr='${JSON.stringify({p:tr.p.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),d:tr.d.map(x=>+x.toFixed(1)),total:+tr.total.toFixed(1)})}'`:''}>
-    <div class="carte-in" style="width:${W}px;height:${H}px">
+  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}" style="aspect-ratio:${opt.ratio}"
+      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
+      ${tr?`data-tr='${JSON.stringify({p:tr.p.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),d:tr.d.map(x=>+x.toFixed(1)),total:+tr.total.toFixed(1)})}'`:''}>
+    <div class="carte-in">
       ${tuiles}
-      <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-        <path class="trace-fond" d="${d}" fill="none" stroke="#8B9BFF" stroke-width="11"
-              stroke-linecap="round" stroke-linejoin="round" opacity=".24"/>
-        <path class="trace-anim" d="${d}" fill="none" stroke="#A9B6FF" stroke-width="4.6"
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+        <path class="trace-fond" d="${d}" fill="none" stroke="#fff" stroke-width="20"
               stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="6.5" fill="#fff"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="11" fill="none" stroke="#fff" stroke-width="1.6" opacity=".45"/>
-        ${anim ? '' : `<circle cx="${f[0].toFixed(1)}" cy="${f[1].toFixed(1)}" r="6.5" fill="#A9B6FF"/>`}
-        <g class="chien" style="opacity:${anim?0:1}" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
-          ${typeof CHIEN_SVG === 'string' ? CHIEN_SVG : ''}
+        <path class="trace-anim" d="${d}" fill="none" stroke="var(--moss)" stroke-width="12"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="#fff"/>
+        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="none" stroke="var(--moss)" stroke-width="5"/>
+        <g class="chien" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
+          <g transform="scale(2.4)">${typeof CHIEN_SVG === 'string' ? CHIEN_SVG : ''}</g>
         </g>
       </svg>
     </div>
-    <div class="carte-pied"><span>${km} km · ${pts.length} points</span>
+    <div class="carte-pied"><span>${km} km</span>
       ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
   </div>`;
 }
@@ -2631,6 +2633,7 @@ function rejouer(baladeId){
   if (!ligne || !chien) return;
 
   arreterAnim(baladeId);
+  chien.style.opacity = 0;
   const lg = ligne.getTotalLength();
   const tr = JSON.parse(hote.dataset.tr);
   const reduit = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3630,6 +3633,10 @@ VIEWS.accueil = () => {
     <p style="margin:8px 0 0;color:rgba(255,255,255,.82);font-size:.9rem;position:relative;z-index:1;max-width:46ch">${esc(H.phrase)}</p>
     ${jauge}
   </div>
+  `;
+
+  const blocJour = `
+  <h2 style="margin-bottom:10px">Aujourd'hui</h2>
   <div class="card todo-card" style="margin-bottom:22px">
     ${aFaire.map(x=>`<div class="todo${x.ok?' ok':''}">
       <span class="mark">${x.ok?'✓':''}</span>
@@ -3680,9 +3687,12 @@ VIEWS.accueil = () => {
       return `<button class="axe ${cls}" onclick="detailAxe('${e.axe.id}')">
         <div class="spread"><b>${esc(e.axe.t)}</b>
           ${e.vide?'<span class="tiny muted">à découvrir</span>'
-            :`<span class="num" style="font-size:1.25rem;font-weight:720">${e.sc}<span class="fl">${e.tend==='up'?'↑':e.tend==='down'?'↓':'→'}</span></span>`}</div>
-        <div class="progress" style="margin:8px 0 7px"><i style="width:${e.vide?0:e.sc}%"></i></div>
-        <div class="tiny muted">${e.vide?'aucune donnée pour l\'instant':esc(e.lecture)}</div>
+            :`<span class="verdict">${esc(e.verdict.toLowerCase())}</span>`}</div>
+        <div class="progress" style="margin:8px 0 6px"><i style="width:${e.vide?0:e.sc}%"></i></div>
+        <div class="spread" style="gap:6px">
+          <span class="tiny muted" style="flex:1">${e.vide?'pas encore de données':esc(e.lecture)}</span>
+          ${e.vide?'':`<span class="num tiny" style="font-weight:700;white-space:nowrap">${e.sc}<span class="muted">/100</span>${(e.delta!==null&&e.delta!==0)?` <span class="${e.delta>0?'up':'down'}">${e.delta>0?'↑':'↓'}</span>`:''}</span>`}
+        </div>
       </button>`;}).join('')}
   </div>`;
 
@@ -3710,7 +3720,7 @@ VIEWS.accueil = () => {
     </div>
   </details>`;
 
-  return bloc1 + bloc2 + bloc3 + bloc4 + bloc5;
+  return bloc1 + bloc2 + bloc3 + blocJour + bloc5;
 };
 
 /* Détail d'un axe : d'où vient la note, et quoi faire */
@@ -3802,7 +3812,7 @@ function baladeCard(b, compact){
       ${num(b.recup)?`<span>Retour au calme <b>${fmin(b.recup)}</b></span>`:''}
     </div>
     ${!compact ? ((b.gps && b.gps.length>1)
-      ? `<div style="margin-top:12px">${carteHTML(b.gps,{h:220, anim:true, id:'carte-'+b.id})}
+      ? `<div style="margin-top:12px">${carteHTML(b.gps,{ratio:'4 / 3', anim:true, id:'carte-'+b.id})}
          <div class="row no-print" style="margin-top:8px">
            <button class="btn sm" onclick="rejouer('${b.id}')">Revoir ma balade</button>
            <button class="btn ghost sm" onclick="exportGPX('${b.id}')">Exporter en GPX</button></div></div>`
@@ -4942,7 +4952,7 @@ function openTerrain(){
         <span class="lb" style="font-size:.95rem;font-weight:640">${t.flairAt?'Flair en cours, taper pour arrêter':'Il renifle : démarrer le chrono flair'}</span>
         <span class="ct" id="flairV2">${hms(tFlair())}</span></button>
       <div class="tsec">Parcours</div>
-      ${(t.gps && t.gps.length>1) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{h:170, id:'carte-live'})}</div>` : ''}
+      ${(t.gps && t.gps.length>1) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'16 / 10', id:'carte-live'})}</div>` : ''}
       <div class="card" style="padding:13px 15px">
         <div class="spread">
           <div class="small" id="gpsInfo">${gpsResume(t.gps)}</div>
@@ -5140,7 +5150,10 @@ function rendreFin(){
 function finaliser(detaille){
   const t = S.terrain; if(!t) return;
   const mins = Math.max(1, Math.round(tElapsed()/60000));
-  const trace = (t.gps && t.gps.length > 2) ? simplifier(t.gps, 4) : (t.gps || []);
+  /* Nettoyer, lisser, puis simplifier : on garde la forme du parcours en
+     supprimant le bruit, plutôt que de simplifier du bruit. */
+  const trace = (t.gps && t.gps.length > 4)
+    ? simplifier(lisser(nettoyer(t.gps)), 3) : (t.gps || []);
   const f = t.fin || {emoDepart:2, emoPic:5, emoFin:3};
   const inten = (t.intensites||[]);
   const pre = Object.assign({}, t.c, {

@@ -1,7 +1,7 @@
 /* Service worker : l'application doit s'ouvrir hors connexion depuis l'écran
    d'accueil. Les fichiers de l'app sont servis depuis le cache ; les tuiles de
    carte passent par le réseau, avec repli sur le cache si la connexion manque. */
-const VERSION = 'carnet-v12';
+const VERSION = 'carnet-v13';
 const FICHIERS = ['./', './index.html', './manifest.webmanifest',
                   './icon-180.png', './icon-192.png', './icon-512.png'];
 

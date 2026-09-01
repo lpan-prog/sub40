@@ -2746,7 +2746,7 @@ function carteHTML(pts, opt){
               stroke-linecap="round" stroke-linejoin="round"/>
         <path class="trace-live2" d="" fill="none" stroke="var(--moss)" stroke-width="12"
               stroke-linecap="round" stroke-linejoin="round"/>
-        <g class="pas-semis" data-total="${(tr && !seul) ? tr.total.toFixed(1) : 0}" data-count="${(tr && !seul) ? Math.floor(tr.total/58)+1 : 0}">${(tr && !seul && typeof empreintes === 'function') ? empreintes(tr) : ''}</g>
+        <g class="pas-semis" data-total="${(tr && !seul) ? tr.total.toFixed(1) : 0}" data-count="${(tr && !seul) ? Math.floor(tr.total/PAS_TRACE)+1 : 0}">${(tr && !seul && typeof empreintes === 'function') ? empreintes(tr) : ''}</g>
         <g class="chien" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
           <circle class="pos-halo" r="17" fill="var(--moss)" opacity=".22"/>
           <circle class="pos-pt" r="9" fill="var(--moss)" stroke="#fff" stroke-width="4.5"/>
@@ -2813,7 +2813,8 @@ ${pts}
    rechargé ni recalculé ; les tuiles ne sont régénérées qu'au relâchement. */
 const VUES = {};
 const ZOOM_MIN = -6;
-const ZOOM_MAX = 10;
+const ZOOM_MAX = 6;
+const PAS_TRACE = 28;
 function activerGestes(hote, refaire){
   if (!hote || hote.dataset.gestesOk) return;
   hote.dataset.gestesOk = '1';
@@ -2918,10 +2919,10 @@ const CHIEN_SVG = PATTE_SVG;   // compatibilité avec l'ancien nom
 const ANIM = {actifs:new Map()};
 
 /* Longueurs cumulées, pour avancer à vitesse constante quel que soit l'espacement */
-/* Semis d'empreintes le long du tracé : une tous les 46 px, décalées
-   alternativement de part et d'autre de l'axe, comme une vraie foulée. */
+/* Semis d'empreintes serrées le long du tracé, décalées alternativement
+   de part et d'autre de l'axe, comme une vraie foulée. */
 function empreintes(tr, opt){
-  opt = Object.assign({pas:58, ecart:9, depuis:0, indexStart:0}, opt||{});
+  opt = Object.assign({pas:PAS_TRACE, ecart:5, depuis:0, indexStart:0}, opt||{});
   let out = '', i = opt.indexStart;
   for (let d = opt.depuis; d <= tr.total; d += opt.pas, i++){
     const q = pointA(tr, d);
@@ -2929,7 +2930,7 @@ function empreintes(tr, opt){
     const r = (q.ang + 90) * Math.PI/180;
     const x = q.x + Math.cos(r)*cote, y = q.y + Math.sin(r)*cote;
     out += `<g class="pas" style="animation-delay:${(i*0.045).toFixed(2)}s"
-      transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(q.ang+90).toFixed(1)}) scale(1.7)">${PATTE_SVG}</g>`;
+      transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(q.ang+90).toFixed(1)}) scale(1.15)">${PATTE_SVG}</g>`;
   }
   return out;
 }
@@ -3042,7 +3043,7 @@ function avancerLive(hote, pts){
     const trF = {p:fige, d:[0], total:0};
     for (let i=1;i<fige.length;i++) trF.d.push(trF.d[i-1] + Math.hypot(fige[i][0]-fige[i-1][0], fige[i][1]-fige[i-1][1]));
     trF.total = trF.d[trF.d.length-1] || 1;
-    const pas = 58;
+    const pas = PAS_TRACE;
     const deja = Number(semis.dataset.total||0);
     const depart = deja ? deja + pas : 0;
     if (trF.total >= depart){

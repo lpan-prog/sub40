@@ -522,18 +522,20 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .livebar .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.55);color:#fff}
 
 /* ---------- Carte du parcours ---------- */
-.carte{position:relative;overflow:hidden;border-radius:var(--r-m);background:var(--surface-3);
-  display:flex;align-items:center;justify-content:center;max-width:100%}
-.carte.sans-fond{background:var(--moss-soft)}
+/* Fond de carte volontairement sombre, y compris en thème clair : le tracé
+   ressort, et le bloc se lit comme une pièce à part dans la page. */
+.carte{position:relative;overflow:hidden;border-radius:var(--r-l);background:#0C1226;
+  display:flex;align-items:center;justify-content:center;max-width:100%;
+  box-shadow:inset 0 0 0 1px rgba(139,155,255,.14)}
+.carte.sans-fond{background:#0C1226}
 .carte-in{position:relative;flex:0 0 auto}
 .carte .tuile{position:absolute;width:256px;height:256px;user-select:none;pointer-events:none;
-  filter:grayscale(1) brightness(1.06) contrast(.82)}
-/* Voile bleu par-dessus les tuiles : la carte doit appartenir à la même palette
-   que le reste de l'application, pas ressembler à une capture d'écran. */
+  filter:invert(1) grayscale(1) brightness(.52) contrast(1.35)}
+/* Teinte bleu nuit par-dessus les tuiles inversées, pour rester dans la palette */
 .carte-in::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:var(--moss);opacity:.16;mix-blend-mode:multiply}
-html[data-theme="sombre"] .carte .tuile{filter:invert(1) grayscale(1) brightness(.78) contrast(1.05)}
-html[data-theme="sombre"] .carte-in::after{opacity:.3;mix-blend-mode:screen;background:#1B2547}
+  background:linear-gradient(160deg,#2B3A7A,#131B3A 70%);opacity:.55;mix-blend-mode:color}
+.carte-in::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 45%,transparent 40%,rgba(8,12,28,.55));}
 .carte svg{position:relative;z-index:2}
 .chien{transition:opacity .25s}
 .chien .corps{fill:var(--moss-deep)}
@@ -552,11 +554,16 @@ html[data-theme="sombre"] .chien .oreille,html[data-theme="sombre"] .chien .queu
 @keyframes trotte{0%,100%{transform:skewX(0deg)}25%{transform:skewX(13deg)}75%{transform:skewX(-13deg)}}
 @keyframes queue{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
 .carte-pied{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:10px;
-  justify-content:space-between;align-items:center;padding:6px 11px;font-size:.72rem;
-  background:linear-gradient(transparent,rgba(255,255,255,.86));color:var(--ink-2);font-weight:560}
-html[data-theme="sombre"] .carte-pied{background:linear-gradient(transparent,rgba(13,16,32,.9))}
-.carte-pied .attr{font-weight:400;color:var(--ink-3);display:none}
+  justify-content:space-between;align-items:center;padding:10px 14px;font-size:.78rem;
+  background:linear-gradient(transparent,rgba(8,12,28,.85));color:#fff;font-weight:640;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.carte-pied .attr{font-weight:400;color:rgba(255,255,255,.45);font-size:.68rem;display:none}
 .carte.avec-tuiles .carte-pied .attr{display:inline}
+/* Le chien passe en blanc : il doit rester lisible sur le fond nuit */
+.carte .chien .corps{fill:#fff}
+.carte .chien .patte,.carte .chien .oreille,.carte .chien .queue{stroke:#fff}
+.carte .chien .oeil{fill:#2B3A7A}
+.carte .chien .ombre{fill:rgba(0,0,0,.35)}
 
 /* ---------- Balade : quatre grandes cibles ---------- */
 .gros-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -2488,11 +2495,11 @@ function carteHTML(pts, opt){
      après coup rendrait les tuiles floues et faisait déborder le cadre. */
   let dispo = 640;
   try { dispo = Math.max(260, Math.min(640, (window.innerWidth || 640) - (window.innerWidth < 901 ? 66 : 110))); } catch(e){}
-  const W = Math.round(dispo), H = opt.h, PAD = 22;
+  const W = Math.round(dispo), H = opt.h, PAD = 14;
   const b = bbox(pts);
   /* Un parcours de quelques mètres ne doit pas remplir l'écran : on impose une
      fenêtre minimale d'environ 150 m de côté. */
-  const MIN = 0.0014;
+  const MIN = 0.00055;   // fenêtre plancher d'environ 60 m de côté
   const cLa = (b.laMin + b.laMax)/2, cLo = (b.loMin + b.loMax)/2;
   const eLa = Math.max(b.laMax - b.laMin, MIN)/2;
   const eLo = Math.max(b.loMax - b.loMin, MIN / Math.max(0.25, Math.cos(cLa*Math.PI/180)))/2;
@@ -2501,7 +2508,7 @@ function carteHTML(pts, opt){
   const dx = Math.max(1e-7, merX(b.loMax) - merX(b.loMin));
   const dy = Math.max(1e-7, merY(b.laMin) - merY(b.laMax));
   let z = Math.floor(Math.min(Math.log2((W-2*PAD)/(dx*256)), Math.log2((H-2*PAD)/(dy*256))));
-  z = Math.max(1, Math.min(17, z));
+  z = Math.max(1, Math.min(19, z));   // 19 est le dernier niveau servi par OSM
   const S2 = 256 * Math.pow(2, z);
   const cx = (merX(b.loMin)+merX(b.loMax))/2 * S2, cy = (merY(b.laMin)+merY(b.laMax))/2 * S2;
   const ox = cx - W/2, oy = cy - H/2;
@@ -2533,11 +2540,13 @@ function carteHTML(pts, opt){
     <div class="carte-in" style="width:${W}px;height:${H}px">
       ${tuiles}
       <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-        <path class="trace-fond" d="${d}" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
-        <path class="trace-anim" d="${d}" fill="none" stroke="var(--moss)" stroke-width="4"
+        <path class="trace-fond" d="${d}" fill="none" stroke="#8B9BFF" stroke-width="11"
+              stroke-linecap="round" stroke-linejoin="round" opacity=".24"/>
+        <path class="trace-anim" d="${d}" fill="none" stroke="#A9B6FF" stroke-width="4.6"
               stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="7" fill="#fff" stroke="var(--vert)" stroke-width="3.5"/>
-        ${anim ? '' : `<circle cx="${f[0].toFixed(1)}" cy="${f[1].toFixed(1)}" r="7" fill="var(--moss)" stroke="#fff" stroke-width="3.5"/>`}
+        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="6.5" fill="#fff"/>
+        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="11" fill="none" stroke="#fff" stroke-width="1.6" opacity=".45"/>
+        ${anim ? '' : `<circle cx="${f[0].toFixed(1)}" cy="${f[1].toFixed(1)}" r="6.5" fill="#A9B6FF"/>`}
         <g class="chien" style="opacity:${anim?0:1}" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
           ${typeof CHIEN_SVG === 'string' ? CHIEN_SVG : ''}
         </g>

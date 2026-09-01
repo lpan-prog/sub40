@@ -528,7 +528,8 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
    Le bloc prend la largeur de son conteneur et impose son ratio : plus aucune
    mesure de la fenêtre, donc plus de débordement sur les blocs voisins. */
 .carte{position:relative;width:100%;overflow:hidden;border-radius:var(--r-l);
-  background:var(--surface-2);margin:14px 0;box-shadow:inset 0 0 0 1px var(--line)}
+  background:var(--surface-2);margin:14px 0;
+  box-shadow:0 1px 2px rgba(30,42,95,.06), 0 14px 34px -20px rgba(30,42,95,.45), inset 0 0 0 1px var(--line)}
 .carte.sans-fond{background:var(--moss-soft)}
 .carte-in{position:absolute;inset:0}
 .carte .tuile{position:absolute;user-select:none;pointer-events:none;
@@ -543,10 +544,26 @@ html[data-theme="sombre"] .carte-in::after{opacity:.22;mix-blend-mode:screen;bac
 .carte .trace-fond{opacity:.9}
 html[data-theme="sombre"] .carte .trace-fond{stroke:#0D1020}
 .carte-pied{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:10px;
-  justify-content:space-between;align-items:flex-end;padding:12px 16px;font-size:.95rem;
-  color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
-  background:linear-gradient(transparent,rgba(255,255,255,.9) 65%)}
-html[data-theme="sombre"] .carte-pied{color:#fff;background:linear-gradient(transparent,rgba(13,16,32,.92) 65%)}
+  justify-content:space-between;align-items:flex-end;padding:16px 18px;
+  background:linear-gradient(transparent,rgba(255,255,255,.94) 60%)}
+.carte-pied .stats{display:flex;flex-direction:column;line-height:1.1}
+.carte-pied .s1{font-size:1.9rem;font-weight:760;letter-spacing:-.045em;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.carte-pied .s1 small{font-size:.85rem;font-weight:620;color:var(--ink-3);letter-spacing:0;margin-left:2px}
+.carte-pied .s2{font-size:.76rem;font-weight:560;color:var(--ink-3);margin-top:2px}
+html[data-theme="sombre"] .carte-pied{background:linear-gradient(transparent,rgba(13,16,32,.94) 60%)}
+html[data-theme="sombre"] .carte-pied .s1{color:#fff}
+.carte-live-badge{position:absolute;top:14px;left:14px;z-index:3;display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.94);color:var(--ink);border-radius:999px;padding:6px 13px 6px 10px;
+  font-size:.72rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
+  box-shadow:0 4px 14px -6px rgba(30,42,95,.5)}
+html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:#fff}
+.carte-live-badge i{width:8px;height:8px;border-radius:50%;background:var(--rouge);flex:0 0 auto}
+@media (prefers-reduced-motion:no-preference){
+  .carte-live-badge i{animation:battement 1.6s ease-in-out infinite}
+}
+@keyframes battement{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+.carte .trace-anim{filter:drop-shadow(0 2px 5px rgba(75,98,240,.45))}
 .carte-pied .attr{font-weight:400;color:var(--ink-3);font-size:.66rem;display:none}
 .carte.avec-tuiles .carte-pied .attr{display:inline}
 .carte .chien .corps{fill:var(--moss-deep)}
@@ -597,6 +614,12 @@ html[data-theme="sombre"] .carte .chien .oeil{fill:#2B3A7A}
 .viseur.pret{background:var(--vert-soft);color:var(--vert)}
 .prep .etat{font-size:1.15rem;font-weight:700;letter-spacing:-.02em}
 .prep .detail{font-size:.86rem;color:var(--ink-2);max-width:32ch}
+.prep.avec-carte{justify-content:flex-start;padding-top:8px}
+.prep.avec-carte .etat{margin-top:6px}
+.carte .halo{animation:respire 2.2s ease-in-out infinite}
+@keyframes respire{0%,100%{opacity:.16;transform:scale(.9)}50%{opacity:.3;transform:scale(1.1)}}
+.carte .halo{transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.carte .halo{animation:none}}
 
 /* ---------- Compteurs : correction d'un tap ---------- */
 .tap-wrap{position:relative;display:flex}
@@ -2448,7 +2471,11 @@ function gpsPoint(pos){
   const c = pos.coords;
   /* Avant le départ : on se contente de confirmer que le signal est là */
   if (typeof PREP !== 'undefined' && PREP){
-    if (c.accuracy <= 60){ PREP.points.push(1); PREP.acc = Math.round(c.accuracy); PREP.err = ''; rendrePrep(); }
+    if (c.accuracy <= 60){
+      PREP.points.push(1); PREP.acc = Math.round(c.accuracy); PREP.err = '';
+      PREP.pos = [+c.latitude.toFixed(5), +c.longitude.toFixed(5), 0];
+      if (PREP.points.length <= 2) rendrePrep();   // la carte est posée, on ne la reconstruit plus
+    }
     return;
   }
   const t = S.terrain; if (!t) { gpsArreter(); return; }
@@ -2470,11 +2497,8 @@ function gpsPoint(pos){
   /* On ne reconstruit la carte que de loin en loin : entre deux, on ne touche
      qu'au tracé et à la position du chien. */
   const hote = document.getElementById('carte-live');
-  if (!hote && t.gps.length === 2 && document.querySelector('.terrain')) openTerrain();
-  else if (hote){
-    if (t.gps.length % 15 === 0) openTerrain();
-    else if (typeof allongerTraceLive === 'function') allongerTraceLive(hote, t.gps);
-  }
+  if (!hote){ if (document.querySelector('.terrain')) openTerrain(); }
+  else if (typeof avancerLive === 'function') avancerLive(hote, t.gps);
   persistSoon();
 }
 function gpsErreur(e){
@@ -2540,13 +2564,14 @@ function nettoyer(pts){
    en pourcentages d'un repère logique, et le bloc prend la largeur de son
    conteneur. Aucune mesure de la fenêtre, donc aucun débordement possible. */
 function carteHTML(pts, opt){
-  opt = Object.assign({ratio:'4 / 3', fond:true, id:'', anim:false}, opt||{});
-  if (!pts || pts.length < 2) return '';
+  opt = Object.assign({ratio:'4 / 3', fond:true, id:'', anim:false, minWin:0.0006}, opt||{});
+  if (!pts || !pts.length) return '';
+  const seul = pts.length < 2;
   const [rw, rh] = opt.ratio.split('/').map(x=>parseFloat(x));
   const W = 800, H = Math.round(800 * rh / rw), PAD = Math.round(W * 0.11);
 
   const b = bbox(pts);
-  const MIN = 0.0006;                                   // fenêtre plancher, environ 65 m
+  const MIN = opt.minWin;                               // fenêtre plancher
   const cLa = (b.laMin + b.laMax)/2, cLo = (b.loMin + b.loMax)/2;
   const eLa = Math.max(b.laMax - b.laMin, MIN)/2;
   const eLo = Math.max(b.loMax - b.loMin, MIN / Math.max(0.25, Math.cos(cLa*Math.PI/180)))/2;
@@ -2582,6 +2607,8 @@ function carteHTML(pts, opt){
   const d = pts.map((p,i)=>{ const q = PX(p); return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1); }).join(' ');
   const a = PX(pts[0]), f = PX(pts[pts.length-1]);
   const km = (longueurTrace(pts)/1000).toFixed(2);
+  const halo = seul ? `<circle class="halo" cx="${f[0].toFixed(1)}" cy="${f[1].toFixed(1)}" r="26"
+      fill="var(--moss)" opacity=".18"/>` : '';
   const tr = (typeof preparerTrace === 'function') ? preparerTrace(pts, PX) : null;
   const anim = !!opt.anim;
 
@@ -2591,19 +2618,30 @@ function carteHTML(pts, opt){
     <div class="carte-in">
       ${tuiles}
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+        ${halo}
         <path class="trace-fond" d="${d}" fill="none" stroke="#fff" stroke-width="20"
               stroke-linecap="round" stroke-linejoin="round"/>
         <path class="trace-anim" d="${d}" fill="none" stroke="var(--moss)" stroke-width="12"
               stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="#fff"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="none" stroke="var(--moss)" stroke-width="5"/>
+        <path class="trace-live" d="" fill="none" stroke="#fff" stroke-width="20"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="trace-live2" d="" fill="none" stroke="var(--moss)" stroke-width="12"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        ${seul ? '' : `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="#fff"/>
+        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="none" stroke="var(--moss)" stroke-width="5"/>`}
         <g class="chien" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
           <g transform="scale(2.4)">${typeof CHIEN_SVG === 'string' ? CHIEN_SVG : ''}</g>
         </g>
       </svg>
     </div>
-    <div class="carte-pied"><span>${km} km</span>
-      ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
+    ${opt.direct?'<div class="carte-live-badge"><i></i>en direct</div>':''}
+    <div class="carte-pied">
+      <div class="stats">
+        ${seul ? '<span class="s1">Prêt</span><span class="s2">position trouvée</span>'
+               : `<span class="s1">${km}<small> km</small></span>${opt.sous?`<span class="s2">${esc(opt.sous)}</span>`:''}`}
+      </div>
+      ${fond?'<span class="attr">© OpenStreetMap</span>':''}
+    </div>
   </div>`;
 }
 
@@ -2720,7 +2758,74 @@ function arreterAnim(id){
 function arreterToutesAnims(){ ANIM.actifs.forEach((h)=>cancelAnimationFrame(h)); ANIM.actifs.clear(); }
 
 /* Un onglet en arrière-plan ne doit rien animer */
-document.addEventListener('visibilitychange', () => { if (document.hidden) arreterToutesAnims(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){ arreterToutesAnims();
+    if (LIVE.raf){ cancelAnimationFrame(LIVE.raf); LIVE.raf = null; } }
+});
+
+/* ---- Tracé en direct ----
+   Le GPS ne livre un point que toutes les quelques secondes : sans
+   interpolation, le chien saute. On anime donc chaque segment image par image,
+   en n'écrivant que deux attributs de path et le transform du chien. */
+const LIVE = {raf:null, fin:0};
+function avancerLive(hote, pts){
+  const proj = JSON.parse(hote.dataset.proj || 'null');
+  if (!proj || pts.length < 2) return;
+  const PX = p => [merX(p[1])*proj.S - proj.ox, merY(p[0])*proj.S - proj.oy];
+  const svg = hote.querySelector('svg');
+  const base = svg.querySelector('.trace-anim'), baseF = svg.querySelector('.trace-fond');
+  const seg = svg.querySelector('.trace-live2'), segF = svg.querySelector('.trace-live');
+  const chien = svg.querySelector('.chien');
+  if (!base || !seg || !chien) return;
+
+  const px = pts.map(PX);
+  /* Recadrer seulement si l'on sort de la zone utile, sinon on reconstruirait
+     la carte à chaque pas et l'animation sauterait. */
+  const vb = (svg.getAttribute('viewBox')||'0 0 800 600').split(' ').map(Number);
+  const d0 = px[px.length-1];
+  if (d0[0] < vb[2]*0.08 || d0[0] > vb[2]*0.92 || d0[1] < vb[3]*0.08 || d0[1] > vb[3]*0.92){
+    if (typeof openTerrain === 'function') openTerrain();
+    return;
+  }
+
+  const fige = px.slice(0, -1);
+  const dFige = fige.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  base.setAttribute('d', dFige); if (baseF) baseF.setAttribute('d', dFige);
+
+  const a = px[px.length-2], b = px[px.length-1];
+  const ang = Math.atan2(b[1]-a[1], b[0]-a[0]) * 180/Math.PI;
+  const reduit = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduit){
+    poser(seg, segF, a, b, 1); placer(chien, b, ang);
+    hote.dataset.tr = trDe(px);
+    return;
+  }
+  if (LIVE.raf) cancelAnimationFrame(LIVE.raf);
+  const t0 = performance.now(), duree = 900;
+  const pas = (t) => {
+    const e = Math.min(1, (t - t0)/duree);
+    const k = 1 - Math.pow(1 - e, 3);                     // ralenti en fin de course
+    poser(seg, segF, a, b, k);
+    placer(chien, [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k], ang);
+    if (e < 1) LIVE.raf = requestAnimationFrame(pas);
+    else { LIVE.raf = null; hote.dataset.tr = trDe(px); }
+  };
+  LIVE.raf = requestAnimationFrame(pas);
+}
+function poser(seg, segF, a, b, k){
+  const d = `M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${(a[0]+(b[0]-a[0])*k).toFixed(1)} ${(a[1]+(b[1]-a[1])*k).toFixed(1)}`;
+  seg.setAttribute('d', d); if (segF) segF.setAttribute('d', d);
+}
+function placer(chien, p, ang){
+  chien.setAttribute('transform', `translate(${p[0].toFixed(2)} ${p[1].toFixed(2)}) rotate(${ang.toFixed(1)})`);
+  chien.style.opacity = 1;
+}
+function trDe(px){
+  const d = [0];
+  for (let i=1;i<px.length;i++) d.push(d[i-1] + Math.hypot(px[i][0]-px[i-1][0], px[i][1]-px[i-1][1]));
+  return JSON.stringify({p:px.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),
+    d:d.map(x=>+x.toFixed(1)), total:+(d[d.length-1]||1).toFixed(1)});
+}
 
 /* Allonge le tracé et déplace le chien sans redessiner la carte */
 function allongerTraceLive(hote, pts){
@@ -3860,7 +3965,8 @@ function baladeCard(b, compact){
       ${num(b.recup)?`<span>Retour au calme <b>${fmin(b.recup)}</b></span>`:''}
     </div>
     ${!compact ? ((b.gps && b.gps.length>1)
-      ? `<div style="margin-top:12px">${carteHTML(b.gps,{ratio:'4 / 3', anim:true, id:'carte-'+b.id})}
+      ? `<div style="margin-top:12px">${carteHTML(b.gps,{ratio:'4 / 3', anim:true, id:'carte-'+b.id,
+           sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`})}
          <div class="row no-print" style="margin-top:8px">
            <button class="btn sm" onclick="rejouer('${b.id}')">Revoir ma balade</button>
            <button class="btn ghost sm" onclick="exportGPX('${b.id}')">Exporter en GPX</button></div></div>`
@@ -4944,7 +5050,7 @@ function hms(ms){
 let PREP = null;
 function terrainStart(){
   if (S.terrain){ openTerrain(); return; }
-  PREP = {points:[], depuis:Date.now(), err:''};
+  PREP = {points:[], pos:null, depuis:Date.now(), err:''};
   gpsDemarrer();
   rendrePrep();
 }
@@ -4970,8 +5076,10 @@ function rendrePrep(){
         <div class="chrono-sub">le chrono démarrera quand tu voudras</div></div>
       <button class="icon-btn" id="pFerme" aria-label="Fermer">✕</button>
     </div>
-    <div class="prep">
-      <div class="viseur ${pret?'pret':'cherche'}">${ico(pret?'sessions':'balades')}</div>
+    <div class="prep${PREP.pos?' avec-carte':''}">
+      ${PREP.pos
+        ? `<div style="width:100%">${carteHTML([PREP.pos],{ratio:'4 / 3', id:'carte-prep', minWin:0.0035})}</div>`
+        : `<div class="viseur cherche">${ico('balades')}</div>`}
       <div class="etat">${esc(etat)}</div>
       <p class="detail">${esc(detail)}</p>
       ${PREP.err?`<button class="btn ghost sm" style="margin-top:14px" id="pTest">Tester la position</button>`:''}
@@ -4987,7 +5095,7 @@ function rendrePrep(){
   const t = $('#pTest'); if (t) t.onclick = testerPosition;
 }
 function lancerBalade(avecGps){
-  const pts = (PREP && PREP.points.length) ? [] : [];
+  const pts = (avecGps && PREP && PREP.pos) ? [PREP.pos] : [];
   PREP = null;
   if (!avecGps) gpsArreter();
   S.terrain = {id:uid(), t0:Date.now(), pauseAt:null, pauseMs:0, flairAt:null, flairMs:0,
@@ -5052,7 +5160,8 @@ function openTerrain(){
         <span class="lb" style="font-size:.95rem;font-weight:640">${t.flairAt?'Flair en cours, taper pour arrêter':'Il renifle : démarrer le chrono flair'}</span>
         <span class="ct" id="flairV2">${hms(tFlair())}</span></button>
       <div class="tsec">Parcours</div>
-      ${(t.gps && t.gps.length>1) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'16 / 10', id:'carte-live'})}</div>` : ''}
+      ${(t.gps && t.gps.length) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0035, direct:true,
+        sous:`${t.gps.length} point${t.gps.length>1?'s':''} relevé${t.gps.length>1?'s':''}`})}</div>` : ''}
       <div class="card" style="padding:13px 15px">
         <div class="spread">
           <div class="small" id="gpsInfo">${gpsResume(t.gps)}</div>

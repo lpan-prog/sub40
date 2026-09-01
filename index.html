@@ -369,6 +369,8 @@ html[data-theme="sombre"] .opt.on{color:var(--moss)}
 
 /* ---------- Exercice guidé ---------- */
 .guide{position:fixed;inset:0;z-index:130;background:var(--paper);display:flex;flex-direction:column}
+.guide.plein .grand-carte{flex:1;display:flex;align-items:center;padding:0 12px}
+.guide.plein .carte{margin:0;border-radius:var(--r-l)}
 .guide-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:calc(12px + env(safe-area-inset-top,0px)) 16px 8px}
 .guide-mid{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -2510,6 +2512,8 @@ function gpsPoint(pos){
   const hote = document.getElementById('carte-live');
   if (!hote){ if (document.querySelector('.terrain')) openTerrain(); }
   else if (typeof avancerLive === 'function') avancerLive(hote, t.gps);
+  const pied = hote && hote.querySelector('.carte-pied .s1');
+  if (pied) pied.innerHTML = (longueurTrace(t.gps)/1000).toFixed(2) + '<small> km</small>';
   persistSoon();
 }
 function gpsErreur(e){
@@ -2596,6 +2600,10 @@ function carteHTML(pts, opt){
   const S2 = 256 * Math.pow(2, z);
   let cx, cy;
   if (opt.cx !== undefined && opt.cx !== null){ cx = opt.cx * S2; cy = opt.cy * S2; }
+  else if (opt.suivi){                            // on suit le chien, pas le tracé entier
+    const d = pts[pts.length-1];
+    cx = merX(d[1]) * S2; cy = merY(d[0]) * S2;
+  }
   else { cx = (merX(b.loMin)+merX(b.loMax))/2 * S2; cy = (merY(b.laMin)+merY(b.laMax))/2 * S2; }
   const ox = cx - W/2, oy = cy - H/2;
   const PX = p => [merX(p[1])*S2 - ox, merY(p[0])*S2 - oy];
@@ -2797,19 +2805,20 @@ function pointA(tr, dist){
 }
 
 /* ---- Rejeu d'une balade terminée ---- */
-function rejouer(baladeId){
+function rejouer(baladeId){ rejouerHote(document.getElementById('carte-'+baladeId), baladeId); }
+function rejouerHote(hote, baladeId){
   const b = S.balades.find(x=>x.id===baladeId);
-  if (!b || !b.gps || b.gps.length < 2) return;
-  const hote = document.getElementById('carte-'+baladeId);
-  if (!hote) return;
+  if (!b || !b.gps || b.gps.length < 2 || !hote) return;
   const svg = hote.querySelector('svg');
   const ligne = svg.querySelector('.trace-anim');
   const fond = svg.querySelector('.trace-fond');
   const chien = svg.querySelector('.chien');
+  const semis = svg.querySelector('.pas-semis');
   if (!ligne || !chien) return;
 
   arreterAnim(baladeId);
   chien.style.opacity = 0;
+  if (semis) semis.style.opacity = 0;
   const lg = ligne.getTotalLength();
   const tr = JSON.parse(hote.dataset.tr);
   const reduit = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2819,6 +2828,7 @@ function rejouer(baladeId){
     const f = pointA(tr, tr.total);
     chien.setAttribute('transform', `translate(${f.x} ${f.y}) rotate(${f.ang})`);
     chien.style.opacity = 1;
+    if (semis) semis.style.opacity = 1;
     return;
   }
 
@@ -2836,8 +2846,10 @@ function rejouer(baladeId){
     if (fond) fond.style.strokeDashoffset = off;
     const q = pointA(tr, tr.total * k);
     chien.setAttribute('transform', `translate(${q.x.toFixed(2)} ${q.y.toFixed(2)}) rotate(${q.ang.toFixed(1)})`);
+    if (semis) semis.style.opacity = k;
     if (e < 1) ANIM.actifs.set(baladeId, requestAnimationFrame(pas));
-    else { ANIM.actifs.delete(baladeId); chien.classList.add('arrive'); }
+    else { ANIM.actifs.delete(baladeId); chien.classList.add('arrive');
+           if (semis) semis.style.opacity = 1; }
   };
   ANIM.actifs.set(baladeId, requestAnimationFrame(pas));
 }
@@ -2873,7 +2885,7 @@ function avancerLive(hote, pts){
      la carte à chaque pas et l'animation sauterait. */
   const vb = (svg.getAttribute('viewBox')||'0 0 800 600').split(' ').map(Number);
   const d0 = px[px.length-1];
-  if (d0[0] < vb[2]*0.08 || d0[0] > vb[2]*0.92 || d0[1] < vb[3]*0.08 || d0[1] > vb[3]*0.92){
+  if (d0[0] < vb[2]*0.22 || d0[0] > vb[2]*0.78 || d0[1] < vb[3]*0.22 || d0[1] > vb[3]*0.78){
     if (typeof openTerrain === 'function') openTerrain();
     return;
   }
@@ -2881,6 +2893,13 @@ function avancerLive(hote, pts){
   const fige = px.slice(0, -1);
   const dFige = fige.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
   base.setAttribute('d', dFige); if (baseF) baseF.setAttribute('d', dFige);
+  const semis = svg.querySelector('.pas-semis');
+  if (semis && fige.length > 1){
+    const trF = {p:fige, d:[0], total:0};
+    for (let i=1;i<fige.length;i++) trF.d.push(trF.d[i-1] + Math.hypot(fige[i][0]-fige[i-1][0], fige[i][1]-fige[i-1][1]));
+    trF.total = trF.d[trF.d.length-1] || 1;
+    semis.innerHTML = empreintes(trF);
+  }
 
   const a = px[px.length-2], b = px[px.length-1];
   const ang = Math.atan2(b[1]-a[1], b[0]-a[0]) * 180/Math.PI;
@@ -4061,6 +4080,7 @@ function baladeCard(b, compact){
            sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`})}
          <div class="row no-print" style="margin-top:8px">
            <button class="btn sm" onclick="rejouer('${b.id}')">Revoir ma balade</button>
+           <button class="btn ghost sm" onclick="carteGrand('${b.id}')">Agrandir</button>
            <button class="btn ghost sm" onclick="exportGPX('${b.id}')">Exporter en GPX</button></div></div>`
       : `<p class="tiny muted no-print" style="margin:10px 0 0">Pas de tracé : cette balade a été saisie à la main, ou la position n'était pas disponible.</p>`) : ''}
     <div class="grid g3" style="margin-top:11px">
@@ -4087,6 +4107,40 @@ function majVueCarte(id, v){
   const tmp = document.createElement('div'); tmp.innerHTML = html;
   hote.replaceWith(tmp.firstElementChild);
   brancherCartes();
+}
+/* Plein écran, pour vérifier le parcours au retour de balade */
+const GRAND = {id:null, vue:{}};
+function carteGrand(id){
+  const b = S.balades.find(x=>x.id===id);
+  if (!b || !b.gps || b.gps.length < 2){ toast('Pas de tracé sur cette balade.'); return; }
+  GRAND.id = id; GRAND.vue = {};
+  rendreGrand();
+}
+function rendreGrand(){
+  const b = S.balades.find(x=>x.id===GRAND.id); if (!b) return;
+  const km = (longueurTrace(b.gps)/1000).toFixed(2);
+  $('#guideHost').innerHTML = `<div class="guide plein">
+    <div class="guide-head">
+      <button class="icon-btn" onclick="fermerGrand()" aria-label="Fermer">✕</button>
+      <span class="small muted">${esc(b.lieu || fdate(b.date))}</span>
+      <span style="width:36px"></span>
+    </div>
+    <div class="grand-carte">${carteHTML(b.gps, Object.assign({ratio:'3 / 4', anim:false,
+      id:'carte-grand', gestes:true, sous:`${km} km · ${fmin(num(b.duree))} · ${b.gps.length} points`}, GRAND.vue))}</div>
+    <div class="guide-foot">
+      <button class="btn ghost" onclick="exportGPX('${b.id}')">Exporter en GPX</button>
+      <button class="btn" onclick="rejouerGrand()">Revoir le trajet</button>
+    </div></div>`;
+  document.body.style.overflow = 'hidden';
+  const h = document.getElementById('carte-grand');
+  if (h) activerGestes(h, v => { GRAND.vue = (v.cx === null) ? {} : v; rendreGrand(); });
+}
+function rejouerGrand(){
+  const h = document.getElementById('carte-grand');
+  if (h){ h.classList.add('animable'); rejouerHote(h, GRAND.id); }
+}
+function fermerGrand(){
+  GRAND.id = null; $('#guideHost').innerHTML = ''; document.body.style.overflow = ''; route();
 }
 function brancherCartes(){
   document.querySelectorAll('.carte.gestes').forEach(h=>{
@@ -5189,7 +5243,7 @@ function rendrePrep(){
     </div>
     <div class="prep${PREP.pos?' avec-carte':''}">
       ${PREP.pos
-        ? `<div style="width:100%">${carteHTML([PREP.pos],{ratio:'4 / 3', id:'carte-prep', minWin:0.0035})}</div>`
+        ? `<div style="width:100%">${carteHTML([PREP.pos],{ratio:'4 / 3', id:'carte-prep', minWin:0.0009})}</div>`
         : `<div class="viseur cherche">${ico('balades')}</div>`}
       <div class="etat">${esc(etat)}</div>
       <p class="detail">${esc(detail)}</p>
@@ -5271,7 +5325,9 @@ function openTerrain(){
         <span class="lb" style="font-size:.95rem;font-weight:640">${t.flairAt?'Flair en cours, taper pour arrêter':'Il renifle : démarrer le chrono flair'}</span>
         <span class="ct" id="flairV2">${hms(tFlair())}</span></button>
       <div class="tsec">Parcours</div>
-      ${(t.gps && t.gps.length) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0035, direct:true,
+      ${(t.gps && t.gps.length) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0009, direct:true, gestes:true,
+        suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
+        dz:(t.vue||{}).dz||0, cx:(t.vue||{}).cx, cy:(t.vue||{}).cy,
         sous:`${t.gps.length} point${t.gps.length>1?'s':''} relevé${t.gps.length>1?'s':''}`})}</div>` : ''}
       <div class="card" style="padding:13px 15px">
         <div class="spread">
@@ -5326,9 +5382,29 @@ function openTerrain(){
   $('#terrainHost').querySelectorAll('[data-unsig]').forEach(b=> b.onclick = () => {
     S.terrain.sig.splice(num(b.dataset.unsig),1); persist(true); openTerrain(); });
 
+  const hc = document.getElementById('carte-live');
+  if (hc && typeof activerGestes === 'function') activerGestes(hc, v => {
+    S.terrain.vue = (v.cx === null) ? null : v;   // recentrer rend la main au suivi
+    persistSoon(); openTerrain();
+  });
+
   clearInterval(_tTick);
   _tTick = setInterval(terrainTick, 1000);
 }
+
+/* iOS suspend les minuteurs quand l'application passe en arrière-plan : le
+   temps écoulé reste juste (il vient des horodatages), mais l'affichage se
+   fige. On le rafraîchit et on relance le suivi dès le retour. */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden || !S.terrain) return;
+  if (document.querySelector('.terrain')){
+    clearInterval(_tTick);
+    _tTick = setInterval(terrainTick, 1000);
+    terrainTick();
+  }
+  if (!S.terrain.pauseAt && !S.terrain.sansGps && GPS.watch === null && !GPS.refus) gpsDemarrer();
+  if (typeof route === 'function' && !document.querySelector('.terrain')) route();
+});
 function closeTerrain(){
   clearInterval(_tTick); _tTick = null;
   $('#terrainHost').innerHTML = ''; document.body.style.overflow = '';

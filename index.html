@@ -414,7 +414,18 @@ html[data-theme="sombre"] .opt.on{color:var(--moss)}
 .sheet{background:var(--paper);width:min(680px,100%);height:100%;overflow-y:auto;box-shadow:var(--shadow)}
 .sheet-head{position:sticky;top:0;background:var(--paper);padding:16px 18px 14px;z-index:2;display:flex;gap:12px;
   align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--line)}
-.sheet-body{padding:18px 18px 70px}
+.sheet-body{padding:18px 18px 24px}
+.sheet-foot{position:sticky;bottom:0;background:var(--paper);border-top:1px solid var(--line);
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));display:flex}
+.sheet-foot .btn{flex:1}
+.poignee{display:none}
+@media (max-width:900px){
+  .sheet-head #sheetClose{display:none}
+  .poignee{display:block;width:38px;height:4px;border-radius:99px;background:var(--line-2);
+    margin:0 auto 10px;position:absolute;left:0;right:0;top:6px}
+  .sheet-head{padding-top:22px}
+}
+@media (min-width:901px){.sheet-foot{display:none}}
 .sheet-body h4{margin:20px 0 8px;color:var(--ink)}
 .sheet-body ol,.sheet-body ul{margin:0 0 4px;padding-left:20px}
 .sheet-body li{margin-bottom:6px}
@@ -526,6 +537,23 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .livebar .btn{background:rgba(255,255,255,.22);box-shadow:none;color:#fff}
 .livebar .btn:hover{background:rgba(255,255,255,.34)}
 .livebar .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.55);color:#fff}
+
+/* ---------- Où sortir ---------- */
+.lieu-liste{display:grid;gap:10px}
+.lieu{background:var(--surface);border:0;border-radius:var(--r-m);padding:14px 16px;box-shadow:var(--shadow);
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;text-align:left;width:100%;transition:transform .1s}
+.lieu:hover{transform:translateY(-2px)}
+.lieu .puce{width:10px;height:10px;border-radius:50%;flex:0 0 auto;margin-top:6px}
+.carte .marq{cursor:pointer}
+.carte .marq:active{opacity:.7}
+.gps-ok{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;color:var(--ink-3);font-weight:600}
+.gps-ok i{width:8px;height:8px;border-radius:50%;background:var(--vert)}
+.gps-ok.cherche i{background:var(--ochre)}
+@media (prefers-reduced-motion:no-preference){.gps-ok.cherche i{animation:battement 1.4s ease-in-out infinite}}
+.gps-alerte{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.82rem;
+  background:var(--ochre-soft);border-radius:var(--r-s);padding:10px 13px;color:var(--ink)}
+.livebar{width:100%;border:0;cursor:pointer;text-align:left;font-size:.88rem}
+.livebar .fleche{font-size:1.3rem;line-height:1;opacity:.8}
 
 /* ---------- Carte du parcours ----------
    Le bloc prend la largeur de son conteneur et impose son ratio : plus aucune
@@ -1978,12 +2006,12 @@ const blank = () => ({
     veto:'', vetoTel:'', regime:'', particularites:'', peurs:'', motivations:'', photo:''},
   objectifs: {baladesSem:10, minutesSem:420, sessionsSem:5, flairPct:35},
   balades:[], sessions:[], poids:[], sante:[], repas:[], journal:[], signaux:[],
-  contacts:[], taches:[], depenses:[], notes:[], ordres:[], foyer:[],
+  contacts:[], taches:[], depenses:[], notes:[], ordres:[], foyer:[], lieux:[],
   terrain: null, epingles: [], depart: null, objectifsRegles: false,
   reglages:{theme:'clair', unite:'km', carte:'osm'}
 });
 const COLLS = ['balades','sessions','poids','sante','repas','journal','signaux',
-  'contacts','taches','depenses','notes','ordres','foyer'];
+  'contacts','taches','depenses','notes','ordres','foyer','lieux'];
 let S = blank();
 let dirty = false;
 
@@ -2243,6 +2271,7 @@ const PAGES = [
   {id:'journal',   t:'Journal du jour',   c:'Journal',  i:'journal', grp:'Au quotidien'},
   {id:'exercices', t:'Fiches exercices',  c:'Fiches',   i:'exercices', grp:'Progresser'},
   {id:'metriques', t:'Évolution',         c:'Courbes',  i:'metriques', grp:'Progresser'},
+  {id:'lieux',     t:'Où sortir',         c:'Lieux',    i:'balades', grp:'Au quotidien'},
   {id:'signaux',   t:'Carnet de signaux', c:'Signaux',  i:'signaux', grp:'Comprendre'},
   {id:'ordres',    t:'Ordres du foyer',   c:'Ordres',   i:'ordres', grp:'Comprendre'},
   {id:'rapports',  t:'Comptes rendus',    c:'Rapports', i:'rapports', grp:'Comprendre'},
@@ -2257,7 +2286,7 @@ const PAGES = [
 ];
 /* Cinq entrées maximum en bas : le reste passe par « Suivi » et « Profil ». */
 const NAV_BAS = ['accueil','exercices'];
-const NAV_SUIVI = ['journal','balades','sessions','signaux','sante','poids','repas','taches'];
+const NAV_SUIVI = ['journal','balades','lieux','sessions','signaux','sante','poids','repas','taches'];
 const NAV_PROFIL = ['profil','ordres','metriques','rapports','depenses','contacts','donnees'];
 function currentPage(){ const h = (location.hash||'').replace('#/','').split('/')[0]; return PAGES.some(p=>p.id===h) ? h : 'accueil'; }
 function go(id){ location.hash = '#/'+id; }
@@ -2504,7 +2533,7 @@ function gpsPoint(pos){
     if (dt <= 0 && saut > 50) return;                  // deux relevés au même instant, très éloignés
   }
   t.gps.push(p);
-  GPS.refus = false; GPS.dernierMsg = '';
+  GPS.refus = false; GPS.dernierMsg = ''; GPS.acc = Math.round(c.accuracy);
   const el = document.getElementById('gpsInfo');
   if (el) el.innerHTML = gpsResume(t.gps);
   /* On ne reconstruit la carte que de loin en loin : entre deux, on ne touche
@@ -2530,11 +2559,13 @@ function gpsErreur(e){
   const el = document.getElementById('gpsInfo');
   if (el) el.innerHTML = gpsResume(S.terrain && S.terrain.gps);
 }
+/* On signale les ennuis, pas le fonctionnement normal. */
 function gpsResume(pts){
-  if (GPS.dernierMsg && (!pts || pts.length < 2)) return `<span class="muted">${esc(GPS.dernierMsg)}</span>`;
-  if (!pts || !pts.length) return '<span class="muted">Recherche du signal…</span>';
-  if (pts.length < 2) return '<span class="muted">Position trouvée, en attente du déplacement…</span>';
-  return `<b>${(longueurTrace(pts)/1000).toFixed(2)} km</b> relevés · ${pts.length} points`;
+  if (GPS.dernierMsg && GPS.watch === null)
+    return `<div class="gps-alerte">⚠ ${esc(GPS.dernierMsg)}
+      <button class="btn ghost sm" id="tGps">Réessayer</button></div>`;
+  if (!pts || !pts.length) return '<div class="gps-ok cherche"><i></i>recherche du signal</div>';
+  return `<div class="gps-ok"><i></i>GPS${GPS.acc?` · ±${GPS.acc} m`:''}</div>`;
 }
 
 /* ---- Carte : tuiles OpenStreetMap en fond, tracé en SVG par-dessus ---- */
@@ -2632,6 +2663,17 @@ function carteHTML(pts, opt){
       fill="var(--moss)" opacity=".18"/>` : '';
   const tr = (typeof preparerTrace === 'function') ? preparerTrace(pts, PX) : null;
   const anim = !!opt.anim;
+  if (opt.sansTrace) return `<div class="carte${fond?'':' sans-fond'}${opt.gestes?' gestes':''}" style="aspect-ratio:${opt.ratio}"
+      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
+      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null})}'>
+    <div class="carte-in">${tuiles}<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg></div>
+    ${opt.gestes?`<div class="carte-outils">
+      <button data-zoom="1" aria-label="Zoomer">+</button>
+      <button data-zoom="-1" aria-label="Dézoomer">−</button>
+      <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
+    <div class="carte-pied"><div class="stats"></div>
+      ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
+  </div>`;
 
   return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}${opt.gestes?' gestes':''}" style="aspect-ratio:${opt.ratio}"
       ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
@@ -3032,18 +3074,46 @@ function openSheet(title, sub, body, onSave, saveLabel){
   sheetSave = onSave;
   $('#sheetHost').innerHTML = `<div class="sheet-mask" id="mask"><div class="sheet" role="dialog" aria-modal="true">
     <div class="sheet-head">
-      <div><h2>${esc(title)}</h2>${sub?`<p class="small muted" style="margin:3px 0 0">${sub}</p>`:''}</div>
+      <div><span class="poignee no-print" aria-hidden="true"></span>
+        <h2>${esc(title)}</h2>${sub?`<p class="small muted" style="margin:3px 0 0">${sub}</p>`:''}</div>
       <div class="row" style="flex-wrap:nowrap">
         ${onSave?`<button class="btn sm" id="sheetSaveBtn">${esc(saveLabel||'Enregistrer')}</button>`:''}
         <button class="icon-btn" id="sheetClose" aria-label="Fermer">✕</button>
       </div>
     </div>
-    <div class="sheet-body" id="sheetBody">${body}</div></div></div>`;
+    <div class="sheet-body" id="sheetBody">${body}</div>
+    <div class="sheet-foot no-print"><button class="btn ghost" id="sheetClose2">Fermer</button></div>
+    </div></div>`;
   document.body.style.overflow = 'hidden';
   document.documentElement.classList.add('sheet-open');
   $('#sheetClose').onclick = closeSheet;
+  $('#sheetClose2').onclick = closeSheet;
   $('#mask').addEventListener('mousedown', e=>{ if(e.target.id==='mask') closeSheet(); });
+  glisserPourFermer($('#mask').firstElementChild);
   const b = $('#sheetSaveBtn'); if (b) b.onclick = ()=>{ const d = readForm($('#sheetBody')); if (sheetSave(d) !== false) closeSheet(); };
+}
+/* Le panneau se referme aussi en le tirant vers le bas : le haut de l'écran
+   est hors de portée du pouce sur un grand téléphone. */
+function glisserPourFermer(sheet){
+  if (!sheet) return;
+  const tete = sheet.querySelector('.sheet-head');
+  let y0 = null, dy = 0;
+  const depart = e => { if (sheet.scrollTop > 4) return; y0 = e.touches[0].clientY; dy = 0; };
+  const bouge = e => {
+    if (y0 === null) return;
+    dy = e.touches[0].clientY - y0;
+    if (dy > 0){ sheet.style.transform = `translate3d(0,${dy}px,0)`; sheet.style.transition = 'none'; }
+  };
+  const fin = () => {
+    if (y0 === null) return;
+    sheet.style.transition = 'transform .18s';
+    if (dy > 110) closeSheet(); else sheet.style.transform = '';
+    y0 = null;
+  };
+  [tete, sheet].forEach(el => { if (!el) return;
+    el.addEventListener('touchstart', depart, {passive:true});
+    el.addEventListener('touchmove', bouge, {passive:true});
+    el.addEventListener('touchend', fin, {passive:true}); });
 }
 function closeSheet(){ $('#sheetHost').innerHTML=''; document.body.style.overflow='';
   document.documentElement.classList.remove('sheet-open'); sheetSave=null; }
@@ -3099,6 +3169,8 @@ function route(){
   $('#view').innerHTML = (typeof liveBar === 'function' ? liveBar() : '') + (VIEWS[p] || VIEWS.accueil)();
   markNav();
   if (typeof brancherCartes === 'function') brancherCartes();
+  document.querySelectorAll('[data-lieu]').forEach(m=> m.onclick = e => {
+    e.stopPropagation(); ficheLieu(m.dataset.lieu); });
   try { window.scrollTo(0, y); } catch(e){}
   pagePrec = p;
   const fab = $('#fab');
@@ -3107,7 +3179,7 @@ function route(){
     fab.setAttribute('aria-label', txt); fab.onclick = fn;
   };
   fab.classList.toggle('actif', !!S.terrain);
-  if (S.terrain)            setFab(hms(tElapsed()), 'chrono', ()=>openTerrain());
+  if (S.terrain)            setFab(hmsCourt(tElapsed()), 'chrono', ()=>openTerrain());
   else if (p==='ordres')    setFab('Nouvel ordre',  'plus', ()=>formOrdre());
   else if (p==='sessions')  setFab('Nouvelle séance','plus', ()=>formSession());
   else if (p==='journal')   setFab('Ajouter la journée','plus', ()=>formJournal());
@@ -4665,6 +4737,264 @@ function exportOrdres(){
 </script>
 <script>
 /* =========================================================================
+   ESPACE CANIN
+   Repérer où sortir : aires clôturées, parcs en laisse, points d'eau et
+   secteurs interdits. Les lieux sont saisis par l'utilisateur ou importés ;
+   aucun annuaire n'est embarqué, les distances sont calculées depuis la
+   position réelle quand elle est disponible.
+   ========================================================================= */
+
+const TYPES_LIEU = [
+  {id:'dogpark',  t:'Aire canine',   c:'var(--vert)',  i:'Sans laisse'},
+  {id:'park',     t:'Parc ou espace vert', c:'var(--moss)', i:'En laisse'},
+  {id:'water',    t:'Point d\'eau',  c:'var(--sky)',   i:'Eau'},
+  {id:'chemin',   t:'Chemin ou forêt', c:'#12A57A',    i:'Nature'},
+  {id:'forbidden',t:'Chiens interdits', c:'var(--rouge)', i:'Interdit'}
+];
+const typeLieu = id => TYPES_LIEU.find(t=>t.id===id) || TYPES_LIEU[1];
+
+const FILTRES_LIEU = [
+  ['offleash','Sans laisse'], ['water','Eau'], ['fenced','Clôturé'],
+  ['lit','Éclairé'], ['leashed','Laisse obligatoire'], ['forbidden','Chiens interdits']
+];
+
+let VUE_LIEUX = {mode:'carte', filtres:[], q:'', autour:false};
+
+/* Distance depuis la position connue, sinon rien : mieux vaut ne rien dire
+   qu'annoncer une distance inventée. */
+function distanceLieu(l){
+  const p = POS_ACTUELLE || (S.terrain && S.terrain.gps && S.terrain.gps[S.terrain.gps.length-1]);
+  if (!p || !l.lat) return null;
+  return distM([p[0], p[1]], [l.lat, l.lng]);
+}
+let POS_ACTUELLE = null;
+function autourDeMoi(){
+  VUE_LIEUX.autour = true;
+  toast('Recherche de ta position…');
+  if (!navigator.geolocation){ toast('Position indisponible sur ce navigateur.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => { POS_ACTUELLE = [p.coords.latitude, p.coords.longitude]; route();
+           toast('Lieux triés par distance.'); },
+    e => { VUE_LIEUX.autour = false;
+           toast(e.code===1 ? 'Position refusée. Autorise-la pour trier par distance.' : 'Position introuvable.'); },
+    {enableHighAccuracy:true, timeout:15000});
+}
+
+function lieuxFiltres(){
+  let L = S.lieux.slice();
+  const q = VUE_LIEUX.q.toLowerCase().trim();
+  if (q) L = L.filter(l => (l.nom+' '+(l.notes||'')).toLowerCase().includes(q));
+  VUE_LIEUX.filtres.forEach(f => {
+    if (f === 'offleash') L = L.filter(l => l.type === 'dogpark' || l.offleash);
+    else if (f === 'forbidden') L = L.filter(l => l.type === 'forbidden');
+    else if (f === 'leashed') L = L.filter(l => l.leashed);
+    else L = L.filter(l => l[f]);
+  });
+  L.forEach(l => l._d = distanceLieu(l));
+  if (VUE_LIEUX.autour) L.sort((a,b)=>(a._d===null?1e12:a._d)-(b._d===null?1e12:b._d));
+  else L.sort((a,b)=>(a.favori?0:1)-(b.favori?0:1) || a.nom.localeCompare(b.nom));
+  return L;
+}
+
+VIEWS.lieux = () => {
+  const L = lieuxFiltres();
+  const H = head('Où sortir',
+    'Les endroits que tu repères autour de chez toi : aires clôturées, parcs en laisse, points d\'eau, et les secteurs à éviter.',
+    `<button class="btn" onclick="formLieu()">Ajouter un lieu</button>
+     <button class="btn ghost" onclick="autourDeMoi()">Autour de moi</button>`);
+
+  if (!S.lieux.length) return H + empty('Aucun lieu enregistré',
+    'Ajoute les endroits où tu sors : une aire canine clôturée, un parc où la laisse est obligatoire, un point d\'eau, ou une zone interdite aux chiens. Chaque lieu porte un conseil adapté à ton chien.',
+    `<div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn" onclick="formLieu()">Ajouter le premier</button></div>`);
+
+  const barre = `
+    <div class="row" style="margin-bottom:12px;gap:8px">
+      <input type="text" placeholder="Rechercher un lieu…" value="${esc(VUE_LIEUX.q)}"
+        oninput="VUE_LIEUX.q=this.value;pagePrec=null;clearTimeout(window._ql);window._ql=setTimeout(route,220)"
+        style="flex:1;min-width:150px">
+      <div class="seg">
+        <button class="${VUE_LIEUX.mode==='carte'?'on':''}" onclick="VUE_LIEUX.mode='carte';route()">Carte</button>
+        <button class="${VUE_LIEUX.mode==='liste'?'on':''}" onclick="VUE_LIEUX.mode='liste'; route()">Liste</button>
+      </div>
+    </div>
+    <div class="row chips" style="margin-bottom:16px">
+      ${FILTRES_LIEU.map(([k,t])=>`<button class="chip${VUE_LIEUX.filtres.includes(k)?' on':''}"
+        onclick="basculeFiltre('${k}')">${esc(t)}</button>`).join('')}
+    </div>`;
+
+  const vide = L.length ? '' : `<div class="empty" style="margin-bottom:16px">
+    <h3>Aucun lieu ne correspond</h3><p class="small muted">Retire un filtre ou change ta recherche.</p></div>`;
+
+  const carte = (VUE_LIEUX.mode === 'carte' && L.length)
+    ? carteLieux(L) : '';
+
+  const liste = L.map(l => {
+    const T = typeLieu(l.type);
+    return `<button class="lieu" onclick="ficheLieu('${l.id}')">
+      <span class="puce" style="background:${T.c}"></span>
+      <div style="flex:1;min-width:0">
+        <div class="spread" style="gap:8px">
+          <b style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.favori?'★ ':''}${esc(l.nom)}</b>
+          ${l._d!==null?`<span class="tiny muted num" style="white-space:nowrap">${fdist(l._d)}</span>`:''}
+        </div>
+        <div class="tiny muted">${esc(T.t)}${l.horaires?' · '+esc(l.horaires):''}</div>
+        <div class="row" style="gap:5px;margin-top:5px">
+          ${l.type==='forbidden'?'<span class="pill rouge">interdit</span>':''}
+          ${(l.offleash||l.type==='dogpark')?'<span class="pill vert">sans laisse</span>':''}
+          ${l.leashed?'<span class="pill">en laisse</span>':''}
+          ${l.fenced?'<span class="pill">clôturé</span>':''}
+          ${l.water?'<span class="pill sky">eau</span>':''}
+          ${l.lit?'<span class="pill">éclairé</span>':''}
+        </div>
+      </div></button>`;
+  }).join('');
+
+  return H + barre + vide + carte + `<div class="lieu-liste">${liste}</div>`;
+};
+
+const fdist = m => m === null ? '' : m < 1000 ? Math.round(m/10)*10 + ' m' : (m/1000).toFixed(1) + ' km';
+function basculeFiltre(k){
+  const i = VUE_LIEUX.filtres.indexOf(k);
+  if (i>=0) VUE_LIEUX.filtres.splice(i,1); else VUE_LIEUX.filtres.push(k);
+  route();
+}
+
+/* Carte des lieux : même moteur de tuiles que le tracé, marqueurs colorés */
+function carteLieux(L){
+  const pts = L.filter(l=>l.lat).map(l=>[l.lat, l.lng, 0]);
+  if (POS_ACTUELLE) pts.push([POS_ACTUELLE[0], POS_ACTUELLE[1], 0]);
+  if (!pts.length) return '';
+  const base = carteHTML(pts.length > 1 ? pts : [pts[0]],
+    {ratio:'1 / 1', id:'carte-lieux', gestes:true, minWin:0.012, sansTrace:true});
+  if (!base) return '';
+  const tmp = document.createElement('div'); tmp.innerHTML = base;
+  const hote = tmp.firstElementChild;
+  const proj = JSON.parse(hote.dataset.proj);
+  const svg = hote.querySelector('svg');
+  svg.querySelectorAll('path, .pas-semis, .chien').forEach(e=>e.remove());
+  let m = '';
+  if (POS_ACTUELLE){
+    const q = [merX(POS_ACTUELLE[1])*proj.S-proj.ox, merY(POS_ACTUELLE[0])*proj.S-proj.oy];
+    m += `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="22" fill="var(--moss)" opacity=".2"/>
+      <circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="9" fill="var(--moss)" stroke="#fff" stroke-width="4"/>`;
+  }
+  L.filter(l=>l.lat).forEach(l=>{
+    const T = typeLieu(l.type);
+    const q = [merX(l.lng)*proj.S-proj.ox, merY(l.lat)*proj.S-proj.oy];
+    m += `<g class="marq" data-lieu="${l.id}" transform="translate(${q[0].toFixed(1)} ${q[1].toFixed(1)})">
+      <path d="M0 4c-7-9-11-13-11-19a11 11 0 0 1 22 0c0 6-4 10-11 19Z" fill="${T.c}" stroke="#fff" stroke-width="3"/>
+      <circle cy="-15" r="4.4" fill="#fff"/></g>`;
+  });
+  svg.insertAdjacentHTML('beforeend', m);
+  return hote.outerHTML;
+}
+
+function ficheLieu(id){
+  const l = S.lieux.find(x=>x.id===id); if(!l) return;
+  const T = typeLieu(l.type), d = distanceLieu(l);
+  const ligne = (ok, oui, non) => `<div class="warn-row">
+    <span class="pill ${ok?'vert':''}">${ok?'oui':'non'}</span><div class="small">${esc(ok?oui:non)}</div></div>`;
+  const body = `
+    <div class="card pad-lg" style="margin-bottom:14px;border-left:4px solid ${T.c}">
+      <div class="spread"><h3 style="font-size:1.15rem">${esc(l.nom)}</h3>
+        <span class="pill" style="background:${T.c}1a;color:${T.c}">${esc(T.t)}</span></div>
+      ${d!==null?`<p class="small muted" style="margin:6px 0 0">À ${fdist(d)} de ta position</p>`:''}
+      ${l.horaires?`<p class="small" style="margin:6px 0 0">Horaires : ${esc(l.horaires)}</p>`:''}
+    </div>
+    ${l.type==='forbidden'?'<div class="alert bad"><b>Chiens interdits.</b> À éviter, y compris en laisse.</div>':''}
+    <h4>Ce qu'on y trouve</h4>
+    ${ligne(l.offleash||l.type==='dogpark','Liberté possible','Laisse nécessaire')}
+    ${ligne(l.fenced,'Clôturé','Non clôturé')}
+    ${ligne(l.water,'Point d\'eau','Pas d\'eau sur place')}
+    ${ligne(l.lit,'Éclairé le soir','Pas d\'éclairage')}
+    ${l.notes?`<h4>Notes</h4><p class="small">${esc(l.notes)}</p>`:''}
+    <div class="pourquoi" style="margin-top:16px"><b>Conseil du coach</b>
+      <p class="small" style="margin:4px 0 0">${esc(conseilLieu(l))}</p></div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" onclick="favoriLieu('${l.id}')">${l.favori?'★ Retirer des favoris':'☆ Mettre en favori'}</button>
+      ${l.lat?`<button class="btn ghost" onclick="yAller('${l.id}')">Y aller</button>`:''}
+      <button class="btn ghost" onclick="closeSheet();formLieu('${l.id}')">Modifier</button>
+      <button class="btn danger ghost" onclick="closeSheet();del('lieux','${l.id}','${esc(l.nom)}')">Supprimer</button>
+    </div>`;
+  openSheet(l.nom, esc(T.t), body, null);
+}
+
+/* Le conseil dépend de l'état réel du chien, pas seulement du lieu */
+function conseilLieu(l){
+  if (l.type === 'forbidden') return 'Zone à exclure de tes itinéraires.';
+  const rap = etatAxe('rappel'), cro = etatAxe('croisements');
+  const libre = l.offleash || l.type === 'dogpark';
+  if (libre && !l.fenced){
+    if (rap.vide) return 'Zone ouverte sans clôture : garde la longe tant que tu n\'as pas de mesures sur le rappel.';
+    return rap.sc >= 75 ? `Le rappel tient (${rap.sc}/100) : la liberté est envisageable ici, en restant attentif aux sorties de zone.`
+      : `Le rappel est encore à ${rap.sc}/100 et la zone n'est pas clôturée : reste en longue longe.`;
+  }
+  if (libre && l.fenced){
+    if (cro.vide) return 'Aire clôturée : commence par observer depuis l\'extérieur avant d\'entrer.';
+    return cro.sc >= 70 ? `Les croisements se passent bien (${cro.sc}/100) : l\'aire peut convenir, de préférence aux heures creuses.`
+      : `Les croisements sont à ${cro.sc}/100 : privilégie les heures creuses, ou travaille d\'abord à distance depuis l\'extérieur.`;
+  }
+  if (l.water) return 'Point d\'eau utile pour les sorties longues et les jours chauds.';
+  return cro.vide ? 'Bon endroit pour observer et noter tes premières balades.'
+    : `Espace en laisse : pratique pour travailler les croisements à distance choisie (actuellement ${cro.sc}/100).`;
+}
+
+function favoriLieu(id){
+  const l = S.lieux.find(x=>x.id===id); if(!l) return;
+  l.favori = !l.favori; persist(true); closeSheet(); route();
+  toast(l.favori ? 'Ajouté aux favoris.' : 'Retiré des favoris.');
+}
+function yAller(id){
+  const l = S.lieux.find(x=>x.id===id); if(!l || !l.lat) return;
+  const url = `https://www.openstreetmap.org/directions?to=${l.lat}%2C${l.lng}`;
+  try { window.open(url, '_blank', 'noopener'); } catch(e){ toast('Impossible d\'ouvrir l\'itinéraire.'); }
+}
+
+function formLieu(id){
+  const l = S.lieux.find(x=>x.id===id) || {id:uid(), type:'park', lat:'', lng:''};
+  const body = `
+    ${plain([
+      {k:'nom', l:'Nom du lieu', ph:'Aire canine du parc…'},
+      {k:'type', l:'Type', t:'select', opts:TYPES_LIEU.map(t=>[t.id, t.t])},
+      {k:'horaires', l:'Horaires', ph:'06:30 – 22:30 ou Accès libre'}
+    ], l)}
+    <div class="card" style="margin-bottom:12px">
+      <div class="small" style="font-weight:560;margin-bottom:8px">Ce qu'on y trouve</div>
+      <label class="inline-check"><input type="checkbox" data-b="offleash"${l.offleash?' checked':''}> Liberté possible</label>
+      <label class="inline-check"><input type="checkbox" data-b="leashed"${l.leashed?' checked':''}> Laisse obligatoire</label>
+      <label class="inline-check"><input type="checkbox" data-b="fenced"${l.fenced?' checked':''}> Clôturé</label>
+      <label class="inline-check"><input type="checkbox" data-b="water"${l.water?' checked':''}> Point d'eau</label>
+      <label class="inline-check"><input type="checkbox" data-b="lit"${l.lit?' checked':''}> Éclairé</label>
+    </div>
+    ${plain([
+      {k:'lat', l:'Latitude', hint:'facultatif', t:'number', step:'any'},
+      {k:'lng', l:'Longitude', hint:'facultatif', t:'number', step:'any'}
+    ], l, 'g2')}
+    <button class="btn ghost sm" type="button" id="lPos">Utiliser ma position actuelle</button>
+    ${plain([{k:'notes', l:'Notes', t:'textarea', rows:3}], l)}`;
+  openSheet(id?'Modifier le lieu':'Nouveau lieu', 'Ces repères servent aussi au coach.', body, d=>{
+    if (!d.nom){ toast('Il manque le nom.'); return false; }
+    d.id = l.id; d.favori = l.favori || false;
+    document.querySelectorAll('#sheetBody [data-b]').forEach(c=>{ d[c.dataset.b] = c.checked; });
+    d.lat = num(d.lat) || ''; d.lng = num(d.lng) || '';
+    upsert('lieux', d); commit('Lieu enregistré.');
+  });
+  const b = $('#lPos');
+  if (b) b.onclick = () => {
+    if (!navigator.geolocation){ toast('Position indisponible.'); return; }
+    b.textContent = 'Recherche…';
+    navigator.geolocation.getCurrentPosition(
+      p => { $('#sheetBody [data-k="lat"]').value = p.coords.latitude.toFixed(5);
+             $('#sheetBody [data-k="lng"]').value = p.coords.longitude.toFixed(5);
+             b.textContent = 'Position enregistrée'; },
+      () => { b.textContent = 'Position refusée'; },
+      {enableHighAccuracy:true, timeout:15000});
+  };
+}
+</script>
+<script>
+/* =========================================================================
    VUE — MÉTRIQUES
    ========================================================================= */
 VIEWS.metriques = () => {
@@ -5321,22 +5651,21 @@ function openTerrain(){
       </div>
     </div>
     <div class="terrain-body">
-      <button class="tap wide big" id="tFlair">
+      ${groupes}
+
+      <button class="tap wide big" id="tFlair" style="margin-top:14px">
         <span class="lb" style="font-size:.95rem;font-weight:640">${t.flairAt?'Flair en cours, taper pour arrêter':'Il renifle : démarrer le chrono flair'}</span>
         <span class="ct" id="flairV2">${hms(tFlair())}</span></button>
-      <div class="tsec">Parcours</div>
-      ${(t.gps && t.gps.length) ? `<div style="margin-bottom:10px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0009, direct:true, gestes:true,
+
+      ${(t.gps && t.gps.length) ? `<div class="tsec">Parcours</div>
+      <div style="margin-bottom:6px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0009,
+        direct:true, gestes:true,
         suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
-        dz:(t.vue||{}).dz||0, cx:(t.vue||{}).cx, cy:(t.vue||{}).cy,
-        sous:`${t.gps.length} point${t.gps.length>1?'s':''} relevé${t.gps.length>1?'s':''}`})}</div>` : ''}
-      <div class="card" style="padding:13px 15px">
-        <div class="spread">
-          <div class="small" id="gpsInfo">${gpsResume(t.gps)}</div>
-          <button class="btn ghost sm" id="tGps">${GPS.watch!==null?'Suivi actif':'Tester'}</button>
-        </div>
-      </div>
-      ${groupes}
-      <details class="acc" style="margin-top:20px"${t.lieu?' open':''}>
+        dz:(t.vue||{}).dz||0, cx:(t.vue||{}).cx, cy:(t.vue||{}).cy})}</div>` : ''}
+      <div id="gpsInfo" style="margin-bottom:16px">${t.sansGps
+        ? '<span class="tiny muted">Balade sans tracé</span>' : gpsResume(t.gps)}</div>
+
+      <details class="acc"${t.lieu?' open':''}>
         <summary>Lieu et équipement${t.lieu?' — '+esc(t.lieu):''}</summary>
         <div class="in"><div class="grid g3">
           <label class="f"><span>Lieu</span><input type="text" id="tLieu" list="tLieux" value="${esc(t.lieu)}" placeholder="Parc, chemin…"></label>
@@ -5345,8 +5674,10 @@ function openTerrain(){
         </div></div>
       </details>
       <datalist id="tLieux">${lieux.map(l=>`<option value="${esc(l)}">`).join('')}</datalist>
+
       <div class="tsec">Signaux observés ${t.sig.length?`<span class="pill ochre">${t.sig.length}</span>`:''}</div>
-      <button class="tap wide" id="tSignal"><span class="lb">Noter un signal d'inconfort</span><span class="ct">${ico('signaux')}</span></button>
+      <button class="tap wide" id="tSignal"><span class="lb">Noter un signal d'inconfort</span>
+        <span class="ct">${ico('signaux')}</span></button>
       ${t.sig.length?`<div class="row" style="margin-top:9px">${t.sig.map((x,i)=>`<span class="pill ochre">${esc(x)}
         <button class="x-mini" data-unsig="${i}" aria-label="Retirer ce signal">✕</button></span>`).join('')}</div>`:''}
     </div>
@@ -5363,8 +5694,12 @@ function openTerrain(){
   $('#tFlair').onclick = terrainFlairToggle;
   $('#tSignal').onclick = terrainSignal;
   $('#tUndo').onclick = terrainUndo;
-  $('#tGps').onclick = () => { gpsArreter(); gpsDemarrer(); testerPosition();
-    $('#gpsInfo').innerHTML = '<span class="muted">Recherche du signal…</span>'; };
+  const bg = $('#tGps');
+  if (bg) bg.onclick = () => {
+    if (S.terrain) S.terrain.sansGps = false;
+    gpsArreter(); gpsDemarrer(); testerPosition();
+    const gi = $('#gpsInfo'); if (gi) gi.innerHTML = '<span class="muted">Recherche du signal…</span>';
+  };
   ['tLieu','tTerrain','tEquip'].forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
     el.onchange = el.oninput = () => {
@@ -5388,8 +5723,7 @@ function openTerrain(){
     persistSoon(); openTerrain();
   });
 
-  clearInterval(_tTick);
-  _tTick = setInterval(terrainTick, 1000);
+  battementGlobal();
 }
 
 /* iOS suspend les minuteurs quand l'application passe en arrière-plan : le
@@ -5397,24 +5731,34 @@ function openTerrain(){
    fige. On le rafraîchit et on relance le suivi dès le retour. */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden || !S.terrain) return;
-  if (document.querySelector('.terrain')){
-    clearInterval(_tTick);
-    _tTick = setInterval(terrainTick, 1000);
-    terrainTick();
-  }
+  battementGlobal();
   if (!S.terrain.pauseAt && !S.terrain.sansGps && GPS.watch === null && !GPS.refus) gpsDemarrer();
   if (typeof route === 'function' && !document.querySelector('.terrain')) route();
 });
 function closeTerrain(){
-  clearInterval(_tTick); _tTick = null;
   $('#terrainHost').innerHTML = ''; document.body.style.overflow = '';
+  battementGlobal();          // le chrono continue depuis les autres pages
 }
+/* Le battement est global : il tourne tant qu'une balade est active, quelle que
+   soit la page affichée, et met à jour tout ce qui montre le temps. */
 function terrainTick(){
-  if (!S.terrain || !$('#chronoV')){ clearInterval(_tTick); return; }
-  $('#chronoV').textContent = hms(tElapsed());
-  const f = hms(tFlair());
-  if ($('#flairV')) $('#flairV').textContent = f;
-  if ($('#flairV2')) $('#flairV2').textContent = f;
+  if (!S.terrain){ clearInterval(_tTick); _tTick = null; return; }
+  const t = hms(tElapsed()), f = hms(tFlair());
+  const set = (sel, v) => { const e = document.querySelector(sel); if (e) e.textContent = v; };
+  set('#chronoV', t); set('#flairV', f); set('#flairV2', f);
+  set('#liveDuree', t);
+  const ft = document.querySelector('#fab .ft');
+  if (ft) ft.textContent = hmsCourt(tElapsed());
+}
+/* Format compact pour la barre basse : au-delà d'une heure, on abrège */
+function hmsCourt(ms){
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor(s%3600/60);
+  return h ? h + 'h' + String(m).padStart(2,'0') : m + ':' + String(s%60).padStart(2,'0');
+}
+function battementGlobal(){
+  clearInterval(_tTick);
+  if (S.terrain) { _tTick = setInterval(terrainTick, 1000); terrainTick(); }
+  else _tTick = null;
 }
 function terrainPause(){
   const t = S.terrain; if(!t) return;
@@ -5577,12 +5921,9 @@ function liveBar(){
   if (GPS.watch === null && !GPS.refus && !t.pauseAt) gpsDemarrer();
   const n = Object.values(t.c).reduce((a,b)=>a+num(b),0);
   const km = (t.gps && t.gps.length>1) ? ' · ' + (longueurTrace(t.gps)/1000).toFixed(2) + ' km' : '';
-  return `<div class="livebar no-print">
-    <div><b>Balade en cours</b> — ${hms(tElapsed())}${t.pauseAt?' (en pause)':''} · ${n} événement${n>1?'s':''} noté${n>1?'s':''}${km}${t.lieu?' · '+esc(t.lieu):''}</div>
-    <div class="row" style="flex-wrap:nowrap">
-      <button class="btn sm" onclick="openTerrain()">Reprendre</button>
-      <button class="btn ghost sm" onclick="terrainStop()">Terminer</button>
-    </div></div>`;
+  return `<button class="livebar no-print" onclick="openTerrain()">
+    <span>Balade en cours · <b id="liveDuree">${hms(tElapsed())}</b>${t.pauseAt?' (en pause)':''}${km}</span>
+    <span class="fleche">›</span></button>`;
 }
 </script>
 <script>

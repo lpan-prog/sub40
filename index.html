@@ -523,11 +523,17 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 
 /* ---------- Carte du parcours ---------- */
 .carte{position:relative;overflow:hidden;border-radius:var(--r-m);background:var(--surface-3);
-  display:flex;align-items:center;justify-content:center}
+  display:flex;align-items:center;justify-content:center;max-width:100%}
 .carte.sans-fond{background:var(--moss-soft)}
 .carte-in{position:relative;flex:0 0 auto}
-.carte .tuile{position:absolute;width:256px;height:256px;user-select:none;pointer-events:none}
-html[data-theme="sombre"] .carte .tuile{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9)}
+.carte .tuile{position:absolute;width:256px;height:256px;user-select:none;pointer-events:none;
+  filter:grayscale(1) brightness(1.06) contrast(.82)}
+/* Voile bleu par-dessus les tuiles : la carte doit appartenir à la même palette
+   que le reste de l'application, pas ressembler à une capture d'écran. */
+.carte-in::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:var(--moss);opacity:.16;mix-blend-mode:multiply}
+html[data-theme="sombre"] .carte .tuile{filter:invert(1) grayscale(1) brightness(.78) contrast(1.05)}
+html[data-theme="sombre"] .carte-in::after{opacity:.3;mix-blend-mode:screen;background:#1B2547}
 .carte svg{position:relative;z-index:2}
 .chien{transition:opacity .25s}
 .chien .corps{fill:var(--moss-deep)}
@@ -1913,13 +1919,13 @@ const Store = (() => {
    ========================================================================= */
 const blank = () => ({
   version: 1,
-  chien: {nom:'', surnom:'', sexe:'', race:'', taille:'', naissance:'', adoption:'', origine:'',
+  chien: {nom:'', surnom:'', sexe:'', race:'', groupe:'', taille:'', naissance:'', adoption:'', origine:'',
     poidsCible:'', puce:'', tatouage:'', passeport:'', couleur:'', sterilise:'', assureur:'', numContrat:'',
     veto:'', vetoTel:'', regime:'', particularites:'', peurs:'', motivations:'', photo:''},
   objectifs: {baladesSem:10, minutesSem:420, sessionsSem:5, flairPct:35},
   balades:[], sessions:[], poids:[], sante:[], repas:[], journal:[], signaux:[],
   contacts:[], taches:[], depenses:[], notes:[], ordres:[], foyer:[],
-  terrain: null, epingles: [], depart: null,
+  terrain: null, epingles: [], depart: null, objectifsRegles: false,
   reglages:{theme:'clair', unite:'km', carte:'osm'}
 });
 const COLLS = ['balades','sessions','poids','sante','repas','journal','signaux',
@@ -1936,6 +1942,7 @@ async function boot(){
   S.chien = Object.assign(blank().chien, S.chien||{});
   S.objectifs = Object.assign(blank().objectifs, S.objectifs||{});
   S.reglages = Object.assign(blank().reglages, S.reglages||{});
+  if (!S.objectifsRegles && typeof objectifsDefaut === 'function') S.objectifs = objectifsDefaut();
   if (S.terrain && typeof S.terrain !== 'object') S.terrain = null;
   if (S.terrain && !S.terrain.c) S.terrain.c = {};
   if (!Array.isArray(S.epingles)) S.epingles = [];
@@ -2018,6 +2025,12 @@ function scoreBalade(b){
   s += Math.min(6, num(b.croisCalmes)*1.5);
   s -= num(b.incidents)*6;
   s -= (num(b.reactivite)/5)*8;
+  /* Une sortie se juge par rapport aux besoins de la lignée : 3 km suffisent à
+     un carlin, ils sont maigres pour un husky. */
+  if (num(b.distance) && typeof refDistance === 'function'){
+    const r = refDistance();
+    if (r) s += Math.max(-7, Math.min(7, (num(b.distance)/r - 1) * 9));
+  }
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 function verdictSession(s){
@@ -2471,13 +2484,24 @@ const merY = la => { const s = Math.sin(la*Math.PI/180);
 function carteHTML(pts, opt){
   opt = Object.assign({h:260, fond:true, id:''}, opt||{});
   if (!pts || pts.length < 2) return '';
-  const W = 640, H = opt.h, PAD = 18;
+  /* La carte est dessinée à la largeur réelle disponible : mettre à l'échelle
+     après coup rendrait les tuiles floues et faisait déborder le cadre. */
+  let dispo = 640;
+  try { dispo = Math.max(260, Math.min(640, (window.innerWidth || 640) - (window.innerWidth < 901 ? 66 : 110))); } catch(e){}
+  const W = Math.round(dispo), H = opt.h, PAD = 22;
   const b = bbox(pts);
-  // zoom qui fait tenir la trace dans le cadre
+  /* Un parcours de quelques mètres ne doit pas remplir l'écran : on impose une
+     fenêtre minimale d'environ 150 m de côté. */
+  const MIN = 0.0014;
+  const cLa = (b.laMin + b.laMax)/2, cLo = (b.loMin + b.loMax)/2;
+  const eLa = Math.max(b.laMax - b.laMin, MIN)/2;
+  const eLo = Math.max(b.loMax - b.loMin, MIN / Math.max(0.25, Math.cos(cLa*Math.PI/180)))/2;
+  b.laMin = cLa - eLa; b.laMax = cLa + eLa;
+  b.loMin = cLo - eLo; b.loMax = cLo + eLo;
   const dx = Math.max(1e-7, merX(b.loMax) - merX(b.loMin));
   const dy = Math.max(1e-7, merY(b.laMin) - merY(b.laMax));
   let z = Math.floor(Math.min(Math.log2((W-2*PAD)/(dx*256)), Math.log2((H-2*PAD)/(dy*256))));
-  z = Math.max(1, Math.min(18, z));
+  z = Math.max(1, Math.min(17, z));
   const S2 = 256 * Math.pow(2, z);
   const cx = (merX(b.loMin)+merX(b.loMax))/2 * S2, cy = (merY(b.laMin)+merY(b.laMax))/2 * S2;
   const ox = cx - W/2, oy = cy - H/2;
@@ -2830,6 +2854,110 @@ function kpi(k, v, u, d, cls){
 </script>
 <script>
 /* =========================================================================
+   RACE ET GROUPE FONCTIONNEL
+
+   Une race ne dit pas ce qu'un chien est, elle dit ce pour quoi sa lignée a
+   été sélectionnée. Un beagle a été retenu pendant des siècles pour suivre
+   une piste en se coupant du reste : lui reprocher un rappel moyen avec la
+   même exigence qu'à un border collie n'a pas de sens.
+
+   On module donc trois choses, et rien d'autre :
+   — les objectifs hebdomadaires par défaut (durée, part de flair) ;
+   — la distance et la durée de référence du score de balade ;
+   — la tolérance de notation sur trois axes (rappel, marche, calme).
+
+   Aucune modulation ne dépasse ±25 %. Le chien réel prime toujours : ces
+   valeurs ne servent qu'à fixer un point de départ raisonnable.
+   ========================================================================= */
+
+const GROUPES = [
+  {id:'berger',   t:'Chien de berger et de conduite',
+   min:75, flair:30, km:5.0, rappel:1.10, laisse:1.05, calme:0.90,
+   note:"Sélectionné pour travailler en lien constant avec l'humain : le rappel vient vite, le besoin d'occupation mentale est élevé et l'ennui se transforme vite en agitation."},
+  {id:'courant',  t:'Chien courant et de chasse',
+   min:80, flair:50, km:6.0, rappel:0.78, laisse:0.92, calme:1.00,
+   note:"Sélectionné pour suivre une piste loin du maître. Un rappel imparfait n'est pas un échec d'éducation, c'est une lignée : la longe reste la règle plus longtemps, et le flair est un besoin, pas un loisir."},
+  {id:'rapporteur',t:'Retriever et chien d\'eau',
+   min:70, flair:35, km:5.0, rappel:1.12, laisse:1.00, calme:0.95,
+   note:"Sélectionné pour rapporter au maître : le retour est naturel, mais l'excitation monte vite sur les objets en mouvement et le contrôle de l'impulsion demande du travail."},
+  {id:'terrier',  t:'Terrier',
+   min:60, flair:40, km:4.0, rappel:0.85, laisse:0.88, calme:0.85,
+   note:"Sélectionné pour travailler seul face à une proie : ténacité, seuil de réaction bas, redescente lente. Les croisements et le retour au calme demandent plus de patience."},
+  {id:'garde',    t:'Molosse et chien de garde',
+   min:60, flair:30, km:3.5, rappel:0.95, laisse:0.90, calme:1.00,
+   note:"Sélectionné pour surveiller un territoire : peu de dépense nécessaire, mais une vigilance qui rend la socialisation et les croisements structurants."},
+  {id:'nordique', t:'Chien nordique et de traction',
+   min:95, flair:40, km:8.0, rappel:0.72, laisse:0.72, calme:1.00,
+   note:"Sélectionné pour tracter des heures et décider seul. Tirer en laisse est le métier de la lignée, et le rappel en liberté totale reste rarement fiable : ce n'est pas un défaut à corriger, c'est un cadre à accepter."},
+  {id:'levrier',  t:'Lévrier',
+   min:50, flair:25, km:4.0, rappel:0.80, laisse:1.05, calme:1.15,
+   note:"Sélectionné pour des courses très courtes et très intenses : peu d'endurance nécessaire, beaucoup de repos, mais un déclenchement de poursuite quasi irrépressible à la vue."},
+  {id:'compagnie',t:'Chien de compagnie',
+   min:55, flair:30, km:3.0, rappel:1.05, laisse:1.00, calme:0.95,
+   note:"Sélectionné pour la proximité : peu d'exigence physique, mais une sensibilité à la séparation qui rend le travail de la solitude prioritaire."},
+  {id:'utilite',  t:'Chien d\'utilité et de service',
+   min:80, flair:35, km:5.5, rappel:1.08, laisse:1.02, calme:0.92,
+   note:"Sélectionné pour obéir sous contrainte : apprentissage rapide, mais besoin réel d'un cadre et d'un travail régulier sous peine de s'inventer un métier."},
+  {id:'inconnu',  t:'Croisé ou inconnu',
+   min:70, flair:35, km:4.5, rappel:1.00, laisse:1.00, calme:1.00,
+   note:"Sans lignée identifiée, les valeurs de référence restent neutres : ce sont tes propres relevés qui feront la calibration."}
+];
+const groupeById = id => GROUPES.find(g=>g.id===id) || GROUPES[GROUPES.length-1];
+
+/* Races courantes en France, rattachées à leur groupe fonctionnel */
+const RACES = [
+  ['Berger australien','berger'], ['Border collie','berger'], ['Berger allemand','utilite'],
+  ['Berger belge malinois','utilite'], ['Beauceron','berger'], ['Bouvier bernois','garde'],
+  ['Labrador retriever','rapporteur'], ['Golden retriever','rapporteur'], ['Épagneul breton','courant'],
+  ['Cocker spaniel','courant'], ['Beagle','courant'], ['Braque','courant'], ['Setter','courant'],
+  ['Teckel','terrier'], ['Jack russell','terrier'], ['Fox terrier','terrier'],
+  ['Yorkshire','terrier'], ['Bull terrier','terrier'], ['Staffordshire','garde'],
+  ['Rottweiler','garde'], ['Cane corso','garde'], ['Boxer','garde'], ['Dogue','garde'],
+  ['Husky sibérien','nordique'], ['Malamute','nordique'], ['Spitz','nordique'],
+  ['Akita','nordique'], ['Shiba inu','nordique'],
+  ['Whippet','levrier'], ['Greyhound','levrier'], ['Lévrier','levrier'],
+  ['Chihuahua','compagnie'], ['Bichon','compagnie'], ['Carlin','compagnie'],
+  ['Cavalier king charles','compagnie'], ['Bouledogue français','compagnie'],
+  ['Caniche','compagnie'], ['Shih tzu','compagnie'], ['Berger des Shetland','berger'],
+  ['Croisé','inconnu'], ['Autre ou inconnue','inconnu']
+];
+
+/* Groupe retenu : celui choisi explicitement, sinon déduit du nom de la race */
+function groupeChien(){
+  if (S.chien.groupe) return groupeById(S.chien.groupe);
+  const r = (S.chien.race||'').toLowerCase().trim();
+  if (!r) return groupeById('inconnu');
+  const t = RACES.find(x=>r.includes(x[0].toLowerCase()) || x[0].toLowerCase().includes(r));
+  return groupeById(t ? t[1] : 'inconnu');
+}
+
+/* Objectifs de départ, tant que l'utilisateur ne les a pas réglés lui-même */
+function objectifsDefaut(){
+  const g = groupeChien();
+  return {baladesSem:10, minutesSem:Math.round(g.min*7/10)*10, sessionsSem:5, flairPct:g.flair};
+}
+/* Facteur appliqué à la note d'un axe : au-dessus de 1, on est plus indulgent */
+function toleranceAxe(id){
+  const g = groupeChien();
+  if (id === 'rappel') return g.rappel;
+  if (id === 'laisse') return g.laisse;
+  if (id === 'calme')  return g.calme;
+  return 1;
+}
+function refDistance(){ return groupeChien().km; }
+
+/* Phrase affichée quand la lignée explique une difficulté */
+function motGroupe(axeId){
+  const g = groupeChien();
+  const f = toleranceAxe(axeId);
+  if (g.id === 'inconnu' || Math.abs(f-1) < 0.06) return '';
+  return f > 1
+    ? `Sa lignée (${g.t.toLowerCase()}) le prédispose plutôt bien sur cet axe : l'exigence est donc un cran plus haute.`
+    : `Sa lignée (${g.t.toLowerCase()}) joue contre lui sur cet axe : la note est ajustée en conséquence, il n'y a pas de retard à rattraper.`;
+}
+</script>
+<script>
+/* =========================================================================
    COACH
    Six axes de comportement, notés sur les données réelles, comparés à la
    période précédente. L'axe le plus en difficulté détermine l'exercice
@@ -2958,8 +3086,10 @@ function etatAxe(id){
   }
   if (!m.n) return {axe:a, vide:true, sc:null, n:0,
     verdict:'Pas encore de données', conseil:`Note quelques balades pour que ${esc(S.chien.nom||'ton chien')} ait un point de départ sur cet axe.`};
-  const sc = Math.round(m.sc);
-  const delta = p.n ? sc - Math.round(p.sc) : null;
+  const tol = (typeof toleranceAxe === 'function') ? toleranceAxe(id) : 1;
+  const ajuste = v => Math.max(0, Math.min(100, Math.round(v / (tol || 1))));
+  const sc = ajuste(m.sc);
+  const delta = p.n ? sc - ajuste(p.sc) : null;
   const verdict = sc >= 80 ? 'Solide' : sc >= 60 ? 'En progrès' : sc >= 40 ? 'Fragile' : 'En difficulté';
   const tend = delta === null ? null : delta >= 5 ? 'up' : delta <= -5 ? 'down' : 'flat';
   const nom = S.chien.nom || 'ton chien';
@@ -2974,7 +3104,8 @@ function etatAxe(id){
   const base = sc >= 80 ? 'C\'est un point solide.' : sc >= 60 ? 'C\'est en bonne voie.'
     : sc >= 40 ? 'C\'est encore fragile.' : 'C\'est le point le plus difficile en ce moment.';
   const lecture = (tend && LECTURE[id] && LECTURE[id][tend]) ? LECTURE[id][tend] : base;
-  return {axe:a, vide:false, sc, n:m.n, delta, det:m.det, brut:m.brut, verdict, tend, lecture, base};
+  const lignee = (typeof motGroupe === 'function') ? motGroupe(id) : '';
+  return {axe:a, vide:false, sc, n:m.n, delta, det:m.det, brut:m.brut, verdict, tend, lecture, base, lignee, tol};
 }
 function tousLesAxes(){ return AXES.map(a=>etatAxe(a.id)); }
 
@@ -3313,7 +3444,7 @@ function rendreOnb(){
       ${plain([
         {k:'nom', l:'Son prénom', ph:'Nala'},
         {k:'naissance', l:'Date de naissance approximative', t:'date'},
-        {k:'race', l:'Race ou type', ph:'Croisé berger'},
+        {k:'race', l:'Race ou type', t:'select', opts:[''].concat(RACES.map(r=>r[0]))},
         {k:'sexe', l:'Sexe', t:'select', opts:['','Mâle','Femelle']}
       ], o, 'g2')}`;
     peut = true;
@@ -3394,6 +3525,7 @@ function terminerOnb(){
   const o = ONB;
   S.chien = Object.assign(S.chien, {nom:o.nom, naissance:o.naissance, race:o.race,
     sexe:o.sexe, motivations:o.objectif});
+  if (!S.objectifsRegles) S.objectifs = objectifsDefaut();
   /* Les réponses deviennent une note de départ, remplacée dès les premières mesures */
   const axesVises = [...new Set(o.difficultes.map(d=>(DIFFICULTES.find(x=>x[0]===d)||[])[2]).filter(Boolean))];
   S.depart = {axes:axesVises, chiens:o.chiens, rappel:o.rappel, le:todayISO()};
@@ -3413,6 +3545,7 @@ function terminerOnb(){
     <div class="guide-mid">
       <div class="rond bon"><b>${axesVises.length||1}</b><span>axe${axesVises.length>1?'s':''}</span></div>
       <h2 style="margin:18px 0 6px">Programme créé pour ${esc(o.nom)}</h2>
+      ${o.race ? `<p class="tiny muted" style="max-width:34ch;margin:0 0 8px">${esc(groupeChien().t)} · objectif de ${S.objectifs.minutesSem} min par semaine</p>` : ''}
       <p class="small" style="color:var(--ink-2);max-width:36ch">
         ${axesVises.length ? 'Priorité de départ : ' + esc(axesVises.map(a=>axeById(a).lg.toLowerCase()).join(' et ')) + '. Les notes s\u2019ajusteront dès tes premières balades.'
           : 'On commence par les fondations, et le programme s\u2019affinera avec tes premières balades.'}</p>
@@ -3589,6 +3722,8 @@ function detailAxe(id){
       </div>
       <h4>Ce qui est mesuré</h4>
       <p class="small">${esc(e.det[0].toUpperCase()+e.det.slice(1))}.${e.delta!==null?` C'est ${e.delta>0?'+':''}${e.delta} points par rapport aux 14 jours précédents.`:''}</p>
+      ${e.lignee?`<div class="pourquoi"><b>Ajusté selon sa lignée</b>
+        <p class="small" style="margin:4px 0 0">${esc(e.lignee)}</p></div>`:''}
       <h4>Évolution sur 8 semaines</h4>
       ${lineChart([{name:a.t,data:serie,color:'var(--moss)'}], W.map(w=>w.label), {min:0,max:100})}`}
     <h4>Exercices de cet axe</h4>
@@ -4527,9 +4662,25 @@ VIEWS.contacts = () => {
    VUE — FICHE DU CHIEN
    ========================================================================= */
 VIEWS.profil = () => {
+  const g = groupeChien();
   const c = S.chien;
   return head('Fiche du chien', 'Tout ce qui ne change pas souvent : identité, identification, vétérinaire, particularités.',
     `<button class="btn" onclick="formProfil()">Modifier la fiche</button>`) + `
+  ${S.chien.nom ? `<div class="card pad-lg" style="margin-bottom:14px;border-left:4px solid var(--moss)">
+    <div class="spread" style="margin-bottom:6px">
+      <h3 style="font-size:1.05rem">${esc(g.t)}</h3>
+      ${S.chien.groupe?'<span class="pill moss">choisi</span>':'<span class="pill">déduit de la race</span>'}</div>
+    <p class="small" style="margin:0 0 12px;color:var(--ink-2)">${esc(g.note)}</p>
+    <div class="table-wrap"><table><tbody>
+      <tr><td>Objectif hebdomadaire</td><td class="num">${g.min*7/10*10|0} min</td></tr>
+      <tr><td>Part de flair visée</td><td class="num">${g.flair} %</td></tr>
+      <tr><td>Distance de référence par sortie</td><td class="num">${g.km} km</td></tr>
+      <tr><td>Exigence sur le rappel</td><td class="num">${g.rappel>1?'+':''}${Math.round((g.rappel-1)*100)} %</td></tr>
+      <tr><td>Exigence sur la marche en laisse</td><td class="num">${g.laisse>1?'+':''}${Math.round((g.laisse-1)*100)} %</td></tr>
+      <tr><td>Exigence sur le calme</td><td class="num">${g.calme>1?'+':''}${Math.round((g.calme-1)*100)} %</td></tr>
+    </tbody></table></div>
+    <p class="tiny muted" style="margin:10px 0 0">Ces valeurs décalent les notes et les objectifs de départ, jamais de plus d'un quart. Elles décrivent une lignée, pas ton chien : tes propres relevés prennent le dessus dès qu'ils existent, et tu peux fixer tes objectifs à la main.</p>
+  </div>`:''}
   <div class="grid g2">
     <div class="card pad-lg">
       <div class="row" style="align-items:center;gap:14px;margin-bottom:14px">
@@ -5318,7 +5469,11 @@ function formProfil(){
     ], c, 'g2')}`;
   openSheet('Fiche du chien', '', body, d=>{
     d.photo = photoTmp;
-    S.chien = Object.assign(S.chien, d); commit('Fiche mise à jour.');
+    const avant = groupeChien().id;
+    S.chien = Object.assign(S.chien, d);
+    /* Les objectifs suivent la lignée tant que l'utilisateur ne les a pas fixés */
+    if (groupeChien().id !== avant && !S.objectifsRegles) S.objectifs = objectifsDefaut();
+    commit('Fiche mise à jour.');
   });
   const inp = $('#photoIn'), prev = $('#photoPrev'), sup = $('#photoDel');
   $('#photoBtn').onclick = () => inp.click();
@@ -5334,6 +5489,7 @@ function formProfil(){
 }
 
 function formObjectifs(){
+  S.objectifsRegles = true;
   const body = plain([
     {k:'baladesSem', l:'Balades par semaine', t:'number', min:0},
     {k:'minutesSem', l:'Minutes dehors par semaine', t:'number', min:0},

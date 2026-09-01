@@ -600,15 +600,15 @@ html[data-theme="sombre"] .carte-pied .s1{color:#fff}
   font-size:.72rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
   box-shadow:0 4px 14px -6px rgba(30,42,95,.5)}
 html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:#fff}
-.carte.gestes{touch-action:pan-y;cursor:grab}
-.carte.gestes.plein-ecran{height:100%;aspect-ratio:auto!important;touch-action:none}
+.carte.gestes{touch-action:pan-y;cursor:grab;overflow:visible;margin-bottom:72px}
+.carte.gestes.plein-ecran{height:calc(100% - 64px);aspect-ratio:auto!important;touch-action:none}
 .carte.gestes:active{cursor:grabbing}
-.carte.gestes .carte-in{will-change:transform}
-.carte-outils{position:absolute;top:12px;right:12px;left:12px;z-index:4;display:flex;align-items:center;gap:8px;
+.carte.gestes .carte-in{will-change:transform;overflow:hidden;border-radius:inherit;background:inherit}
+.carte-outils{position:absolute;top:calc(100% + 9px);right:0;left:0;z-index:4;display:flex;align-items:center;gap:8px;
   pointer-events:none}
 .carte-zoom{flex:1;min-width:0;background:rgba(255,255,255,.94);border-radius:999px;padding:8px 12px;
   box-shadow:0 4px 14px -6px rgba(30,42,95,.55);pointer-events:auto}
-.carte-zoom input{display:block;width:100%;height:18px;margin:0;accent-color:var(--moss)}
+.carte-zoom input{display:block;width:100%;height:18px;margin:0;accent-color:var(--moss);cursor:pointer}
 .carte-outils button{width:38px;height:38px;border-radius:13px;border:0;cursor:pointer;flex:0 0 auto;
   background:rgba(255,255,255,.94);color:var(--ink);font-size:1.05rem;font-weight:700;
   display:grid;place-items:center;box-shadow:0 4px 14px -6px rgba(30,42,95,.55);pointer-events:auto}
@@ -2679,7 +2679,9 @@ function carteHTML(pts, opt){
   const dx = Math.max(1e-7, merX(b.loMax) - merX(b.loMin));
   const dy = Math.max(1e-7, merY(b.laMin) - merY(b.laMax));
   let z = Math.floor(Math.min(Math.log2((W-2*PAD)/(dx*256)), Math.log2((H-2*PAD)/(dy*256))));
-  z = Math.max(1, Math.min(19, z + (opt.dz||0)));
+  z = Math.max(1, z + (opt.dz||0));
+  const zTile = Math.min(19, z);
+  const over = Math.pow(2, z - zTile);
   const S2 = 256 * Math.pow(2, z);
   let cx, cy;
   if (opt.cx !== undefined && opt.cx !== null){ cx = opt.cx * S2; cy = opt.cy * S2; }
@@ -2695,15 +2697,16 @@ function carteHTML(pts, opt){
   let tuiles = '';
   const fond = opt.fond && S.reglages.carte !== 'off';
   if (fond){
-    const t0x = Math.floor(ox/256), t1x = Math.floor((ox+W)/256);
-    const t0y = Math.floor(oy/256), t1y = Math.floor((oy+H)/256);
-    const max = Math.pow(2, z);
+    const tilePx = 256 * over;
+    const t0x = Math.floor(ox/tilePx), t1x = Math.floor((ox+W)/tilePx);
+    const t0y = Math.floor(oy/tilePx), t1y = Math.floor((oy+H)/tilePx);
+    const max = Math.pow(2, zTile);
     for (let tx=t0x; tx<=t1x; tx++) for (let ty=t0y; ty<=t1y; ty++){
       if (ty < 0 || ty >= max) continue;
       const wx = ((tx % max) + max) % max;
-      tuiles += `<img class="tuile" src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png"
-        style="left:${pc(tx*256-ox, W)};top:${pc(ty*256-oy, H)};width:${pc(256, W)};height:${pc(256, H)}"
-        alt="" loading="lazy" data-src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png"
+      tuiles += `<img class="tuile" src="https://tile.openstreetmap.org/${zTile}/${wx}/${ty}.png"
+        style="left:${pc(tx*tilePx-ox, W)};top:${pc(ty*tilePx-oy, H)};width:${pc(tilePx, W)};height:${pc(tilePx, H)}"
+        alt="" loading="lazy" data-src="https://tile.openstreetmap.org/${zTile}/${wx}/${ty}.png"
         onload="tileChargee(this)" onerror="tileErreur(this)">`;
     }
   }
@@ -2717,10 +2720,10 @@ function carteHTML(pts, opt){
   const anim = !!opt.anim;
   if (opt.sansTrace) return `<div class="carte${fond?'':' sans-fond'}${opt.gestes?' gestes':''}${opt.plein?' plein-ecran':''}" style="aspect-ratio:${opt.ratio}"
       ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy, W, H})}'
-      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'>
+      data-vue='${JSON.stringify({z:zTile, zVirt:z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'>
     <div class="carte-in">${tuiles}<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg></div>
     ${opt.gestes?`<div class="carte-outils">
-      <label class="carte-zoom"><input type="range" min="-4" max="7" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
+      <label class="carte-zoom"><input type="range" min="${ZOOM_MIN}" max="${ZOOM_MAX}" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
       <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
     <div class="carte-pied"><div class="stats"></div>
       ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
@@ -2728,7 +2731,7 @@ function carteHTML(pts, opt){
 
   return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}${opt.gestes?' gestes':''}${opt.plein?' plein-ecran':''}" style="aspect-ratio:${opt.ratio}"
       ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy, W, H})}'
-      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'
+      data-vue='${JSON.stringify({z:zTile, zVirt:z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'
       ${tr?`data-tr='${JSON.stringify({p:tr.p.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),d:tr.d.map(x=>+x.toFixed(1)),total:+tr.total.toFixed(1)})}'`:''}>
     <div class="carte-in">
       ${tuiles}
@@ -2751,7 +2754,7 @@ function carteHTML(pts, opt){
     </div>
     ${opt.direct?'<div class="carte-live-badge"><i></i>en direct</div>':''}
     ${opt.gestes?`<div class="carte-outils">
-      <label class="carte-zoom"><input type="range" min="-4" max="7" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
+      <label class="carte-zoom"><input type="range" min="${ZOOM_MIN}" max="${ZOOM_MAX}" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
       <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
     <div class="carte-pied">
       <div class="stats">
@@ -2808,8 +2811,8 @@ ${pts}
    Pendant le geste on ne touche qu'au transform du conteneur, donc rien n'est
    rechargé ni recalculé ; les tuiles ne sont régénérées qu'au relâchement. */
 const VUES = {};
-const ZOOM_MIN = -4;
-const ZOOM_MAX = 7;
+const ZOOM_MIN = -6;
+const ZOOM_MAX = 12;
 function activerGestes(hote, refaire){
   if (!hote || hote.dataset.gestesOk) return;
   hote.dataset.gestesOk = '1';
@@ -2854,15 +2857,33 @@ function activerGestes(hote, refaire){
 
   const zr = hote.querySelector('[data-zoom-range]');
   if (zr){
-    const zoomer = e => {
-      e.stopPropagation();
+    let zoomCible = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(zr.value)));
+    const centre = () => {
       const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
       const W = proj.W || 800, H = proj.H || 600;
-      refaire({cx:(proj.ox+W/2)/proj.S, cy:(proj.oy+H/2)/proj.S,
-        dz:Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(zr.value)))});
+      return {proj, vue, W, H};
     };
-    zr.addEventListener('input', zoomer);
-    zr.addEventListener('change', zoomer);
+    const preview = e => {
+      if (e) e.stopPropagation();
+      const {vue} = centre();
+      zoomCible = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(zr.value)));
+      const s = Math.pow(2, zoomCible - (vue.dz||0));
+      dx = 0; dy = 0; k = 1;
+      inner.style.transformOrigin = '50% 50%';
+      inner.style.transform = `translate3d(0,0,0) scale(${s})`;
+    };
+    const valider = e => {
+      if (e) e.stopPropagation();
+      const {proj, vue, W, H} = centre();
+      zoomCible = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(zr.value)));
+      inner.style.transform = '';
+      if (zoomCible === (vue.dz||0)) return;
+      refaire({cx:(proj.ox+W/2)/proj.S, cy:(proj.oy+H/2)/proj.S, dz:zoomCible});
+    };
+    zr.addEventListener('input', preview);
+    zr.addEventListener('change', valider);
+    zr.addEventListener('touchend', valider, {passive:true});
+    zr.addEventListener('pointerup', valider);
     zr.addEventListener('touchstart', e=>e.stopPropagation(), {passive:true});
     zr.addEventListener('pointerdown', e=>e.stopPropagation());
   }

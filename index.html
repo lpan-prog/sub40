@@ -604,11 +604,16 @@ html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:
 .carte.gestes.plein-ecran{height:100%;aspect-ratio:auto!important;touch-action:none}
 .carte.gestes:active{cursor:grabbing}
 .carte.gestes .carte-in{will-change:transform}
-.carte-outils{position:absolute;top:12px;right:12px;z-index:4;display:flex;flex-direction:column;gap:7px}
-.carte-outils button{width:38px;height:38px;border-radius:13px;border:0;cursor:pointer;
+.carte-outils{position:absolute;top:12px;right:12px;left:12px;z-index:4;display:flex;align-items:center;gap:8px;
+  pointer-events:none}
+.carte-zoom{flex:1;min-width:0;background:rgba(255,255,255,.94);border-radius:999px;padding:8px 12px;
+  box-shadow:0 4px 14px -6px rgba(30,42,95,.55);pointer-events:auto}
+.carte-zoom input{display:block;width:100%;height:18px;margin:0;accent-color:var(--moss)}
+.carte-outils button{width:38px;height:38px;border-radius:13px;border:0;cursor:pointer;flex:0 0 auto;
   background:rgba(255,255,255,.94);color:var(--ink);font-size:1.05rem;font-weight:700;
-  display:grid;place-items:center;box-shadow:0 4px 14px -6px rgba(30,42,95,.55)}
+  display:grid;place-items:center;box-shadow:0 4px 14px -6px rgba(30,42,95,.55);pointer-events:auto}
 .carte-outils button:active{transform:scale(.92)}
+html[data-theme="sombre"] .carte-zoom,
 html[data-theme="sombre"] .carte-outils button{background:rgba(23,27,46,.94);color:#fff}
 .carte-live-badge i{width:8px;height:8px;border-radius:50%;background:var(--rouge);flex:0 0 auto}
 @media (prefers-reduced-motion:no-preference){
@@ -2715,8 +2720,7 @@ function carteHTML(pts, opt){
       data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'>
     <div class="carte-in">${tuiles}<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg></div>
     ${opt.gestes?`<div class="carte-outils">
-      <button data-zoom="1" aria-label="Zoomer">+</button>
-      <button data-zoom="-1" aria-label="Dézoomer">−</button>
+      <label class="carte-zoom"><input type="range" min="-4" max="7" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
       <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
     <div class="carte-pied"><div class="stats"></div>
       ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
@@ -2747,8 +2751,7 @@ function carteHTML(pts, opt){
     </div>
     ${opt.direct?'<div class="carte-live-badge"><i></i>en direct</div>':''}
     ${opt.gestes?`<div class="carte-outils">
-      <button data-zoom="1" aria-label="Zoomer">+</button>
-      <button data-zoom="-1" aria-label="Dézoomer">−</button>
+      <label class="carte-zoom"><input type="range" min="-4" max="7" step="1" value="${opt.dz||0}" data-zoom-range aria-label="Zoom de la carte"></label>
       <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
     <div class="carte-pied">
       <div class="stats">
@@ -2849,13 +2852,20 @@ function activerGestes(hote, refaire){
   hote.addEventListener('touchend', fin, {passive:true});
   hote.addEventListener('touchcancel', fin, {passive:true});
 
-  hote.querySelectorAll('[data-zoom]').forEach(b => b.onclick = e => {
-    e.stopPropagation();
-    const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
-    const W = proj.W || 800, H = proj.H || 600;
-    refaire({cx:(proj.ox+W/2)/proj.S, cy:(proj.oy+H/2)/proj.S,
-      dz:Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, vue.dz + Number(b.dataset.zoom)))});
-  });
+  const zr = hote.querySelector('[data-zoom-range]');
+  if (zr){
+    const zoomer = e => {
+      e.stopPropagation();
+      const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
+      const W = proj.W || 800, H = proj.H || 600;
+      refaire({cx:(proj.ox+W/2)/proj.S, cy:(proj.oy+H/2)/proj.S,
+        dz:Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(zr.value)))});
+    };
+    zr.addEventListener('input', zoomer);
+    zr.addEventListener('change', zoomer);
+    zr.addEventListener('touchstart', e=>e.stopPropagation(), {passive:true});
+    zr.addEventListener('pointerdown', e=>e.stopPropagation());
+  }
   const rc = hote.querySelector('[data-recentrer]');
   if (rc) rc.onclick = e => { e.stopPropagation(); refaire({cx:null, cy:null, dz:0}); };
 }

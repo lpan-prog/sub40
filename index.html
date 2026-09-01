@@ -497,7 +497,8 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .chrono{font-variant-numeric:tabular-nums;font-size:2.5rem;font-weight:720;letter-spacing:-.04em;line-height:1.05}
 .chrono.pause{opacity:.6}
 .chrono-sub{font-size:.77rem;color:rgba(255,255,255,.78)}
-.terrain-body{flex:1;overflow-y:auto;padding:18px 16px 24px;-webkit-overflow-scrolling:touch}
+.terrain-body{flex:1;overflow-y:auto;padding:18px 16px 34px;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain}
 .terrain-foot{background:var(--surface);border-top:1px solid var(--line);
   padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px}
 .terrain-foot .btn{flex:1}
@@ -533,12 +534,12 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .carte.sans-fond{background:var(--moss-soft)}
 .carte-in{position:absolute;inset:0}
 .carte .tuile{position:absolute;user-select:none;pointer-events:none;
-  filter:grayscale(1) brightness(1.1) contrast(.72)}
-/* Voile bleu très léger : la carte reste claire et sobre, le tracé domine */
+  filter:saturate(1.15) brightness(1.03) contrast(1.02)}
+/* Voile minimal : juste de quoi rattacher la carte à la palette, sans l'éteindre */
 .carte-in::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:var(--moss);opacity:.09;mix-blend-mode:multiply}
+  background:var(--moss);opacity:.05;mix-blend-mode:multiply}
 html[data-theme="sombre"] .carte{background:#161B2E;box-shadow:inset 0 0 0 1px var(--line)}
-html[data-theme="sombre"] .carte .tuile{filter:invert(1) grayscale(1) brightness(.72) contrast(.95)}
+html[data-theme="sombre"] .carte .tuile{filter:invert(1) hue-rotate(180deg) saturate(.85) brightness(.82) contrast(.95)}
 html[data-theme="sombre"] .carte-in::after{opacity:.22;mix-blend-mode:screen;background:#26325E}
 .carte svg{position:absolute;inset:0;width:100%;height:100%;z-index:2}
 .carte .trace-fond{opacity:.9}
@@ -558,6 +559,15 @@ html[data-theme="sombre"] .carte-pied .s1{color:#fff}
   font-size:.72rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
   box-shadow:0 4px 14px -6px rgba(30,42,95,.5)}
 html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:#fff}
+.carte.gestes{touch-action:none;cursor:grab}
+.carte.gestes:active{cursor:grabbing}
+.carte.gestes .carte-in{will-change:transform}
+.carte-outils{position:absolute;top:12px;right:12px;z-index:4;display:flex;flex-direction:column;gap:7px}
+.carte-outils button{width:38px;height:38px;border-radius:13px;border:0;cursor:pointer;
+  background:rgba(255,255,255,.94);color:var(--ink);font-size:1.05rem;font-weight:700;
+  display:grid;place-items:center;box-shadow:0 4px 14px -6px rgba(30,42,95,.55)}
+.carte-outils button:active{transform:scale(.92)}
+html[data-theme="sombre"] .carte-outils button{background:rgba(23,27,46,.94);color:#fff}
 .carte-live-badge i{width:8px;height:8px;border-radius:50%;background:var(--rouge);flex:0 0 auto}
 @media (prefers-reduced-motion:no-preference){
   .carte-live-badge i{animation:battement 1.6s ease-in-out infinite}
@@ -566,16 +576,17 @@ html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:
 .carte .trace-anim{filter:drop-shadow(0 2px 5px rgba(75,98,240,.45))}
 .carte-pied .attr{font-weight:400;color:var(--ink-3);font-size:.66rem;display:none}
 .carte.avec-tuiles .carte-pied .attr{display:inline}
-.carte .chien .corps{fill:var(--moss-deep)}
-.carte .chien .patte,.carte .chien .oreille,.carte .chien .queue{stroke:var(--moss-deep)}
-.carte .chien .oeil{fill:#fff}
-.carte .chien .ombre{fill:rgba(20,26,51,.16)}
-.carte .chien{filter:drop-shadow(0 2px 4px rgba(20,26,51,.28))}
-html[data-theme="sombre"] .carte .chien .corps{fill:#fff}
-html[data-theme="sombre"] .carte .chien .patte,
-html[data-theme="sombre"] .carte .chien .oreille,
-html[data-theme="sombre"] .carte .chien .queue{stroke:#fff}
-html[data-theme="sombre"] .carte .chien .oeil{fill:#2B3A7A}
+.carte .pas{fill:#fff;opacity:.95}
+.carte .pas-semis{filter:drop-shadow(0 1px 2.5px rgba(20,26,51,.5))}
+html[data-theme="sombre"] .carte .pas{fill:#0D1020;opacity:.9}
+@media (prefers-reduced-motion:no-preference){
+  .carte.animable .pas{animation:poser .3s ease-out both}
+}
+@keyframes poser{from{opacity:0;transform:scale(.4)}to{opacity:.95;transform:none}}
+.carte .pos-pt{filter:drop-shadow(0 2px 6px rgba(30,42,95,.55))}
+@media (prefers-reduced-motion:no-preference){
+  .carte .pos-halo{animation:respire 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+}
 
 /* ---------- Balade : quatre grandes cibles ---------- */
 .gros-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -2581,9 +2592,11 @@ function carteHTML(pts, opt){
   const dx = Math.max(1e-7, merX(b.loMax) - merX(b.loMin));
   const dy = Math.max(1e-7, merY(b.laMin) - merY(b.laMax));
   let z = Math.floor(Math.min(Math.log2((W-2*PAD)/(dx*256)), Math.log2((H-2*PAD)/(dy*256))));
-  z = Math.max(1, Math.min(19, z));
+  z = Math.max(1, Math.min(19, z + (opt.dz||0)));
   const S2 = 256 * Math.pow(2, z);
-  const cx = (merX(b.loMin)+merX(b.loMax))/2 * S2, cy = (merY(b.laMin)+merY(b.laMax))/2 * S2;
+  let cx, cy;
+  if (opt.cx !== undefined && opt.cx !== null){ cx = opt.cx * S2; cy = opt.cy * S2; }
+  else { cx = (merX(b.loMin)+merX(b.loMax))/2 * S2; cy = (merY(b.laMin)+merY(b.laMax))/2 * S2; }
   const ox = cx - W/2, oy = cy - H/2;
   const PX = p => [merX(p[1])*S2 - ox, merY(p[0])*S2 - oy];
   const pc = (v, tot) => (v/tot*100).toFixed(4) + '%';
@@ -2612,8 +2625,9 @@ function carteHTML(pts, opt){
   const tr = (typeof preparerTrace === 'function') ? preparerTrace(pts, PX) : null;
   const anim = !!opt.anim;
 
-  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}" style="aspect-ratio:${opt.ratio}"
+  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}${opt.gestes?' gestes':''}" style="aspect-ratio:${opt.ratio}"
       ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
+      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null})}'
       ${tr?`data-tr='${JSON.stringify({p:tr.p.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),d:tr.d.map(x=>+x.toFixed(1)),total:+tr.total.toFixed(1)})}'`:''}>
     <div class="carte-in">
       ${tuiles}
@@ -2629,12 +2643,18 @@ function carteHTML(pts, opt){
               stroke-linecap="round" stroke-linejoin="round"/>
         ${seul ? '' : `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="#fff"/>
         <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="none" stroke="var(--moss)" stroke-width="5"/>`}
+        <g class="pas-semis">${(tr && !seul && typeof empreintes === 'function') ? empreintes(tr) : ''}</g>
         <g class="chien" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
-          <g transform="scale(2.4)">${typeof CHIEN_SVG === 'string' ? CHIEN_SVG : ''}</g>
+          <circle class="pos-halo" r="17" fill="var(--moss)" opacity=".22"/>
+          <circle class="pos-pt" r="9" fill="var(--moss)" stroke="#fff" stroke-width="4.5"/>
         </g>
       </svg>
     </div>
     ${opt.direct?'<div class="carte-live-badge"><i></i>en direct</div>':''}
+    ${opt.gestes?`<div class="carte-outils">
+      <button data-zoom="1" aria-label="Zoomer">+</button>
+      <button data-zoom="-1" aria-label="Dézoomer">−</button>
+      <button data-recentrer aria-label="Recentrer">⌖</button></div>`:''}
     <div class="carte-pied">
       <div class="stats">
         ${seul ? '<span class="s1">Prêt</span><span class="s2">position trouvée</span>'
@@ -2665,7 +2685,61 @@ ${pts}
   toast('Tracé exporté en GPX.');
 }
 </script>
+
 <script>
+/* ---- Gestes sur la carte ----
+   Pendant le geste on ne touche qu'au transform du conteneur, donc rien n'est
+   rechargé ni recalculé ; les tuiles ne sont régénérées qu'au relâchement. */
+const VUES = {};
+function activerGestes(hote, refaire){
+  if (!hote || hote.dataset.gestesOk) return;
+  hote.dataset.gestesOk = '1';
+  const inner = hote.querySelector('.carte-in');
+  let dx = 0, dy = 0, k = 1, x0 = 0, y0 = 0, d0 = 0, actif = false;
+
+  const appliquer = () => { inner.style.transform = `translate3d(${dx}px,${dy}px,0) scale(${k})`; };
+  const dist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+
+  hote.addEventListener('touchstart', e => {
+    if (e.touches.length === 1){ actif = true; x0 = e.touches[0].clientX - dx; y0 = e.touches[0].clientY - dy; }
+    else if (e.touches.length === 2){ actif = true; d0 = dist(e.touches) / k; }
+  }, {passive:true});
+
+  hote.addEventListener('touchmove', e => {
+    if (!actif) return;
+    e.preventDefault();
+    if (e.touches.length === 1){ dx = e.touches[0].clientX - x0; dy = e.touches[0].clientY - y0; }
+    else if (e.touches.length === 2 && d0){ k = Math.max(0.5, Math.min(4, dist(e.touches)/d0)); }
+    appliquer();
+  }, {passive:false});
+
+  const fin = () => {
+    if (!actif) return;
+    actif = false;
+    if (Math.abs(dx) < 4 && Math.abs(dy) < 4 && Math.abs(k-1) < 0.06){ dx=dy=0; k=1; appliquer(); return; }
+    const r = hote.getBoundingClientRect();
+    const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
+    const ech = r.width / 800;                       // repère logique vers pixels réels
+    const S2 = proj.S;
+    /* Le centre visé, exprimé en fraction de la projection courante */
+    const cxPx = proj.ox + (400 - dx/ech/k);
+    const cyPx = proj.oy + (300*(vue.hLog||1) - dy/ech/k);
+    const dz = vue.dz + Math.round(Math.log2(k));
+    dx=dy=0; k=1; appliquer();
+    refaire({cx: cxPx/S2, cy: cyPx/S2, dz});
+  };
+  hote.addEventListener('touchend', fin, {passive:true});
+  hote.addEventListener('touchcancel', fin, {passive:true});
+
+  hote.querySelectorAll('[data-zoom]').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
+    refaire({cx:(proj.ox+400)/proj.S, cy:(proj.oy+300)/proj.S, dz: vue.dz + Number(b.dataset.zoom)});
+  });
+  const rc = hote.querySelector('[data-recentrer]');
+  if (rc) rc.onclick = e => { e.stopPropagation(); refaire({cx:null, cy:null, dz:0}); };
+}
+</script><script>
 /* =========================================================================
    CHIEN ANIMÉ SUR LE TRACÉ
    Le chien est la tête du tracé : il avance le long du parcours, s'oriente
@@ -2678,19 +2752,35 @@ ${pts}
      passe en arrière-plan.
    ========================================================================= */
 
-/* Silhouette de chien de profil, vue de côté, orientée vers la droite */
-const CHIEN_SVG = `<g class="chien-g">
-  <ellipse class="ombre" cx="0" cy="8" rx="11" ry="3"/>
-  <path class="corps" d="M-9 2c-1-4 1-7 4-7h7c3 0 5 2 6 4l3 1c1 .3 1 1.6 0 1.8l-3 .5c-.6 2-2.3 3.2-4.4 3.2H-5c-2.2 0-3.6-1.4-4-3.5Z"/>
-  <path class="patte" d="M-6 4v5M-1.5 4.5v5M3 4.5v5M7 4v5"/>
-  <circle class="oeil" cx="12.4" cy="-.4" r=".9"/>
-  <path class="oreille" d="M8.6-2.4c1.4-1.8 3.2-1.6 3.4.3.1 1.3-.7 2.3-1.9 2.4"/>
-  <path class="queue" d="M-9 1c-2.4-.6-3.6-2.4-3-4.4"/>
+/* Empreinte, reprise du logo : quatre coussinets et une pelote, orientée vers
+   le haut dans son repère pour qu'une rotation la pointe dans le sens du pas. */
+const PATTE_SVG = `<g class="patte-g">
+  <ellipse cx="-3.1" cy="-2.2" rx="1.15" ry="1.55"/>
+  <ellipse cx="-0.9" cy="-3.4" rx="1.15" ry="1.6"/>
+  <ellipse cx="1.5" cy="-2.9" rx="1.1" ry="1.45"/>
+  <ellipse cx="3.4" cy="-1.1" rx="1.05" ry="1.35"/>
+  <path d="M0 0.1c1.95 0 3.35 1.4 3.35 2.95 0 1.3-1 2-2.15 2-.68 0-.88-.28-1.55-.28s-.88.28-1.55.28c-1.15 0-2.15-.7-2.15-2C-4.05 1.5-2.55.1 0 .1Z"/>
 </g>`;
+const CHIEN_SVG = PATTE_SVG;   // compatibilité avec l'ancien nom
 
 const ANIM = {actifs:new Map()};
 
 /* Longueurs cumulées, pour avancer à vitesse constante quel que soit l'espacement */
+/* Semis d'empreintes le long du tracé : une tous les 46 px, décalées
+   alternativement de part et d'autre de l'axe, comme une vraie foulée. */
+function empreintes(tr, opt){
+  opt = Object.assign({pas:58, ecart:9, depuis:0}, opt||{});
+  let out = '', i = 0;
+  for (let d = opt.depuis; d <= tr.total; d += opt.pas, i++){
+    const q = pointA(tr, d);
+    const cote = (i % 2 ? 1 : -1) * opt.ecart;
+    const r = (q.ang + 90) * Math.PI/180;
+    const x = q.x + Math.cos(r)*cote, y = q.y + Math.sin(r)*cote;
+    out += `<g class="pas" style="animation-delay:${(i*0.045).toFixed(2)}s"
+      transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(q.ang+90).toFixed(1)}) scale(1.7)">${PATTE_SVG}</g>`;
+  }
+  return out;
+}
 function preparerTrace(pts, PX){
   const p = pts.map(PX), d = [0];
   for (let i=1;i<p.length;i++) d.push(d[i-1] + Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]));
@@ -2989,6 +3079,7 @@ function route(){
   const y = (p === pagePrec) ? (window.scrollY || window.pageYOffset || 0) : 0;
   $('#view').innerHTML = (typeof liveBar === 'function' ? liveBar() : '') + (VIEWS[p] || VIEWS.accueil)();
   markNav();
+  if (typeof brancherCartes === 'function') brancherCartes();
   try { window.scrollTo(0, y); } catch(e){}
   pagePrec = p;
   const fab = $('#fab');
@@ -3965,7 +4056,8 @@ function baladeCard(b, compact){
       ${num(b.recup)?`<span>Retour au calme <b>${fmin(b.recup)}</b></span>`:''}
     </div>
     ${!compact ? ((b.gps && b.gps.length>1)
-      ? `<div style="margin-top:12px">${carteHTML(b.gps,{ratio:'4 / 3', anim:true, id:'carte-'+b.id,
+      ? `<div style="margin-top:12px">${carteHTML(b.gps,{ratio:'4 / 3', anim:true, id:'carte-'+b.id, gestes:true,
+           dz:(VUE_CARTE[b.id]||{}).dz, cx:(VUE_CARTE[b.id]||{}).cx, cy:(VUE_CARTE[b.id]||{}).cy,
            sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`})}
          <div class="row no-print" style="margin-top:8px">
            <button class="btn sm" onclick="rejouer('${b.id}')">Revoir ma balade</button>
@@ -3983,6 +4075,25 @@ function baladeCard(b, compact){
 /* =========================================================================
    VUE — FICHES EXERCICES
    ========================================================================= */
+/* Cadrage choisi à la main, conservé le temps de la consultation */
+const VUE_CARTE = {};
+function majVueCarte(id, v){
+  VUE_CARTE[id] = (v.cx === null) ? undefined : v;
+  const b = S.balades.find(x=>x.id===id); if (!b) return;
+  const hote = document.getElementById('carte-'+id);
+  if (!hote) return;
+  const html = carteHTML(b.gps, Object.assign({ratio:'4 / 3', anim:true, id:'carte-'+id, gestes:true,
+    sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`}, VUE_CARTE[id]||{}));
+  const tmp = document.createElement('div'); tmp.innerHTML = html;
+  hote.replaceWith(tmp.firstElementChild);
+  brancherCartes();
+}
+function brancherCartes(){
+  document.querySelectorAll('.carte.gestes').forEach(h=>{
+    const id = (h.id||'').replace('carte-','');
+    if (id) activerGestes(h, v => majVueCarte(id, v));
+  });
+}
 const estEpingle = id => (S.epingles||[]).includes(id);
 function epingler(id, ev){
   if (ev) ev.stopPropagation();

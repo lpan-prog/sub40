@@ -276,6 +276,12 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 input[type=checkbox]{width:18px;height:18px;accent-color:var(--moss)}
 input[type=range]{width:100%;accent-color:var(--moss)}
 .inline-check{display:flex;align-items:center;gap:9px;font-size:.86rem;margin-bottom:9px;cursor:pointer}
+.ordre-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--line)}
+.ordre-row:last-child{border-bottom:0}
+.ordre-row .drag{color:var(--ink-3);font-weight:700}
+.ordre-row .mini{width:34px;height:34px;border-radius:11px;border:0;background:var(--surface-3);
+  color:var(--ink);font-weight:700;cursor:pointer}
 
 table{width:100%;border-collapse:collapse;font-size:.85rem}
 th{text-align:left;font-weight:640;color:var(--ink-3);padding:9px 10px;border-bottom:1px solid var(--line);font-size:.76rem}
@@ -369,8 +375,8 @@ html[data-theme="sombre"] .opt.on{color:var(--moss)}
 
 /* ---------- Exercice guidé ---------- */
 .guide{position:fixed;inset:0;z-index:130;background:var(--paper);display:flex;flex-direction:column}
-.guide.plein .grand-carte{flex:1;display:flex;align-items:center;padding:0 12px}
-.guide.plein .carte{margin:0;border-radius:var(--r-l)}
+.guide.plein .grand-carte{flex:1;min-height:0;display:flex;align-items:stretch;padding:0}
+.guide.plein .carte{margin:0;border-radius:0;box-shadow:none}
 .guide-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:calc(12px + env(safe-area-inset-top,0px)) 16px 8px}
 .guide-mid{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -564,7 +570,12 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .carte.sans-fond{background:var(--moss-soft)}
 .carte-in{position:absolute;inset:0}
 .carte .tuile{position:absolute;user-select:none;pointer-events:none;
+  background-color:#e8ece4;
+  background-image:linear-gradient(rgba(83,112,82,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(83,112,82,.12) 1px,transparent 1px);
+  background-size:34px 34px;
   filter:saturate(1.15) brightness(1.03) contrast(1.02)}
+.carte .tuile.chargee{background:none}
+.carte .tuile-ko{opacity:.78;filter:none}
 /* Voile minimal : juste de quoi rattacher la carte à la palette, sans l'éteindre */
 .carte-in::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
   background:var(--moss);opacity:.05;mix-blend-mode:multiply}
@@ -572,7 +583,7 @@ html[data-theme="sombre"] .carte{background:#161B2E;box-shadow:inset 0 0 0 1px v
 html[data-theme="sombre"] .carte .tuile{filter:invert(1) hue-rotate(180deg) saturate(.85) brightness(.82) contrast(.95)}
 html[data-theme="sombre"] .carte-in::after{opacity:.22;mix-blend-mode:screen;background:#26325E}
 .carte svg{position:absolute;inset:0;width:100%;height:100%;z-index:2}
-.carte .trace-fond{opacity:.9}
+.carte .trace-fond,.carte .trace-anim,.carte .trace-live,.carte .trace-live2{opacity:0;pointer-events:none}
 html[data-theme="sombre"] .carte .trace-fond{stroke:#0D1020}
 .carte-pied{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:10px;
   justify-content:space-between;align-items:flex-end;padding:16px 18px;
@@ -589,7 +600,8 @@ html[data-theme="sombre"] .carte-pied .s1{color:#fff}
   font-size:.72rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
   box-shadow:0 4px 14px -6px rgba(30,42,95,.5)}
 html[data-theme="sombre"] .carte-live-badge{background:rgba(23,27,46,.94);color:#fff}
-.carte.gestes{touch-action:none;cursor:grab}
+.carte.gestes{touch-action:pan-y;cursor:grab}
+.carte.gestes.plein-ecran{height:100%;aspect-ratio:auto!important;touch-action:none}
 .carte.gestes:active{cursor:grabbing}
 .carte.gestes .carte-in{will-change:transform}
 .carte-outils{position:absolute;top:12px;right:12px;z-index:4;display:flex;flex-direction:column;gap:7px}
@@ -603,12 +615,12 @@ html[data-theme="sombre"] .carte-outils button{background:rgba(23,27,46,.94);col
   .carte-live-badge i{animation:battement 1.6s ease-in-out infinite}
 }
 @keyframes battement{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
-.carte .trace-anim{filter:drop-shadow(0 2px 5px rgba(75,98,240,.45))}
+.carte .trace-anim{filter:none}
 .carte-pied .attr{font-weight:400;color:var(--ink-3);font-size:.66rem;display:none}
 .carte.avec-tuiles .carte-pied .attr{display:inline}
-.carte .pas{fill:#fff;opacity:.95}
-.carte .pas-semis{filter:drop-shadow(0 1px 2.5px rgba(20,26,51,.5))}
-html[data-theme="sombre"] .carte .pas{fill:#0D1020;opacity:.9}
+.carte .pas{fill:var(--moss);opacity:.92}
+.carte .pas-semis{filter:drop-shadow(0 1px 1.5px rgba(30,42,95,.16))}
+html[data-theme="sombre"] .carte .pas{fill:#8EA7FF;opacity:.92}
 @media (prefers-reduced-motion:no-preference){
   .carte.animable .pas{animation:poser .3s ease-out both}
 }
@@ -664,12 +676,7 @@ html[data-theme="sombre"] .carte .pas{fill:#0D1020;opacity:.9}
 
 /* ---------- Compteurs : correction d'un tap ---------- */
 .tap-wrap{position:relative;display:flex}
-.tap-wrap .tap{flex:1;padding-right:34px}
-.tap-moins{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:10px;border:0;
-  background:var(--surface-3);color:var(--ink-3);font-size:1.05rem;line-height:1;cursor:pointer;
-  display:grid;place-items:center;padding:0;z-index:2}
-.tap-moins:hover{background:var(--rouge-soft);color:var(--rouge)}
-.tap-moins:active{transform:scale(.9)}
+.tap-wrap .tap{flex:1}
 .tap.undo{background:var(--rouge-soft)}
 
 /* ---------- Fiches mises en priorité ---------- */
@@ -2008,6 +2015,9 @@ const blank = () => ({
   balades:[], sessions:[], poids:[], sante:[], repas:[], journal:[], signaux:[],
   contacts:[], taches:[], depenses:[], notes:[], ordres:[], foyer:[], lieux:[],
   terrain: null, epingles: [], depart: null, objectifsRegles: false,
+  suiviBalade:{profil:'essentiel', flair:true, simple:false,
+    principaux:['chiensCroises','rencontresTendues','retours','incidents'],
+    secondaires:null, ordreSecondaires:null},
   reglages:{theme:'clair', unite:'km', carte:'osm'}
 });
 const COLLS = ['balades','sessions','poids','sante','repas','journal','signaux',
@@ -2024,12 +2034,15 @@ async function boot(){
   S.chien = Object.assign(blank().chien, S.chien||{});
   S.objectifs = Object.assign(blank().objectifs, S.objectifs||{});
   S.reglages = Object.assign(blank().reglages, S.reglages||{});
+  S.suiviBalade = normaliserSuiviBalade(S.suiviBalade);
   if (!S.objectifsRegles && typeof objectifsDefaut === 'function') S.objectifs = objectifsDefaut();
   if (S.terrain && typeof S.terrain !== 'object') S.terrain = null;
   if (S.terrain && !S.terrain.c) S.terrain.c = {};
   if (!Array.isArray(S.epingles)) S.epingles = [];
   document.documentElement.dataset.theme = S.reglages.theme || 'clair';
   renderNav(); route();
+  if (S.terrain && typeof battementGlobal === 'function') battementGlobal();
+  if (S.terrain && !S.terrain.pauseAt && !S.terrain.sansGps && typeof gpsDemarrer === 'function') gpsDemarrer();
   if (typeof majPermission === 'function') majPermission();
   /* Hors connexion : sans serveur enregistré, l'icône de l'écran d'accueil
      afficherait une page d'erreur dès que le réseau manque. */
@@ -2097,14 +2110,16 @@ function sliceRange(arr, from, to){ return arr.filter(x=> x.date>=from && x.date
 function scoreBalade(b){
   let s = 50;
   const d = num(b.duree)||1;
-  const flair = Math.min(1, num(b.flair)/d);
-  s += flair*22;                                   // le flair pèse lourd
+  if (flairSuivi() && b.flair !== undefined && b.flair !== ''){
+    const flair = Math.min(1, num(b.flair)/d);
+    s += flair*22;                                 // le flair pèse lourd quand il est suivi
+  }
   s -= (num(b.tirage)/5)*16;                       // tirage 0-5
   s -= (num(b.emoPic)/10)*10;                      // pic émotionnel
   s += (10-num(b.emoFin))/10*10;                   // état de fin
-  if (num(b.rappelsDem) > 0) s += (num(b.rappelsOk)/num(b.rappelsDem))*12;
-  s += Math.min(6, num(b.retours)*1.2);            // retours spontanés
-  s += Math.min(6, num(b.croisCalmes)*1.5);
+  if (suiviAxe('rappel') && num(b.rappelsDem) > 0) s += (num(b.rappelsOk)/num(b.rappelsDem))*12;
+  if (suiviAxe('connexion')) s += Math.min(6, num(b.retours)*1.2);            // retours spontanés
+  if (suiviAxe('croisements')) s += Math.min(6, num(b.croisCalmes)*1.5);
   s -= num(b.incidents)*6;
   s -= (num(b.reactivite)/5)*8;
   /* Une sortie se juge par rapport aux besoins de la lignée : 3 km suffisent à
@@ -2513,7 +2528,7 @@ function gpsPoint(pos){
   const c = pos.coords;
   /* Avant le départ : on se contente de confirmer que le signal est là */
   if (typeof PREP !== 'undefined' && PREP){
-    if (c.accuracy <= 60){
+    if (c.accuracy <= 40){
       PREP.points.push(1); PREP.acc = Math.round(c.accuracy); PREP.err = '';
       PREP.pos = [+c.latitude.toFixed(5), +c.longitude.toFixed(5), 0];
       if (PREP.points.length <= 2) rendrePrep();   // la carte est posée, on ne la reconstruit plus
@@ -2521,7 +2536,13 @@ function gpsPoint(pos){
     return;
   }
   const t = S.terrain; if (!t) { gpsArreter(); return; }
-  if (c.accuracy > 60) return;                         // relevé trop imprécis
+  if (c.accuracy > 40){
+    GPS.acc = Math.round(c.accuracy);
+    GPS.dernierMsg = "Signal GPS faible";
+    const el = document.getElementById('gpsInfo');
+    if (el) el.innerHTML = gpsResume(t.gps);
+    return;
+  }
   const p = [ +c.latitude.toFixed(5), +c.longitude.toFixed(5),
               Math.round((Date.now() - t.t0)/1000) ];
   t.gps = t.gps || [];
@@ -2561,10 +2582,11 @@ function gpsErreur(e){
 }
 /* On signale les ennuis, pas le fonctionnement normal. */
 function gpsResume(pts){
-  if (GPS.dernierMsg && GPS.watch === null)
+  if (GPS.dernierMsg)
     return `<div class="gps-alerte">⚠ ${esc(GPS.dernierMsg)}
       <button class="btn ghost sm" id="tGps">Réessayer</button></div>`;
   if (!pts || !pts.length) return '<div class="gps-ok cherche"><i></i>recherche du signal</div>';
+  if (GPS.acc && GPS.acc > 30) return `<div class="gps-alerte">⚠ Signal GPS faible · ±${GPS.acc} m</div>`;
   return `<div class="gps-ok"><i></i>GPS${GPS.acc?` · ±${GPS.acc} m`:''}</div>`;
 }
 
@@ -2578,6 +2600,23 @@ function bbox(pts){
 const merX = lo => (lo + 180) / 360;
 const merY = la => { const s = Math.sin(la*Math.PI/180);
   return 0.5 - Math.log((1+s)/(1-s)) / (4*Math.PI); };
+function tileChargee(img){
+  img.classList.add('chargee');
+  const c = img.closest('.carte');
+  if (c) c.classList.add('avec-tuiles');
+}
+function tileErreur(img){
+  const n = Number(img.dataset.retry||0);
+  if (n < 2){
+    img.dataset.retry = String(n + 1);
+    const base = img.dataset.src || img.src.split('?')[0];
+    setTimeout(()=>{ img.src = base + '?r=' + (n + 1) + '-' + Date.now(); }, 700 * (n + 1));
+    return;
+  }
+  img.classList.add('tuile-ko');
+  img.onerror = null;
+  img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+}
 
 /* Lissage : moyenne glissante pondérée sur trois points. Assez pour effacer les
    zigzags de mauvais signal, trop faible pour déformer un vrai virage. */
@@ -2613,6 +2652,10 @@ function carteHTML(pts, opt){
   opt = Object.assign({ratio:'4 / 3', fond:true, id:'', anim:false, minWin:0.0006}, opt||{});
   if (!pts || !pts.length) return '';
   const seul = pts.length < 2;
+  if (opt.plein){
+    const libre = Math.max(320, (window.innerHeight||720) - 132);
+    opt.ratio = Math.max(320, window.innerWidth||390) + ' / ' + libre;
+  }
   const [rw, rh] = opt.ratio.split('/').map(x=>parseFloat(x));
   const W = 800, H = Math.round(800 * rh / rw), PAD = Math.round(W * 0.11);
 
@@ -2651,8 +2694,8 @@ function carteHTML(pts, opt){
       const wx = ((tx % max) + max) % max;
       tuiles += `<img class="tuile" src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png"
         style="left:${pc(tx*256-ox, W)};top:${pc(ty*256-oy, H)};width:${pc(256, W)};height:${pc(256, H)}"
-        alt="" loading="lazy" onload="this.closest('.carte').classList.add('avec-tuiles')"
-        onerror="this.style.display='none'">`;
+        alt="" loading="lazy" data-src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png"
+        onload="tileChargee(this)" onerror="tileErreur(this)">`;
     }
   }
 
@@ -2663,9 +2706,9 @@ function carteHTML(pts, opt){
       fill="var(--moss)" opacity=".18"/>` : '';
   const tr = (typeof preparerTrace === 'function') ? preparerTrace(pts, PX) : null;
   const anim = !!opt.anim;
-  if (opt.sansTrace) return `<div class="carte${fond?'':' sans-fond'}${opt.gestes?' gestes':''}" style="aspect-ratio:${opt.ratio}"
-      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
-      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null})}'>
+  if (opt.sansTrace) return `<div class="carte${fond?'':' sans-fond'}${opt.gestes?' gestes':''}${opt.plein?' plein-ecran':''}" style="aspect-ratio:${opt.ratio}"
+      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy, W, H})}'
+      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'>
     <div class="carte-in">${tuiles}<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg></div>
     ${opt.gestes?`<div class="carte-outils">
       <button data-zoom="1" aria-label="Zoomer">+</button>
@@ -2675,9 +2718,9 @@ function carteHTML(pts, opt){
       ${fond?'<span class="attr">© OpenStreetMap</span>':''}</div>
   </div>`;
 
-  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}${opt.gestes?' gestes':''}" style="aspect-ratio:${opt.ratio}"
-      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy})}'
-      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null})}'
+  return `<div class="carte${fond?'':' sans-fond'}${anim?' animable':''}${opt.gestes?' gestes':''}${opt.plein?' plein-ecran':''}" style="aspect-ratio:${opt.ratio}"
+      ${opt.id?`id="${opt.id}"`:''} data-proj='${JSON.stringify({S:S2, ox, oy, W, H})}'
+      data-vue='${JSON.stringify({z, dz:opt.dz||0, cx:opt.cx||null, cy:opt.cy||null, W, H})}'
       ${tr?`data-tr='${JSON.stringify({p:tr.p.map(q=>[+q[0].toFixed(1),+q[1].toFixed(1)]),d:tr.d.map(x=>+x.toFixed(1)),total:+tr.total.toFixed(1)})}'`:''}>
     <div class="carte-in">
       ${tuiles}
@@ -2691,9 +2734,7 @@ function carteHTML(pts, opt){
               stroke-linecap="round" stroke-linejoin="round"/>
         <path class="trace-live2" d="" fill="none" stroke="var(--moss)" stroke-width="12"
               stroke-linecap="round" stroke-linejoin="round"/>
-        ${seul ? '' : `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="#fff"/>
-        <circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="14" fill="none" stroke="var(--moss)" stroke-width="5"/>`}
-        <g class="pas-semis">${(tr && !seul && typeof empreintes === 'function') ? empreintes(tr) : ''}</g>
+        <g class="pas-semis" data-total="${(tr && !seul) ? tr.total.toFixed(1) : 0}" data-count="${(tr && !seul) ? Math.floor(tr.total/58)+1 : 0}">${(tr && !seul && typeof empreintes === 'function') ? empreintes(tr) : ''}</g>
         <g class="chien" transform="translate(${f[0].toFixed(1)} ${f[1].toFixed(1)})">
           <circle class="pos-halo" r="17" fill="var(--moss)" opacity=".22"/>
           <circle class="pos-pt" r="9" fill="var(--moss)" stroke="#fff" stroke-width="4.5"/>
@@ -2746,18 +2787,19 @@ function activerGestes(hote, refaire){
   hote.dataset.gestesOk = '1';
   const inner = hote.querySelector('.carte-in');
   let dx = 0, dy = 0, k = 1, x0 = 0, y0 = 0, d0 = 0, actif = false;
+  const plein = hote.classList.contains('plein-ecran');
 
   const appliquer = () => { inner.style.transform = `translate3d(${dx}px,${dy}px,0) scale(${k})`; };
   const dist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
 
   hote.addEventListener('touchstart', e => {
-    if (e.touches.length === 1){ actif = true; x0 = e.touches[0].clientX - dx; y0 = e.touches[0].clientY - dy; }
+    if (e.touches.length === 1 && plein){ actif = true; x0 = e.touches[0].clientX - dx; y0 = e.touches[0].clientY - dy; }
     else if (e.touches.length === 2){ actif = true; d0 = dist(e.touches) / k; }
   }, {passive:true});
 
   hote.addEventListener('touchmove', e => {
     if (!actif) return;
-    e.preventDefault();
+    if (plein || e.touches.length === 2) e.preventDefault();
     if (e.touches.length === 1){ dx = e.touches[0].clientX - x0; dy = e.touches[0].clientY - y0; }
     else if (e.touches.length === 2 && d0){ k = Math.max(0.5, Math.min(4, dist(e.touches)/d0)); }
     appliquer();
@@ -2769,11 +2811,12 @@ function activerGestes(hote, refaire){
     if (Math.abs(dx) < 4 && Math.abs(dy) < 4 && Math.abs(k-1) < 0.06){ dx=dy=0; k=1; appliquer(); return; }
     const r = hote.getBoundingClientRect();
     const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
-    const ech = r.width / 800;                       // repère logique vers pixels réels
+    const W = proj.W || 800, H = proj.H || Math.round(W * r.height / Math.max(1, r.width));
+    const ech = r.width / W;                       // repère logique vers pixels réels
     const S2 = proj.S;
     /* Le centre visé, exprimé en fraction de la projection courante */
-    const cxPx = proj.ox + (400 - dx/ech/k);
-    const cyPx = proj.oy + (300*(vue.hLog||1) - dy/ech/k);
+    const cxPx = proj.ox + (W/2 - dx/ech/k);
+    const cyPx = proj.oy + (H/2 - dy/ech/k);
     const dz = vue.dz + Math.round(Math.log2(k));
     dx=dy=0; k=1; appliquer();
     refaire({cx: cxPx/S2, cy: cyPx/S2, dz});
@@ -2784,7 +2827,8 @@ function activerGestes(hote, refaire){
   hote.querySelectorAll('[data-zoom]').forEach(b => b.onclick = e => {
     e.stopPropagation();
     const proj = JSON.parse(hote.dataset.proj), vue = JSON.parse(hote.dataset.vue);
-    refaire({cx:(proj.ox+400)/proj.S, cy:(proj.oy+300)/proj.S, dz: vue.dz + Number(b.dataset.zoom)});
+    const W = proj.W || 800, H = proj.H || 600;
+    refaire({cx:(proj.ox+W/2)/proj.S, cy:(proj.oy+H/2)/proj.S, dz: vue.dz + Number(b.dataset.zoom)});
   });
   const rc = hote.querySelector('[data-recentrer]');
   if (rc) rc.onclick = e => { e.stopPropagation(); refaire({cx:null, cy:null, dz:0}); };
@@ -2819,8 +2863,8 @@ const ANIM = {actifs:new Map()};
 /* Semis d'empreintes le long du tracé : une tous les 46 px, décalées
    alternativement de part et d'autre de l'axe, comme une vraie foulée. */
 function empreintes(tr, opt){
-  opt = Object.assign({pas:58, ecart:9, depuis:0}, opt||{});
-  let out = '', i = 0;
+  opt = Object.assign({pas:58, ecart:9, depuis:0, indexStart:0}, opt||{});
+  let out = '', i = opt.indexStart;
   for (let d = opt.depuis; d <= tr.total; d += opt.pas, i++){
     const q = pointA(tr, d);
     const cote = (i % 2 ? 1 : -1) * opt.ecart;
@@ -2940,7 +2984,16 @@ function avancerLive(hote, pts){
     const trF = {p:fige, d:[0], total:0};
     for (let i=1;i<fige.length;i++) trF.d.push(trF.d[i-1] + Math.hypot(fige[i][0]-fige[i-1][0], fige[i][1]-fige[i-1][1]));
     trF.total = trF.d[trF.d.length-1] || 1;
-    semis.innerHTML = empreintes(trF);
+    const pas = 58;
+    const deja = Number(semis.dataset.total||0);
+    const depart = deja ? deja + pas : 0;
+    if (trF.total >= depart){
+      const count = Number(semis.dataset.count||0);
+      const html = empreintes(trF, {pas, depuis:depart, indexStart:count});
+      if (html) semis.insertAdjacentHTML('beforeend', html);
+      semis.dataset.count = String(count + Math.floor((trF.total - depart) / pas) + 1);
+    }
+    semis.dataset.total = String(trF.total);
   }
 
   const a = px[px.length-2], b = px[px.length-1];
@@ -3082,7 +3135,10 @@ function openSheet(title, sub, body, onSave, saveLabel){
       </div>
     </div>
     <div class="sheet-body" id="sheetBody">${body}</div>
-    <div class="sheet-foot no-print"><button class="btn ghost" id="sheetClose2">Fermer</button></div>
+    <div class="sheet-foot no-print">
+      <button class="btn ghost" id="sheetClose2">${onSave?'Annuler':'Fermer'}</button>
+      ${onSave?`<button class="btn" id="sheetSaveBtn2">${esc(saveLabel||'Enregistrer')}</button>`:''}
+    </div>
     </div></div>`;
   document.body.style.overflow = 'hidden';
   document.documentElement.classList.add('sheet-open');
@@ -3091,6 +3147,7 @@ function openSheet(title, sub, body, onSave, saveLabel){
   $('#mask').addEventListener('mousedown', e=>{ if(e.target.id==='mask') closeSheet(); });
   glisserPourFermer($('#mask').firstElementChild);
   const b = $('#sheetSaveBtn'); if (b) b.onclick = ()=>{ const d = readForm($('#sheetBody')); if (sheetSave(d) !== false) closeSheet(); };
+  const b2 = $('#sheetSaveBtn2'); if (b2) b2.onclick = ()=>{ const d = readForm($('#sheetBody')); if (sheetSave(d) !== false) closeSheet(); };
 }
 /* Le panneau se referme aussi en le tirant vers le bas : le haut de l'écran
    est hors de portée du pouce sur un grand téléphone. */
@@ -3341,6 +3398,7 @@ function exosAxe(a){
 
 /* ---- Mesure d'un axe sur une fenêtre de jours ---- */
 function mesureAxe(id, jours, decalage){
+  if (!suiviAxe(id)) return {n:0, nonSuivi:true};
   const fin = addDays(todayISO(), -(decalage||0));
   const debut = addDays(fin, -jours + 1);
   const B = S.balades.filter(b=>b.date >= debut && b.date <= fin);
@@ -3420,6 +3478,8 @@ function mesureAxe(id, jours, decalage){
 function etatAxe(id){
   const a = axeById(id);
   const m = mesureAxe(id, 14, 0), p = mesureAxe(id, 14, 14);
+  if (m.nonSuivi) return {axe:a, vide:true, nonSuivi:true, sc:null, n:0,
+    verdict:'Non suivi', conseil:`${a.t} est volontairement désactivé dans Ma balade.`};
   if (!m.n && S.depart){
     /* Déclaré à l'inscription : sert de point de départ jusqu'aux premières mesures */
     let d = null;
@@ -3458,7 +3518,7 @@ function tousLesAxes(){ return AXES.map(a=>etatAxe(a.id)); }
 
 /* ---- Priorité de la semaine ---- */
 function axePrioritaire(){
-  const E = tousLesAxes().filter(e=>!e.vide);
+  const E = tousLesAxes().filter(e=>!e.vide && !e.nonSuivi);
   if (!E.length) return null;
   // le plus bas d'abord, une régression nette compte comme 12 points de moins
   const note = e => e.sc + (e.tend === 'down' ? -12 : e.tend === 'up' ? 4 : 0);
@@ -4139,10 +4199,10 @@ function baladeCard(b, compact){
     <div class="stat-line">
       <span>Durée <b>${fmin(b.duree)}</b></span>
       ${num(b.distance)?`<span>Distance <b>${num(b.distance).toFixed(1)} km</b></span>`:''}
-      ${num(b.flair)?`<span>Flair <b>${fmin(b.flair)}</b> (${pct(num(b.flair),num(b.duree))} %)</span>`:''}
-      ${num(b.rappelsDem)?`<span>Rappels <b>${num(b.rappelsOk)}/${num(b.rappelsDem)}</b></span>`:''}
-      ${num(b.retours)?`<span>Retours spontanés <b>${num(b.retours)}</b></span>`:''}
-      ${num(b.chiensCroises)?`<span>Chiens croisés <b>${num(b.chiensCroises)}</b> (${num(b.croisCalmes)} calmes)</span>`:''}
+      ${flairSuivi() && num(b.flair)?`<span>Flair <b>${fmin(b.flair)}</b> (${pct(num(b.flair),num(b.duree))} %)</span>`:''}
+      ${suiviAxe('rappel') && num(b.rappelsDem)?`<span>Rappels <b>${num(b.rappelsOk)}/${num(b.rappelsDem)}</b></span>`:''}
+      ${suiviAxe('connexion') && num(b.retours)?`<span>Retours spontanés <b>${num(b.retours)}</b></span>`:''}
+      ${suiviAxe('croisements') && num(b.chiensCroises)?`<span>Chiens croisés <b>${num(b.chiensCroises)}</b> (${num(b.croisCalmes)} calmes)</span>`:''}
       <span>Tirage <b>${num(b.tirage)}/5</b></span>
       ${num(b.recup)?`<span>Retour au calme <b>${fmin(b.recup)}</b></span>`:''}
     </div>
@@ -4177,15 +4237,22 @@ function majVueCarte(id, v){
   const html = carteHTML(b.gps, Object.assign({ratio:'4 / 3', anim:true, id:'carte-'+id, gestes:true,
     sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`}, VUE_CARTE[id]||{}));
   const tmp = document.createElement('div'); tmp.innerHTML = html;
-  hote.replaceWith(tmp.firstElementChild);
+  const neuf = tmp.firstElementChild;
+  hote.className = neuf.className;
+  hote.setAttribute('style', neuf.getAttribute('style') || '');
+  hote.dataset.proj = neuf.dataset.proj;
+  hote.dataset.vue = neuf.dataset.vue;
+  if (neuf.dataset.tr) hote.dataset.tr = neuf.dataset.tr; else delete hote.dataset.tr;
+  hote.innerHTML = neuf.innerHTML;
+  delete hote.dataset.gestesOk;
   brancherCartes();
 }
 /* Plein écran, pour vérifier le parcours au retour de balade */
-const GRAND = {id:null, vue:{}};
+const GRAND = {id:null, vue:{}, scrollY:0};
 function carteGrand(id){
   const b = S.balades.find(x=>x.id===id);
   if (!b || !b.gps || b.gps.length < 2){ toast('Pas de tracé sur cette balade.'); return; }
-  GRAND.id = id; GRAND.vue = {};
+  GRAND.id = id; GRAND.vue = {}; GRAND.scrollY = window.scrollY || window.pageYOffset || 0;
   rendreGrand();
 }
 function rendreGrand(){
@@ -4197,11 +4264,11 @@ function rendreGrand(){
       <span class="small muted">${esc(b.lieu || fdate(b.date))}</span>
       <span style="width:36px"></span>
     </div>
-    <div class="grand-carte">${carteHTML(b.gps, Object.assign({ratio:'3 / 4', anim:false,
+    <div class="grand-carte">${carteHTML(b.gps, Object.assign({ratio:'1 / 1', plein:true, anim:false,
       id:'carte-grand', gestes:true, sous:`${km} km · ${fmin(num(b.duree))} · ${b.gps.length} points`}, GRAND.vue))}</div>
     <div class="guide-foot">
-      <button class="btn ghost" onclick="exportGPX('${b.id}')">Exporter en GPX</button>
       <button class="btn" onclick="rejouerGrand()">Revoir le trajet</button>
+      <button class="btn ghost" onclick="exportGPX('${b.id}')">Export GPX</button>
     </div></div>`;
   document.body.style.overflow = 'hidden';
   const h = document.getElementById('carte-grand');
@@ -4212,7 +4279,9 @@ function rejouerGrand(){
   if (h){ h.classList.add('animable'); rejouerHote(h, GRAND.id); }
 }
 function fermerGrand(){
+  const y = GRAND.scrollY || 0;
   GRAND.id = null; $('#guideHost').innerHTML = ''; document.body.style.overflow = ''; route();
+  requestAnimationFrame(()=>{ try { window.scrollTo(0, y); } catch(e){} });
 }
 function brancherCartes(){
   document.querySelectorAll('.carte.gestes').forEach(h=>{
@@ -5023,6 +5092,7 @@ VIEWS.metriques = () => {
   const poidsPts = [...S.poids].sort((a,b)=>a.date.localeCompare(b.date));
 
   const card = (t, sub, chart) => `<div class="card"><h3>${esc(t)}</h3><p class="small muted" style="margin:2px 0 10px">${esc(sub)}</p>${chart}</div>`;
+  const nonSuivi = t => `<div class="card"><h3>${esc(t)}</h3><p class="small muted" style="margin:2px 0 10px">Non suivi dans Ma balade.</p><span class="pill">Non suivi</span></div>`;
 
   return head('Évolution', 'Chaque indicateur semaine par semaine. Une valeur manquante signifie qu\'il n\'y a eu aucune donnée cette semaine-là.',
     `<div class="seg">${[8,12,26,52].map(x=>`<button class="${n===x?'on':''}" onclick="VIEWS.metriques.n=${x};route()">${x} sem.</button>`).join('')}</div>`) + `
@@ -5031,20 +5101,20 @@ VIEWS.metriques = () => {
     ${card('Temps dehors','Minutes cumulées par semaine, objectif en pointillé.', barChart(mn, L, {target:S.objectifs.minutesSem, color:'var(--sky)', yfmt:v=>v+' min'}))}
     ${card('Régularité','Nombre de balades et de séances par semaine.',
       lineChart([{name:'Balades',data:nbBal,color:'var(--moss)'},{name:'Séances',data:nbSes,color:'var(--violet)'}], L, {min:0,fill:false}))}
-    ${card('Part de flair','Pourcentage du temps de balade passé à renifler. Le guide en fait un besoin fondamental.',
-      lineChart([{name:'Flair',data:flairPct,color:'var(--moss)'}], L, {min:0,max:100,yfmt:v=>v+' %'}))}
-    ${card('Fiabilité du rappel','Rappels réussis sur rappels demandés, en balade.',
-      lineChart([{name:'Rappel',data:rap,color:'var(--ochre)'}], L, {min:0,max:100,yfmt:v=>v+' %'}))}
+    ${flairSuivi() ? card('Part de flair','Pourcentage du temps de balade passé à renifler. Le guide en fait un besoin fondamental.',
+      lineChart([{name:'Flair',data:flairPct,color:'var(--moss)'}], L, {min:0,max:100,yfmt:v=>v+' %'})) : nonSuivi('Part de flair')}
+    ${suiviAxe('rappel') ? card('Fiabilité du rappel','Rappels réussis sur rappels demandés, en balade.',
+      lineChart([{name:'Rappel',data:rap,color:'var(--ochre)'}], L, {min:0,max:100,yfmt:v=>v+' %'})) : nonSuivi('Fiabilité du rappel')}
     ${card('Réussite en séance','Taux de réussite cumulé de tous les exercices travaillés.',
       lineChart([{name:'Séances',data:sesTaux,color:'var(--violet)'}], L, {min:0,max:100,yfmt:v=>v+' %'}))}
     ${card('Échelle émotionnelle','Pic atteint et état de fin de balade. On cherche à faire baisser les deux courbes.',
       lineChart([{name:'Pic',data:emoPic,color:'var(--rouge)'},{name:'Fin',data:emoFin,color:'var(--moss)'}], L, {min:0,max:10,fill:false}))}
     ${card('Tirage et réactivité','Notés de 0 à 5 à chaque balade. Une baisse est un progrès.',
       lineChart([{name:'Tirage',data:tirage,color:'var(--sky)'},{name:'Réactivité',data:react,color:'var(--rouge)'}], L, {min:0,max:5,fill:false}))}
-    ${card('Croisements calmes','Part des chiens croisés sans réaction excessive.',
-      lineChart([{name:'Croisements calmes',data:croisOk,color:'var(--sky)'}], L, {min:0,max:100,yfmt:v=>v+' %'}))}
-    ${card('Connexion','Retours spontanés vers toi, en moyenne par balade. Le meilleur indicateur de lien selon le chapitre 5.',
-      lineChart([{name:'Retours',data:retours,color:'var(--moss)'}], L, {min:0}))}
+    ${suiviAxe('croisements') ? card('Croisements calmes','Part des chiens croisés sans réaction excessive.',
+      lineChart([{name:'Croisements calmes',data:croisOk,color:'var(--sky)'}], L, {min:0,max:100,yfmt:v=>v+' %'})) : nonSuivi('Croisements calmes')}
+    ${suiviAxe('connexion') ? card('Connexion','Retours spontanés vers toi, en moyenne par balade. Le meilleur indicateur de lien selon le chapitre 5.',
+      lineChart([{name:'Retours',data:retours,color:'var(--moss)'}], L, {min:0})) : nonSuivi('Connexion')}
     ${card('Retour au calme','Minutes pour redescendre une fois rentré à la maison.',
       lineChart([{name:'Récupération',data:recup,color:'var(--ochre)'}], L, {min:0,yfmt:v=>v+' min'}))}
     ${card('Score global de balade','Synthèse pondérée : flair, calme, rappel, tirage, incidents.',
@@ -5096,9 +5166,9 @@ function rapport(from, to){
 
   const nom = S.chien.nom || 'Le chien';
   const lignes = [];
-  if (B.length) lignes.push(`${B.length} balade${B.length>1?'s':''} pour ${km.toFixed(1)} km et ${fmin(mn)} dehors, dont ${fmin(fl)} de flair (${pct(fl,mn)} % du temps).`);
-  if (rd) lignes.push(`${ro} rappels réussis sur ${rd} demandés, soit ${pct(ro,rd)} %.`);
-  if (cc) lignes.push(`${cc} chiens croisés, dont ${ck} croisements calmes (${pct(ck,cc)} %).`);
+  if (B.length) lignes.push(`${B.length} balade${B.length>1?'s':''} pour ${km.toFixed(1)} km et ${fmin(mn)} dehors${flairSuivi()?`, dont ${fmin(fl)} de flair (${pct(fl,mn)} % du temps)`:''}.`);
+  if (suiviAxe('rappel') && rd) lignes.push(`${ro} rappels réussis sur ${rd} demandés, soit ${pct(ro,rd)} %.`);
+  if (suiviAxe('croisements') && cc) lignes.push(`${cc} chiens croisés, dont ${ck} croisements calmes (${pct(ck,cc)} %).`);
   if (B.length) lignes.push(`Pic émotionnel moyen à ${emoPic}/10, état de fin de balade à ${emoFin}/10, tirage moyen ${tir}/5.`);
   if (Se.length) lignes.push(`${Se.length} séance${Se.length>1?'s':''} d'entraînement sur ${Object.keys(parExo).length} exercice${Object.keys(parExo).length>1?'s':''}, ${es?pct(rs,es)+' % de réussite':'sans score chiffré'}.`);
   if (inc) lignes.push(`${inc} incident${inc>1?'s':''} noté${inc>1?'s':''} sur la période.`);
@@ -5382,9 +5452,19 @@ VIEWS.profil = () => {
     <p class="small muted" style="margin-bottom:12px">Ils servent de référence sur le tableau de bord.</p>
     <div class="grid g4">
       ${kpi('Balades / semaine', S.objectifs.baladesSem)}${kpi('Minutes dehors', S.objectifs.minutesSem)}
-      ${kpi('Séances / semaine', S.objectifs.sessionsSem)}${kpi('Part de flair', S.objectifs.flairPct, '%')}
+      ${kpi('Séances / semaine', S.objectifs.sessionsSem)}${flairSuivi()?kpi('Part de flair', S.objectifs.flairPct, '%'):kpi('Part de flair','Non suivi')}
     </div>
     <button class="btn ghost sm" style="margin-top:12px" onclick="formObjectifs()">Modifier les objectifs</button>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">Personnalisation · Ma balade</h3>
+    <p class="small muted" style="margin-bottom:12px">Choisis les quatre gros boutons, les événements suivis et le chrono de flair.</p>
+    <div class="row" style="gap:8px">
+      <span class="pill moss">${esc((PROFILS_BALADE[configBalade().profil]||{}).t || 'Essentiel')}</span>
+      <span class="pill">${flairSuivi()?'Flair suivi':'Flair non suivi'}</span>
+      <span class="pill">${configBalade().simple?'Mode simplifié':'Mode complet'}</span>
+    </div>
+    <button class="btn ghost sm" style="margin-top:12px" onclick="formSuiviBalade()">Configurer Ma balade</button>
   </div>`;
 };
 function ligne(l, v){ return `<div class="spread" style="padding:6px 0;border-bottom:1px solid var(--line)">
@@ -5520,7 +5600,60 @@ const TAPS = [
 const TAPS_PRINCIPAUX = ['chiensCroises','rencontresTendues','retours','incidents'];
 const LIB_PRINCIPAUX = {chiensCroises:'Chien croisé', rencontresTendues:'Réaction',
   retours:'Retour vers moi', incidents:'Incident'};
+const PROFILS_BALADE = {
+  essentiel:{t:'Essentiel', principaux:['chiensCroises','rencontresTendues','retours','incidents'],
+    secondaires:['chiensCroises','rencontres','rencontresTendues','humains','enfants','velos','animaux','rappelsDem','rappelsOk','retours','regards','pipi','selles','pauses','incidents']},
+  education:{t:'Éducation', principaux:['rappelsDem','rappelsOk','retours','regards'],
+    secondaires:['rappelsDem','rappelsOk','retours','regards','chiensCroises','rencontresTendues','pauses','incidents']},
+  reactivite:{t:'Réactivité', principaux:['chiensCroises','rencontresTendues','croisCalmes','retours'],
+    secondaires:['chiensCroises','croisCalmes','rencontres','rencontresTendues','humains','enfants','velos','joggeurs','animaux','retours','regards','pauses','incidents']},
+  complet:{t:'Complet', principaux:['chiensCroises','rencontresTendues','retours','rappelsOk'],
+    secondaires:null},
+  perso:{t:'Personnalisé', principaux:['chiensCroises','rencontresTendues','retours','incidents'], secondaires:null}
+};
 let _tTick = null;
+
+function normaliserSuiviBalade(cfg){
+  const base = blank().suiviBalade;
+  const all = (typeof TAPS !== 'undefined') ? TAPS.map(x=>x.k) : base.principaux.slice();
+  const out = Object.assign({}, base, cfg||{});
+  out.profil = out.profil || 'essentiel';
+  out.flair = out.flair !== false;
+  out.simple = !!out.simple;
+  out.principaux = (Array.isArray(out.principaux) ? out.principaux : base.principaux)
+    .filter(k=>all.includes(k)).slice(0,4);
+  while (out.principaux.length < 4){
+    const k = all.find(x=>!out.principaux.includes(x));
+    if (!k) break;
+    out.principaux.push(k);
+  }
+  out.ordreSecondaires = (Array.isArray(out.ordreSecondaires) ? out.ordreSecondaires : all.slice())
+    .filter(k=>all.includes(k));
+  all.forEach(k=>{ if (!out.ordreSecondaires.includes(k)) out.ordreSecondaires.push(k); });
+  out.secondaires = Array.isArray(out.secondaires) ? out.secondaires.filter(k=>all.includes(k)) : null;
+  return out;
+}
+function configBalade(){
+  S.suiviBalade = normaliserSuiviBalade(S.suiviBalade);
+  const cfg = S.suiviBalade;
+  const p = PROFILS_BALADE[cfg.profil] || PROFILS_BALADE.essentiel;
+  const principaux = (cfg.profil === 'perso' ? cfg.principaux : p.principaux).filter(k=>TAPS.some(x=>x.k===k)).slice(0,4);
+  const secondairesBase = (cfg.profil === 'perso' ? cfg.secondaires : p.secondaires);
+  const visibles = secondairesBase ? secondairesBase.slice() : TAPS.map(x=>x.k);
+  principaux.forEach(k=>{ if (!visibles.includes(k)) visibles.push(k); });
+  return Object.assign({}, cfg, {principaux, visibles, ordreSecondaires:cfg.ordreSecondaires});
+}
+function suiviCompteur(k){
+  const c = configBalade();
+  return c.principaux.includes(k) || c.visibles.includes(k);
+}
+function suiviAxe(id){
+  if (id === 'rappel') return suiviCompteur('rappelsDem') || suiviCompteur('rappelsOk');
+  if (id === 'croisements') return suiviCompteur('chiensCroises') || suiviCompteur('rencontresTendues');
+  if (id === 'connexion') return suiviCompteur('retours') || suiviCompteur('regards');
+  return true;
+}
+function flairSuivi(){ return configBalade().flair; }
 
 /* ---- Chronométrage : basé sur des horodatages, juste même en arrière-plan ---- */
 function tElapsed(){
@@ -5616,36 +5749,38 @@ function terrainAnnuler(){
 function openTerrain(){
   if (!S.terrain) return;
   const t = S.terrain;
+  const cfg = configBalade();
+  const principaux = cfg.principaux;
+  const modeSimple = cfg.simple && !t.afficherPlus;
   const lieux = [...new Set(S.balades.map(b=>b.lieu).filter(Boolean))].slice(0,20);
   /* Quatre grandes cibles, atteignables d'une main sans viser */
-  const gros = `<div class="gros-grid">${TAPS_PRINCIPAUX.map(k=>{
+  const gros = `<div class="gros-grid">${principaux.map(k=>{
     const x = TAPS.find(y=>y.k===k) || {k, l:LIB_PRINCIPAUX[k]};
     return `<div class="tap-wrap"><button class="tap gros-tap ${x.c||''}" data-tap="${k}">
       <span class="ct" id="ct-${k}">${num(t.c[k])||0}</span>
-      <span class="lb">${esc(LIB_PRINCIPAUX[k]||x.l)}</span></button>
-      <button class="tap-moins" data-moins="${k}" aria-label="Retirer">−</button></div>`;}).join('')}</div>`;
+      <span class="lb">${esc(LIB_PRINCIPAUX[k]||x.l)}</span></button></div>`;}).join('')}</div>`;
 
   let autres = '', last = '';
-  TAPS.filter(x=>TAPS_PRINCIPAUX.indexOf(x.k)<0).forEach(x=>{
+  const ordre = cfg.ordreSecondaires.filter(k=>cfg.visibles.includes(k) && !principaux.includes(k));
+  ordre.map(k=>TAPS.find(x=>x.k===k)).filter(Boolean).forEach(x=>{
     if (x.g !== last){ autres += (last?'</div>':'') + `<div class="tsec">${esc(x.g)}</div><div class="tgrid">`; last = x.g; }
     autres += `<div class="tap-wrap"><button class="tap ${x.c||''}" data-tap="${x.k}">
-      <span class="ct" id="ct-${x.k}">${num(t.c[x.k])||0}</span><span class="lb">${esc(x.l)}</span></button>
-      <button class="tap-moins" data-moins="${x.k}" aria-label="Retirer un ${esc(x.l)}">−</button></div>`;
+      <span class="ct" id="ct-${x.k}">${num(t.c[x.k])||0}</span><span class="lb">${esc(x.l)}</span></button></div>`;
   });
   autres += '</div>';
-  const nAutres = Object.keys(t.c).filter(k=>TAPS_PRINCIPAUX.indexOf(k)<0 && num(t.c[k])).length;
-  const groupes = gros + `<details class="acc" style="margin-top:18px"${nAutres?' open':''}>
+  const nAutres = Object.keys(t.c).filter(k=>principaux.indexOf(k)<0 && num(t.c[k])).length;
+  const groupes = gros + (modeSimple ? `<button class="btn ghost" id="tMore" style="width:100%;margin-top:16px">Afficher plus</button>` : `<details class="acc" style="margin-top:18px"${nAutres?' open':''}>
     <summary>Autre événement${nAutres?` · ${nAutres} type${nAutres>1?'s':''} noté${nAutres>1?'s':''}`:''}</summary>
-    <div class="in">${autres}</div></details>`;
+    <div class="in">${autres}</div></details>`);
 
   $('#terrainHost').innerHTML = `<div class="terrain" role="dialog" aria-modal="true">
     <div class="terrain-head">
       <div>
         <div class="chrono ${t.pauseAt?'pause':''}" id="chronoV">${hms(tElapsed())}</div>
-        <div class="chrono-sub" id="chronoSub">Départ ${esc(t.heure)} · flair <b id="flairV" class="num">${hms(tFlair())}</b></div>
+        <div class="chrono-sub" id="chronoSub">Départ ${esc(t.heure)}${cfg.flair?' · flair <b id="flairV" class="num">'+hms(tFlair())+'</b>':''}</div>
       </div>
       <div class="row" style="flex-wrap:nowrap">
-        <button class="btn ghost sm" id="tUndo"${(t.hist&&t.hist.length)?'':' disabled'}>Annuler</button>
+        <button class="btn ghost sm" id="tUndo"${(t.hist&&t.hist.length)?'':' disabled'}>↶ Annuler le dernier événement</button>
         <button class="btn ghost sm" id="tPause">${t.pauseAt?'Reprendre':'Pause'}</button>
         <button class="icon-btn" id="tMin" title="Réduire" aria-label="Réduire">▾</button>
       </div>
@@ -5653,16 +5788,16 @@ function openTerrain(){
     <div class="terrain-body">
       ${groupes}
 
-      <button class="tap wide big" id="tFlair" style="margin-top:14px">
+      ${(!modeSimple && cfg.flair) ? `<button class="tap wide big" id="tFlair" style="margin-top:14px">
         <span class="lb" style="font-size:.95rem;font-weight:640">${t.flairAt?'Flair en cours, taper pour arrêter':'Il renifle : démarrer le chrono flair'}</span>
-        <span class="ct" id="flairV2">${hms(tFlair())}</span></button>
+        <span class="ct" id="flairV2">${hms(tFlair())}</span></button>` : ''}
 
-      ${(t.gps && t.gps.length) ? `<div class="tsec">Parcours</div>
+      ${(!modeSimple && t.gps && t.gps.length) ? `<div class="tsec">Parcours</div>
       <div style="margin-bottom:6px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0009,
         direct:true, gestes:true,
         suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
         dz:(t.vue||{}).dz||0, cx:(t.vue||{}).cx, cy:(t.vue||{}).cy})}</div>` : ''}
-      <div id="gpsInfo" style="margin-bottom:16px">${t.sansGps
+      ${!modeSimple ? `<div id="gpsInfo" style="margin-bottom:16px">${t.sansGps
         ? '<span class="tiny muted">Balade sans tracé</span>' : gpsResume(t.gps)}</div>
 
       <details class="acc"${t.lieu?' open':''}>
@@ -5679,7 +5814,7 @@ function openTerrain(){
       <button class="tap wide" id="tSignal"><span class="lb">Noter un signal d'inconfort</span>
         <span class="ct">${ico('signaux')}</span></button>
       ${t.sig.length?`<div class="row" style="margin-top:9px">${t.sig.map((x,i)=>`<span class="pill ochre">${esc(x)}
-        <button class="x-mini" data-unsig="${i}" aria-label="Retirer ce signal">✕</button></span>`).join('')}</div>`:''}
+        <button class="x-mini" data-unsig="${i}" aria-label="Retirer ce signal">✕</button></span>`).join('')}</div>`:''}` : ''}
     </div>
     <div class="terrain-foot">
       <button class="btn ghost" id="tCancel">Abandonner</button>
@@ -5691,8 +5826,9 @@ function openTerrain(){
   $('#tCancel').onclick = terrainAnnuler;
   $('#tStop').onclick = terrainStop;
   $('#tPause').onclick = terrainPause;
-  $('#tFlair').onclick = terrainFlairToggle;
-  $('#tSignal').onclick = terrainSignal;
+  const bf = $('#tFlair'); if (bf) bf.onclick = terrainFlairToggle;
+  const bs = $('#tSignal'); if (bs) bs.onclick = terrainSignal;
+  const bm = $('#tMore'); if (bm) bm.onclick = () => { t.afficherPlus = true; persistSoon(); openTerrain(); };
   $('#tUndo').onclick = terrainUndo;
   const bg = $('#tGps');
   if (bg) bg.onclick = () => {
@@ -5712,8 +5848,6 @@ function openTerrain(){
     bump(b.dataset.tap, b, 1);
     if (b.dataset.tap === 'rencontresTendues') demanderIntensite();
   });
-  $('#terrainHost').querySelectorAll('[data-moins]').forEach(b=> b.onclick = e => {
-    e.stopPropagation(); bump(b.dataset.moins, null, -1); });
   $('#terrainHost').querySelectorAll('[data-unsig]').forEach(b=> b.onclick = () => {
     S.terrain.sig.splice(num(b.dataset.unsig),1); persist(true); openTerrain(); });
 
@@ -5771,6 +5905,7 @@ function terrainPause(){
 }
 function terrainFlairToggle(){
   const t = S.terrain; if(!t || t.pauseAt) return;
+  if (!flairSuivi()) return;
   if (t.flairAt){ t.flairMs += Date.now() - t.flairAt; t.flairAt = null; }
   else t.flairAt = Date.now();
   persist(true); openTerrain();
@@ -5843,7 +5978,7 @@ function demanderIntensite(){
 /* ---- Terminer : trois curseurs, puis c'est enregistré ---- */
 function terrainStop(){
   const t = S.terrain; if(!t) return;
-  if (t.flairAt){ t.flairMs += Date.now() - t.flairAt; t.flairAt = null; }
+  if (flairSuivi() && t.flairAt){ t.flairMs += Date.now() - t.flairAt; t.flairAt = null; }
   gpsArreter();
   t.fin = t.fin || {emoDepart:2, emoPic:5, emoFin:3};
   rendreFin();
@@ -5898,11 +6033,12 @@ function finaliser(detaille){
   const inten = (t.intensites||[]);
   const pre = Object.assign({}, t.c, {
     date: t.date, heure: t.heure, lieu: t.lieu, terrain: t.terrain, equipement: t.equipement,
-    duree: mins, flair: Math.round(tFlair()/60000),
+    duree: mins,
     emoDepart: f.emoDepart, emoPic: f.emoPic, emoFin: f.emoFin,
     reactivite: inten.length ? Math.min(5, Math.round(inten.reduce((a,b)=>a+b,0)/inten.length)) : 1,
     signaux: t.sig.join(' · '), _live: true, _gps: trace
   });
+  if (flairSuivi()) pre.flair = Math.round(tFlair()/60000);
   if (trace.length > 1) pre.distance = +(longueurTrace(trace)/1000).toFixed(2);
   closeTerrain();
   if (detaille){ formBalade(null, pre); return; }
@@ -5933,6 +6069,10 @@ function liveBar(){
 const OPT_METEO = ['','Soleil','Couvert','Pluie','Vent','Neige','Chaud','Froid'];
 const OPT_TERRAIN = ['','Ville','Parc','Forêt','Champs','Chemin','Plage','Montagne','Bord de rivière'];
 const OPT_EQUIP = ['','Laisse courte','Laisse 2 m','Longe 5 m','Longe 10 m','Longe 15 m','Liberté','Alterné'];
+function groupSuivi(title, defs, data, cols){
+  const f = defs.filter(d=>!TAPS.some(t=>t.k===d.k) || suiviCompteur(d.k));
+  return f.length ? group(title, f, data, cols) : '';
+}
 
 function formBalade(id, pre){
   const b = S.balades.find(x=>x.id===id) ||
@@ -5949,8 +6089,8 @@ function formBalade(id, pre){
       {k:'meteo', l:'Météo', t:'select', opts:OPT_METEO}
     ], b)}
 
-    ${group({t:'Contenu de la balade', open:true}, [
-      {k:'flair', l:'Temps de flair libre', hint:'minutes où il a pu renifler à son rythme', t:'number', min:0},
+    ${groupSuivi({t:'Contenu de la balade', open:true}, [
+      ...(flairSuivi() ? [{k:'flair', l:'Temps de flair libre', hint:'minutes où il a pu renifler à son rythme', t:'number', min:0}] : []),
       {k:'pauses', l:'Pauses d\'observation', hint:'nombre', t:'number', min:0},
       {k:'jeu', l:'Temps de jeu intense', hint:'minutes', t:'number', min:0},
       {k:'recup', l:'Retour au calme à la maison', hint:'minutes avant qu\'il se couche', t:'number', min:0}
@@ -5967,7 +6107,7 @@ function formBalade(id, pre){
       {k:'reactivite', l:'Réactivité générale', t:'range', min:0, max:5, lo:'aucune', hi:'très réactif'}
     ], b)}
 
-    ${group('Rencontres et croisements', [
+    ${groupSuivi('Rencontres et croisements', [
       {k:'chiensCroises', l:'Chiens croisés', t:'number', min:0},
       {k:'croisCalmes', l:'Croisements calmes', t:'number', min:0},
       {k:'rencontres', l:'Rencontres avec contact', t:'number', min:0},
@@ -5978,14 +6118,14 @@ function formBalade(id, pre){
       {k:'animaux', l:'Autres animaux (chats, oiseaux, gibier)', t:'number', min:0}
     ], b)}
 
-    ${group('Rappel et connexion', [
+    ${groupSuivi('Rappel et connexion', [
       {k:'rappelsDem', l:'Rappels demandés', t:'number', min:0},
       {k:'rappelsOk', l:'Rappels réussis', t:'number', min:0},
       {k:'retours', l:'Retours spontanés récompensés', t:'number', min:0},
       {k:'regards', l:'Regards offerts', t:'number', min:0}
     ], b)}
 
-    ${group('Besoins et incidents', [
+    ${groupSuivi('Besoins et incidents', [
       {k:'pipi', l:'Urines', t:'number', min:0},
       {k:'selles', l:'Selles', t:'number', min:0},
       {k:'sellesQualite', l:'Aspect des selles', t:'select', opts:['','Normales','Molles','Liquides','Dures','Anormales']},
@@ -6257,6 +6397,61 @@ function formObjectifs(){
   ], S.objectifs, 'g2');
   openSheet('Objectifs hebdomadaires', 'Repères indicatifs, à adapter à l\'âge et à la forme du chien.', body, d=>{
     S.objectifs = Object.assign(S.objectifs, d); commit('Objectifs mis à jour.');
+  });
+}
+
+function optionsTaps(val){
+  return TAPS.map(x=>`<option value="${esc(x.k)}"${x.k===val?' selected':''}>${esc(x.l)}</option>`).join('');
+}
+function moveSuiviRow(btn, dir){
+  const row = btn.closest('.ordre-row'), box = row && row.parentNode;
+  if (!row || !box) return;
+  if (dir < 0 && row.previousElementSibling) box.insertBefore(row, row.previousElementSibling);
+  if (dir > 0 && row.nextElementSibling) box.insertBefore(row.nextElementSibling, row);
+}
+function formSuiviBalade(){
+  const cfg = configBalade();
+  const rows = cfg.ordreSecondaires.map(k=>{
+    const x = TAPS.find(t=>t.k===k); if (!x) return '';
+    return `<div class="ordre-row" data-sec-row="${esc(k)}">
+      <span class="drag">☰</span>
+      <label class="inline-check" style="margin:0"><input type="checkbox" data-sec="${esc(k)}"${cfg.visibles.includes(k)?' checked':''}> ${esc(x.l)}</label>
+      <button class="mini" type="button" onclick="moveSuiviRow(this,-1)" aria-label="Monter">↑</button>
+      <button class="mini" type="button" onclick="moveSuiviRow(this,1)" aria-label="Descendre">↓</button>
+    </div>`;
+  }).join('');
+  const body = `
+    ${plain([
+      {k:'profil', l:'Profil prédéfini', t:'select', opts:Object.entries(PROFILS_BALADE).map(([k,v])=>[k,v.t])},
+      {k:'flair', l:'Chronométrer le flair', t:'check'},
+      {k:'simple', l:'Mode balade simplifié', t:'check'}
+    ], cfg, 'g2')}
+    <details class="acc" open><summary>Quatre gros boutons</summary><div class="in">
+      <div class="grid g2">${[0,1,2,3].map(i=>`<label class="f"><span>Raccourci ${i+1}</span><select data-main="${i}">${optionsTaps(cfg.principaux[i])}</select></label>`).join('')}</div>
+    </div></details>
+    <details class="acc" open><summary>Événements secondaires</summary><div class="in">${rows}</div></details>`;
+  openSheet('Personnalisation · Ma balade', 'Profil → Personnalisation → Ma balade', body, () => {
+    const root = $('#sheetBody');
+    const profil = root.querySelector('[data-k="profil"]').value;
+    let out = {profil, flair:root.querySelector('[data-k="flair"]').checked,
+      simple:root.querySelector('[data-k="simple"]').checked};
+    if (profil === 'perso'){
+      const principaux = [...root.querySelectorAll('[data-main]')].map(s=>s.value);
+      if (new Set(principaux).size < 4){ toast('Choisis quatre raccourcis différents.'); return false; }
+      out.principaux = principaux;
+      out.secondaires = [...root.querySelectorAll('[data-sec]')].filter(c=>c.checked).map(c=>c.dataset.sec);
+    } else {
+      const p = PROFILS_BALADE[profil] || PROFILS_BALADE.essentiel;
+      out.principaux = p.principaux.slice();
+      out.secondaires = p.secondaires ? p.secondaires.slice() : null;
+    }
+    out.ordreSecondaires = [...root.querySelectorAll('[data-sec-row]')].map(r=>r.dataset.secRow);
+    S.suiviBalade = normaliserSuiviBalade(out);
+    if (!S.suiviBalade.flair && S.terrain && S.terrain.flairAt){
+      S.terrain.flairMs += Date.now() - S.terrain.flairAt;
+      S.terrain.flairAt = null;
+    }
+    commit('Personnalisation de balade mise à jour.');
   });
 }
 

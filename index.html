@@ -560,6 +560,44 @@ html[data-theme="sombre"] .carte .chien .oreille,
 html[data-theme="sombre"] .carte .chien .queue{stroke:#fff}
 html[data-theme="sombre"] .carte .chien .oeil{fill:#2B3A7A}
 
+/* ---------- Balade : quatre grandes cibles ---------- */
+.gros-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gros-grid .tap-wrap{min-width:0}
+.gros-tap{min-height:112px;padding:16px 14px;gap:6px}
+.gros-tap .ct{font-size:2.2rem}
+.gros-tap .lb{font-size:.88rem;font-weight:640;color:var(--ink);white-space:normal;overflow-wrap:anywhere}
+.intensite{position:fixed;left:0;right:0;bottom:0;z-index:135;padding:0 16px calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;justify-content:center;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .intensite{animation:monte .18s cubic-bezier(.22,.61,.36,1) both}
+  .intensite.sort{animation:monte .16s reverse both}
+}
+@keyframes monte{from{opacity:0;transform:translate3d(0,26px,0)}to{opacity:1;transform:none}}
+.int-in{background:var(--ink);color:var(--paper);border-radius:var(--r-l);padding:14px 18px;
+  display:flex;align-items:center;gap:16px;pointer-events:auto;box-shadow:var(--shadow)}
+.int-in .lb{font-size:.86rem;font-weight:600;white-space:nowrap}
+.int-row{display:flex;gap:8px}
+.int-row button{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.14);
+  color:var(--paper);font-size:1rem;font-weight:700;cursor:pointer}
+.int-row button:active{transform:scale(.9);background:var(--moss)}
+.fin-ligne{margin-bottom:22px}
+.fin-ligne input[type=range]{margin:4px 0 2px}
+
+/* ---------- Préparation du signal ---------- */
+.prep{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  flex:1;padding:24px 22px;gap:4px}
+.viseur{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;margin-bottom:20px;
+  background:var(--moss-soft);color:var(--moss);position:relative}
+.viseur .ico-svg{width:42px;height:42px}
+@media (prefers-reduced-motion:no-preference){
+  .viseur.cherche::after{content:"";position:absolute;inset:-8px;border-radius:50%;
+    border:2px solid var(--moss);animation:onde 1.5s ease-out infinite}
+}
+@keyframes onde{from{transform:scale(.85);opacity:.7}to{transform:scale(1.25);opacity:0}}
+.viseur.pret{background:var(--vert-soft);color:var(--vert)}
+.prep .etat{font-size:1.15rem;font-weight:700;letter-spacing:-.02em}
+.prep .detail{font-size:.86rem;color:var(--ink-2);max-width:32ch}
+
 /* ---------- Compteurs : correction d'un tap ---------- */
 .tap-wrap{position:relative;display:flex}
 .tap-wrap .tap{flex:1;padding-right:34px}
@@ -2407,8 +2445,13 @@ function gpsArreter(){
   if (GPS.watch !== null){ try { navigator.geolocation.clearWatch(GPS.watch); } catch(e){} GPS.watch = null; }
 }
 function gpsPoint(pos){
-  const t = S.terrain; if (!t) { gpsArreter(); return; }
   const c = pos.coords;
+  /* Avant le départ : on se contente de confirmer que le signal est là */
+  if (typeof PREP !== 'undefined' && PREP){
+    if (c.accuracy <= 60){ PREP.points.push(1); PREP.acc = Math.round(c.accuracy); PREP.err = ''; rendrePrep(); }
+    return;
+  }
+  const t = S.terrain; if (!t) { gpsArreter(); return; }
   if (c.accuracy > 60) return;                         // relevé trop imprécis
   const p = [ +c.latitude.toFixed(5), +c.longitude.toFixed(5),
               Math.round((Date.now() - t.t0)/1000) ];
@@ -2436,6 +2479,11 @@ function gpsPoint(pos){
 }
 function gpsErreur(e){
   GPS.refus = (e && e.code === 1);
+  if (typeof PREP !== 'undefined' && PREP){
+    PREP.err = GPS.refus ? "Position refusée pour ce site. Tu peux quand même noter la balade, sans tracé."
+      : "Signal introuvable pour l'instant.";
+    setTimeout(()=>{ if (PREP) rendrePrep(); }, 0);
+  }
   const c = contexteGeo();
   GPS.dernierMsg = !GPS.refus ? "Signal GPS indisponible pour le moment."
     : c.cadre ? "La position est bloquée dans cet aperçu. Sur ton dépôt GitHub Pages, le tracé fonctionnera."
@@ -4891,12 +4939,64 @@ function hms(ms){
 }
 
 /* ---- Démarrer / reprendre ---- */
+/* Le chrono ne part qu'une fois le signal accroché : sinon les premières
+   minutes de la balade sont perdues pendant que le GPS cherche. */
+let PREP = null;
 function terrainStart(){
   if (S.terrain){ openTerrain(); return; }
+  PREP = {points:[], depuis:Date.now(), err:''};
+  gpsDemarrer();
+  rendrePrep();
+}
+function fermerPrep(){
+  PREP = null; gpsArreter();
+  $('#terrainHost').innerHTML = ''; document.body.style.overflow = '';
+  route();
+}
+function rendrePrep(){
+  if (!PREP) return;
+  const n = PREP.points.length;
+  const pret = n >= 1;
+  const sec = Math.round((Date.now() - PREP.depuis)/1000);
+  const etat = PREP.err ? 'Position indisponible'
+    : pret ? 'Signal accroché' : 'Recherche du signal…';
+  const detail = PREP.err ? PREP.err
+    : pret ? `Précision d'environ ${PREP.acc||'?'} m. Tu peux partir.`
+    : sec > 12 ? 'En intérieur le signal passe mal. Sors, ou démarre quand même : le tracé se rattrapera.'
+    : 'Quelques secondes, le temps que le téléphone se cale.';
+  $('#terrainHost').innerHTML = `<div class="terrain">
+    <div class="terrain-head">
+      <div><div class="chrono" style="font-size:1.6rem">Avant de partir</div>
+        <div class="chrono-sub">le chrono démarrera quand tu voudras</div></div>
+      <button class="icon-btn" id="pFerme" aria-label="Fermer">✕</button>
+    </div>
+    <div class="prep">
+      <div class="viseur ${pret?'pret':'cherche'}">${ico(pret?'sessions':'balades')}</div>
+      <div class="etat">${esc(etat)}</div>
+      <p class="detail">${esc(detail)}</p>
+      ${PREP.err?`<button class="btn ghost sm" style="margin-top:14px" id="pTest">Tester la position</button>`:''}
+    </div>
+    <div class="terrain-foot">
+      <button class="btn ghost" id="pSans">Sans le GPS</button>
+      <button class="btn" id="pGo">${pret?'Démarrer la balade':'Démarrer quand même'}</button>
+    </div></div>`;
+  document.body.style.overflow = 'hidden';
+  $('#pFerme').onclick = fermerPrep;
+  $('#pGo').onclick = () => lancerBalade(true);
+  $('#pSans').onclick = () => lancerBalade(false);
+  const t = $('#pTest'); if (t) t.onclick = testerPosition;
+}
+function lancerBalade(avecGps){
+  const pts = (PREP && PREP.points.length) ? [] : [];
+  PREP = null;
+  if (!avecGps) gpsArreter();
   S.terrain = {id:uid(), t0:Date.now(), pauseAt:null, pauseMs:0, flairAt:null, flairMs:0,
-    date:todayISO(), heure:nowHM(), lieu:'', terrain:'', equipement:'', c:{}, sig:[], gps:[], hist:[]};
-  persist(true); gpsDemarrer(); openTerrain();
-  toast('Chrono lancé. Tape les compteurs au fur et à mesure.');
+    date:todayISO(), heure:nowHM(), lieu:'', terrain:'', equipement:'',
+    c:{}, sig:[], gps:pts, hist:[], sansGps:!avecGps};
+  persist(true);
+  if (avecGps) gpsDemarrer();
+  vibrer(20);
+  openTerrain();
 }
 function terrainAnnuler(){
   const t = S.terrain;

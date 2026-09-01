@@ -521,6 +521,7 @@ code.k{background:var(--surface-3);border-radius:6px;padding:2px 6px;font-family
 .terrain-foot{background:var(--surface);border-top:1px solid var(--line);
   padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px}
 .terrain-foot .btn{flex:1}
+.terrain-foot .btn.danger-mini{flex:0 0 48px;padding:0;border-radius:16px;font-size:1.25rem;color:var(--ink-3)}
 .tsec{font-size:.79rem;color:var(--ink-2);font-weight:640;margin:20px 0 10px}
 .tsec:first-child{margin-top:0}
 .tgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
@@ -4286,13 +4287,8 @@ function baladeCard(b, compact){
    ========================================================================= */
 /* Cadrage choisi à la main, conservé le temps de la consultation */
 const VUE_CARTE = {};
-function majVueCarte(id, v){
-  VUE_CARTE[id] = (v.cx === null) ? undefined : v;
-  const b = S.balades.find(x=>x.id===id); if (!b) return;
-  const hote = document.getElementById('carte-'+id);
+function rafraichirCarte(hote, html){
   if (!hote) return;
-  const html = carteHTML(b.gps, Object.assign({ratio:'4 / 3', anim:true, id:'carte-'+id, gestes:true,
-    sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`}, VUE_CARTE[id]||{}));
   const tmp = document.createElement('div'); tmp.innerHTML = html;
   const neuf = tmp.firstElementChild;
   hote.className = neuf.className;
@@ -4302,6 +4298,14 @@ function majVueCarte(id, v){
   if (neuf.dataset.tr) hote.dataset.tr = neuf.dataset.tr; else delete hote.dataset.tr;
   hote.innerHTML = neuf.innerHTML;
   delete hote.dataset.gestesOk;
+  return hote;
+}
+function majVueCarte(id, v){
+  VUE_CARTE[id] = (v.cx === null) ? undefined : v;
+  const b = S.balades.find(x=>x.id===id); if (!b) return;
+  const hote = document.getElementById('carte-'+id);
+  rafraichirCarte(hote, carteHTML(b.gps, Object.assign({ratio:'4 / 3', anim:true, id:'carte-'+id, gestes:true,
+    sous:`${fmin(num(b.duree))} · ${esc(b.lieu||fdate(b.date))}`}, VUE_CARTE[id]||{})));
   brancherCartes();
 }
 /* Plein écran, pour vérifier le parcours au retour de balade */
@@ -4347,6 +4351,26 @@ function carteTerrainGrand(){
   if (b) t._scrollTop = b.scrollTop;
   rendreTerrainGrand();
 }
+function optionsCarteTerrain(id, plein){
+  const t = S.terrain; if (!t) return null;
+  const pts = t.gps && t.gps.length ? t.gps : [];
+  const km = pts.length > 1 ? (longueurTrace(pts)/1000).toFixed(2) : '0.00';
+  return Object.assign({ratio:'4 / 3', id, minWin:0.0009, direct:true, gestes:true,
+    plein:!!plein, suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
+    sous: plein ? `${km} km · ${hmsCourt(tElapsed())}` : null},
+    t.vue||{});
+}
+function rafraichirCarteTerrain(hote, plein){
+  const t = S.terrain; if (!t || !hote) return;
+  rafraichirCarte(hote, carteHTML(t.gps, optionsCarteTerrain(hote.id, plein)));
+  activerGestes(hote, v => {
+    S.terrain.vue = (v.cx === null) ? null : v;
+    const b = document.querySelector('#terrainHost .terrain-body');
+    if (b) S.terrain._scrollTop = b.scrollTop;
+    persistSoon();
+    rafraichirCarteTerrain(hote, plein);
+  });
+}
 function rendreTerrainGrand(){
   const t = S.terrain; if (!t) return;
   const pts = t.gps && t.gps.length ? t.gps : [];
@@ -4357,9 +4381,7 @@ function rendreTerrainGrand(){
       <span class="small muted">Balade en cours</span>
       <span style="width:36px"></span>
     </div>
-    <div class="grand-carte">${carteHTML(pts, Object.assign({ratio:'1 / 1', plein:true, anim:false,
-      id:'carte-grand-live', direct:true, gestes:true, suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
-      sous:`${km} km · ${hmsCourt(tElapsed())}`}, t.vue||{}))}</div>
+    <div class="grand-carte">${carteHTML(pts, Object.assign(optionsCarteTerrain('carte-grand-live', true), {ratio:'1 / 1', anim:false}))}</div>
     <div class="guide-foot">
       <button class="btn" onclick="rejouerTerrainGrand()">Revoir le trajet</button>
       <button class="btn ghost" onclick="exportGPXLive()">Export GPX</button>
@@ -4369,7 +4391,7 @@ function rendreTerrainGrand(){
   if (h) activerGestes(h, v => {
     S.terrain.vue = (v.cx === null) ? null : v;
     persistSoon();
-    rendreTerrainGrand();
+    rafraichirCarteTerrain(h, true);
   });
 }
 function rejouerTerrainGrand(){
@@ -5692,7 +5714,8 @@ const TAPS = [
   {g:'Croisements',         k:'rencontres',       l:'Rencontre, contact'},
   {g:'Croisements',         k:'rencontresTendues',l:'Rencontre tendue',     c:'rouge'},
   {g:'Croisements',         k:'humains',          l:'Personne de près'},
-  {g:'Croisements',         k:'velos',            l:'Vélo, joggeur'},
+  {g:'Croisements',         k:'velos',            l:'Vélo, trottinette'},
+  {g:'Croisements',         k:'joggeurs',         l:'Joggeur'},
   {g:'Croisements',         k:'enfants',          l:'Enfant'},
   {g:'Croisements',         k:'animaux',          l:'Autre animal'},
   {g:'Besoins et incidents',k:'pauses',           l:'Pause d\'observation'},
@@ -5706,7 +5729,7 @@ const LIB_PRINCIPAUX = {chiensCroises:'Chien croisé', rencontresTendues:'Réact
   retours:'Retour vers moi', incidents:'Incident'};
 const PROFILS_BALADE = {
   essentiel:{t:'Essentiel', principaux:['chiensCroises','rencontresTendues','retours','incidents'],
-    secondaires:['chiensCroises','rencontres','rencontresTendues','humains','enfants','velos','animaux','rappelsDem','rappelsOk','retours','regards','pipi','selles','pauses','incidents']},
+    secondaires:['chiensCroises','rencontres','rencontresTendues','humains','enfants','velos','joggeurs','animaux','rappelsDem','rappelsOk','retours','regards','pipi','selles','pauses','incidents']},
   education:{t:'Éducation', principaux:['rappelsDem','rappelsOk','retours','regards'],
     secondaires:['rappelsDem','rappelsOk','retours','regards','chiensCroises','rencontresTendues','pauses','incidents']},
   reactivite:{t:'Réactivité', principaux:['chiensCroises','rencontresTendues','croisCalmes','retours'],
@@ -5900,10 +5923,7 @@ function openTerrain(){
         <span class="ct" id="flairV2">${hms(tFlair())}</span></button>` : ''}
 
       ${(!modeSimple && t.gps && t.gps.length) ? `<div class="tsec">Parcours</div>
-      <div style="margin-bottom:6px">${carteHTML(t.gps,{ratio:'4 / 3', id:'carte-live', minWin:0.0009,
-        direct:true, gestes:true,
-        suivi:(t.vue && t.vue.cx!==undefined) ? false : true,
-        dz:(t.vue||{}).dz||0, cx:(t.vue||{}).cx, cy:(t.vue||{}).cy})}</div>
+      <div style="margin-bottom:6px">${carteHTML(t.gps, optionsCarteTerrain('carte-live', false))}</div>
       <div class="row no-print" style="margin-bottom:12px">
         <button class="btn ghost sm" id="tMapFull">Agrandir la carte</button>
       </div>` : ''}
@@ -5927,8 +5947,8 @@ function openTerrain(){
         <button class="x-mini" data-unsig="${i}" aria-label="Retirer ce signal">✕</button></span>`).join('')}</div>`:''}` : ''}
     </div>
     <div class="terrain-foot">
-      <button class="btn ghost" id="tCancel">Abandonner</button>
       <button class="btn" id="tStop">Terminer la balade</button>
+      <button class="btn ghost danger-mini" id="tCancel" aria-label="Abandonner la balade">…</button>
     </div></div>`;
 
   document.body.style.overflow = 'hidden';
@@ -5972,7 +5992,7 @@ function openTerrain(){
     S.terrain.vue = (v.cx === null) ? null : v;   // recentrer rend la main au suivi
     const b = document.querySelector('#terrainHost .terrain-body');
     if (b) S.terrain._scrollTop = b.scrollTop;
-    persistSoon(); openTerrain();
+    persistSoon(); rafraichirCarteTerrain(hc, false);
   });
 
   battementGlobal();
@@ -6231,7 +6251,8 @@ function formBalade(id, pre){
       {k:'rencontres', l:'Rencontres avec contact', t:'number', min:0},
       {k:'rencontresTendues', l:'Rencontres tendues', t:'number', min:0},
       {k:'humains', l:'Personnes croisées de près', t:'number', min:0},
-      {k:'velos', l:'Vélos, trottinettes, joggeurs', t:'number', min:0},
+      {k:'velos', l:'Vélos, trottinettes', t:'number', min:0},
+      {k:'joggeurs', l:'Joggeurs', t:'number', min:0},
       {k:'enfants', l:'Enfants croisés', t:'number', min:0},
       {k:'animaux', l:'Autres animaux (chats, oiseaux, gibier)', t:'number', min:0}
     ], b)}
